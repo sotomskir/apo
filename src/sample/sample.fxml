@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.ImageView?>
+<?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:controller="sample.Controller"
-            xmlns:fx="http://javafx.com/fxml"
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller"
             fx:id="rootLayout">
     <top>
         <MenuBar fx:id="menuBar" onKeyPressed="#handleKeyInput">
             <menus>
                 <Menu text="Plik">
                     <items>
-                        <MenuItem text="Otwórz" onAction="#handleOpen"/>
-                        <MenuItem text="Zapisz" onAction="#handleSave"/>
-                        <MenuItem text="Zapisz jako" onAction="#handleSaveAs"/>
+                        <MenuItem text="Otwórz Ctrl+O" onAction="#handleOpen"/>
+                        <MenuItem text="Zapisz Ctrl+S" onAction="#handleSave"/>
+                        <MenuItem text="Zapisz jako Ctrl+Shift+S" onAction="#handleSaveAs"/>
                         <SeparatorMenuItem  />
-                        <MenuItem text="Zamknij" onAction="#handleExit"/>
+                        <MenuItem text="Zamknij Ctrl+Q" onAction="#handleExit"/>
                     </items>
                 </Menu>
                 <Menu text="Narzędzia">
@@ -37,22 +37,16 @@
             </menus>
         </MenuBar>
     </top>
-
-    <left>
-
-    </left>
-
-    <right>
-        <VBox fx:id="toolbox" minHeight="0">
-            <Pane fx:id="histogramPane" onMouseClicked="#switchHistogram"/>
-        </VBox>
-    </right>
-
     <center>
-        <ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER">
-            <ImageView fx:id="imageCanvas"/>
+        <ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+            <ImageView fx:id="imageCanvas" pickOnBounds="true" preserveRatio="true" />
         </ScrollPane>
     </center>
-
+    <right>
+        <VBox BorderPane.alignment="CENTER">
+            <Pane fx:id="histogramPane" onMouseClicked="#switchHistogram"/>
+            <VBox fx:id="toolbox" BorderPane.alignment="CENTER"/>
+        </VBox>
+    </right>
 </BorderPane>
 

@@ -1,40 +1,112 @@
 package sample;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
+import javafx.geometry.Orientation;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.VBox;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
-public class HistogramEq implements Initializable {
-    @FXML
-    ChoiceBox methodChoice;
-    private Pane root;
-
-    public HistogramEq() {
-        try {
-            root = FXMLLoader.load(getClass().getResource("histogramEq.fxml"));
-        } catch (IOException e) {
-            new ExceptionDialog(e, "Error loading histogramEq.fxml");
-            e.printStackTrace();
-        }
+public class HistogramEq extends VBox {
+    private static VBox instance;
+    private ToolController toolController;
+    private ChoiceBox<String> choiceBox;
+    protected HistogramEq(ToolController controller) {
+        this.toolController = controller;
+        Separator separator = new Separator(Orientation.HORIZONTAL);
+        Label label = new Label("Histogram equalisation");
+        this.choiceBox = new ChoiceBox<String>();
+        choiceBox.getItems().addAll("method 1", "method 2", "method 3");
+        Button button = new Button("Apply");
+        button.setOnAction(this::handleApply);
+        getChildren().addAll(separator, label, choiceBox, button);
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
-    }
-
-    public Pane getRoot() {
-        return root;
+    public static VBox getInstance(ToolController controller) {
+        if(instance == null) instance = new HistogramEq(controller);
+        return instance;
     }
 
     public void handleApply(ActionEvent actionEvent) {
+        BufferedImage bufferedImage = toolController.getBufferedImage();
+        String method = choiceBox.getValue();
+        if("method 1".equals(method)){
+            int hR[] = toolController.getHistogram().gethR();
+            int hG[] = toolController.getHistogram().gethG();
+            int hB[] = toolController.getHistogram().gethB();
+            double hRavg = toolController.getHistogram().gethRavg();
+            double hGavg = toolController.getHistogram().gethGavg();
+            double hBavg = toolController.getHistogram().gethBavg();
+            int rR = 0, hRint = 0;
+            int rG = 0, hGint = 0;
+            int rB = 0, hBint = 0;
+            int leftR[] = new int[hR.length];
+            int leftG[] = new int[hR.length];
+            int leftB[] = new int[hR.length];
+            int rightR[] = new int[hR.length];
+            int rightG[] = new int[hR.length];
+            int rightB[] = new int[hR.length];
+            int newR[] = new int[hR.length];
+            int newG[] = new int[hR.length];
+            int newB[] = new int[hR.length];
+            for (int z = 0; z<hR.length; ++z) {
+                leftR[z] = rR;
+                leftG[z] = rG;
+                leftB[z] = rB;
+                hRint+=hR[z];
+                hGint+=hG[z];
+                hBint+=hB[z];
+                while (hRint>hRavg) {
+                    hRint-=hRavg;
+                    ++rR;
+                }
+                while (hGint>hGavg) {
+                    hGint-=hGavg;
+                    ++rG;
+                }
+                while (hBint>hBavg) {
+                    hBint-=hBavg;
+                    ++rB;
+                }
+                rightR[z]=rR;
+                rightG[z]=rG;
+                rightB[z]=rB;
+                newR[z]=(leftR[z]+rightR[z])/2;
+                newG[z]=(leftG[z]+rightG[z])/2;
+                newB[z]=(leftB[z]+rightB[z])/2;
+            }
 
+            int width = bufferedImage.getWidth();
+            int height = bufferedImage.getHeight();
+            for (int x=0;x<width;++x) {
+                for (int y=0;y<height;++y) {
+                    Color rgb = new Color(bufferedImage.getRGB(x, y));
+                    int red = rgb.getRed();
+                    int green = rgb.getGreen();
+                    int blue = rgb.getBlue();
+
+                    if(leftR[red]==rightR[red]) red=leftR[red];
+                    else red=newR[red];
+
+                    if(leftG[green]==rightG[green]) green=leftG[green];
+                    else green=newG[green];
+
+                    if(leftB[blue]==rightB[blue]) blue=leftB[blue];
+                    else blue=newB[blue];
+
+                    bufferedImage.setRGB(x, y, new Color(red, green, blue).getRGB());
+
+                }
+            }
+
+            toolController.getImageCanvas().setImage(SwingFXUtils.toFXImage(bufferedImage, null));
+            toolController.getHistogram().update(bufferedImage);
+            toolController.setBufferedImage(bufferedImage);
+        }
     }
 }

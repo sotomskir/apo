@@ -19,13 +19,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+public class Controller implements Initializable, ToolController {
     @FXML
     private MenuBar menuBar;
     @FXML
     private VBox toolbox;
-    @FXML
-    private Pane histogramEq;
     @FXML
     private Pane histogramPane;
     @FXML
@@ -41,6 +39,14 @@ public class Controller implements Initializable {
         menuBar.setFocusTraversable(true);
     }
 
+    public ImageView getImageCanvas() {
+        return imageCanvas;
+    }
+
+    @Override
+    public void setBufferedImage(BufferedImage image) {
+        this.bufferedImage = image;
+    }
 
     /**
      * Handle action related to "About" menu item.
@@ -112,8 +118,8 @@ public class Controller implements Initializable {
     }
 
     public void handleHistogramEqualisation() {
-//        toolbox.getChildren().clear();
-        toolbox.getChildren().add(new HistogramEq().getRoot());
+        toolbox.getChildren().clear();
+        toolbox.getChildren().add(HistogramEq.getInstance(this));
     }
 
     public void switchHistogram(Event event) {
@@ -121,6 +127,17 @@ public class Controller implements Initializable {
     }
 
     public void handleSampleTool(ActionEvent actionEvent) {
-        toolbox.getChildren().add(new SampleTool());
+        toolbox.getChildren().clear();
+        toolbox.getChildren().add(SampleTool.getInstance(this));
+    }
+
+    @Override
+    public Histogram getHistogram() {
+        return histogram;
+    }
+
+    @Override
+    public BufferedImage getBufferedImage() {
+        return bufferedImage;
     }
 }

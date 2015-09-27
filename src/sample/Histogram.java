@@ -11,17 +11,53 @@ import java.awt.image.BufferedImage;
  * Created by sotomski on 23/09/15.
  */
 public class Histogram {
-    LineChart<Number, Number> areaChart;
-    NumberAxis xAxis;
-    NumberAxis yAxis;
-    XYChart.Series seriesR;
-    XYChart.Series seriesG;
-    XYChart.Series seriesB;
-    XYChart.Series seriesM;
-    int red[];
-    int green[];
-    int blue[];
-    boolean mono;
+    private LineChart<Number, Number> areaChart;
+    private NumberAxis xAxis;
+    private NumberAxis yAxis;
+    private XYChart.Series seriesR;
+    private XYChart.Series seriesG;
+    private XYChart.Series seriesB;
+    private XYChart.Series seriesM;
+    private int hR[];
+    private int hG[];
+    private int hB[];
+    private int hM[];
+    private double hRavg, hGavg, hBavg, Havg;
+    private boolean mono;
+
+    public int[] gethM() {
+        return hM;
+    }
+
+    public double gethBavg() {
+        return hBavg;
+    }
+
+    public double gethGavg() {
+
+        return hGavg;
+    }
+
+    public int[] gethR() {
+        return hR;
+    }
+
+    public int[] gethG() {
+        return hG;
+    }
+
+    public int[] gethB() {
+        return hB;
+    }
+
+    public double gethRavg() {
+
+        return hRavg;
+    }
+
+    public double getHavg() {
+        return Havg;
+    }
 
     public Histogram(BufferedImage image) {
         seriesR = new XYChart.Series();
@@ -29,10 +65,15 @@ public class Histogram {
         seriesB = new XYChart.Series();
         seriesM = new XYChart.Series();
         xAxis = new NumberAxis();
+        xAxis.setAutoRanging(false);
+        xAxis.setLowerBound(0d);
+        xAxis.setTickUnit(25);
         yAxis = new NumberAxis();
 
         areaChart = new LineChart<Number, Number>(xAxis, yAxis);
         update(image);
+        areaChart.getData().addAll(seriesM);
+        seriesM.getNode().getStyleClass().add("series-mono");
         applyStyle();
     }
 
@@ -41,62 +82,72 @@ public class Histogram {
     }
 
     public void update(BufferedImage image) {
-//        seriesR.getData().clear();
-//        seriesG.getData().clear();
-//        seriesB.getData().clear();
+        seriesR.getData().clear();
+        seriesG.getData().clear();
+        seriesB.getData().clear();
+        seriesM.getData().clear();
         int height = image.getHeight();
         int width = image.getWidth();
         int bitDepth = image.getColorModel().getPixelSize()/3;
         int levels = (int)Math.pow(2, bitDepth);
-        xAxis.setUpperBound(levels);
-        red = new int[levels];
-        green = new int[levels];
-        blue =  new int[levels];
+        xAxis.setUpperBound(levels-1);
+
+        hR = new int[levels];
+        hG = new int[levels];
+        hB =  new int[levels];
+        hM =  new int[levels];
+        double Hsum = 0, hRsum = 0, hGsum = 0, hBsum = 0;
         for (int x=0;x<width;++x)
             for (int y=0;y<height;++y) {
                 Color rgb = new Color(image.getRGB(x, y));
-                ++red[rgb.getRed()];
-                ++blue[rgb.getBlue()];
-                ++green[rgb.getGreen()];
+                ++hR[rgb.getRed()];
+                ++hB[rgb.getBlue()];
+                ++hG[rgb.getGreen()];
             }
-        for (int x=0;x<levels;++x) {
-            seriesR.getData().add(new XYChart.Data<Number, Number>(x, red[x]));
-            seriesG.getData().add(new XYChart.Data<Number, Number>(x, green[x]));
-            seriesB.getData().add(new XYChart.Data<Number, Number>(x, blue[x]));
-            seriesM.getData().add(new XYChart.Data<Number, Number>(x, red[x]+green[x]+blue[x]));
+        for (int i=0;i<levels;++i) {
+            seriesR.getData().add(new XYChart.Data<Number, Number>(i, hR[i]));
+            seriesG.getData().add(new XYChart.Data<Number, Number>(i, hG[i]));
+            seriesB.getData().add(new XYChart.Data<Number, Number>(i, hB[i]));
+            seriesM.getData().add(new XYChart.Data<Number, Number>(i, hR[i]+ hG[i]+ hB[i]));
+            hM[i]= hR[i]+ hG[i]+ hB[i];
+            Hsum += hM[i];
+            hRsum += hR[i];
+            hGsum += hG[i];
+            hBsum += hB[i];
         }
-        areaChart.getData().addAll(seriesM, seriesR, seriesG, seriesB);
+
+        hRavg=hRsum/levels;
+        hGavg=hGsum/levels;
+        hBavg=hBsum/levels;
+        Havg=Hsum/levels;
 
     }
 
     private void applyStyle() {
         areaChart.setHorizontalGridLinesVisible(false);
-//        areaChart.setVerticalGridLinesVisible(false);
         areaChart.setVerticalZeroLineVisible(false);
+        areaChart.setAnimated(false);
         areaChart.setLegendVisible(false);
         areaChart.setCreateSymbols(false);
         yAxis.setMinorTickVisible(false);
         yAxis.setTickMarkVisible(false);
         yAxis.setTickLabelsVisible(false);
-        seriesR.getNode().getStyleClass().addAll("series-red", "hidden");
-        seriesG.getNode().getStyleClass().addAll("series-green", "hidden");
-        seriesB.getNode().getStyleClass().addAll("series-blue", "hidden");
-        seriesM.getNode().getStyleClass().add("series-mono");
+        areaChart.setMaxHeight(200.0);
         mono = true;
     }
 
     public void switchType() {
         if (mono) {
-            seriesR.getNode().getStyleClass().remove("hidden");
-            seriesG.getNode().getStyleClass().remove("hidden");
-            seriesB.getNode().getStyleClass().remove("hidden");
-            seriesM.getNode().getStyleClass().add("hidden");
+            areaChart.getData().remove(seriesM);
+            areaChart.getData().addAll(seriesR, seriesG, seriesB);
+            seriesR.getNode().getStyleClass().addAll("series-red");
+            seriesG.getNode().getStyleClass().addAll("series-green");
+            seriesB.getNode().getStyleClass().addAll("series-blue");
             mono = false;
         } else {
-            seriesR.getNode().getStyleClass().add("hidden");
-            seriesG.getNode().getStyleClass().add("hidden");
-            seriesB.getNode().getStyleClass().add("hidden");
-            seriesM.getNode().getStyleClass().remove("hidden");
+            areaChart.getData().removeAll(seriesR, seriesG, seriesB);
+            areaChart.getData().add(seriesM);
+            seriesM.getNode().getStyleClass().add("series-mono");
             mono = true;
         }
     }

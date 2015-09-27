@@ -1,18 +1,22 @@
 .series-red {
     -fx-stroke-width: 1px;
     -fx-stroke: red;
+    /*-fx-fill: #ffa3af;*/
 }
 .series-green {
     -fx-stroke-width: 1px;
     -fx-stroke: green;
+    /*-fx-fill: #648065;*/
 }
 .series-blue {
     -fx-stroke-width: 1px;
     -fx-stroke: blue;
+    /*-fx-fill: #4471ff;*/
 }
 .series-mono {
     -fx-stroke-width: 1px;
     -fx-stroke: black;
+    /*-fx-fill: gray;*/
 }
 .hidden {
     visibility: hidden;
