@@ -1,0 +1,22 @@
+.series-red {
+    -fx-stroke-width: 1px;
+    -fx-stroke: red;
+}
+.series-green {
+    -fx-stroke-width: 1px;
+    -fx-stroke: green;
+}
+.series-blue {
+    -fx-stroke-width: 1px;
+    -fx-stroke: blue;
+}
+.series-mono {
+    -fx-stroke-width: 1px;
+    -fx-stroke: black;
+}
+.hidden {
+    visibility: hidden;
+}
+/*.default-color0.chart-series-line { -fx-stroke: #e90000; }*/
+/*.default-color1.chart-series-line { -fx-stroke: #1be900; }*/
+/*.default-color2.chart-series-line { -fx-stroke: #0029e9; }*/

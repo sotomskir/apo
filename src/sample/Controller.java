@@ -1,9 +1,10 @@
 package sample;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.MenuBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,9 +12,8 @@ import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.stage.FileChooser;
-import javafx.stage.Window;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -22,6 +22,25 @@ import java.util.ResourceBundle;
 public class Controller implements Initializable {
     @FXML
     private MenuBar menuBar;
+    @FXML
+    private VBox toolbox;
+    @FXML
+    private Pane histogramEq;
+    @FXML
+    private Pane histogramPane;
+    @FXML
+    private BorderPane rootLayout;
+    @FXML
+    private ImageView imageCanvas;
+    private BufferedImage bufferedImage;
+    private File openedFile;
+    Histogram histogram;
+
+    @Override
+    public void initialize(java.net.URL arg0, ResourceBundle arg1) {
+        menuBar.setFocusTraversable(true);
+    }
+
 
     /**
      * Handle action related to "About" menu item.
@@ -46,9 +65,14 @@ public class Controller implements Initializable {
         if (event instanceof KeyEvent)
         {
             final KeyEvent keyEvent = (KeyEvent) event;
-            if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.A)
-            {
+            if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.A) {
                 provideAboutFunctionality();
+            } else if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.O) {
+                handleOpen(null);
+            } else if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.S) {
+                handleSave(null);
+            } else if (keyEvent.isControlDown() && keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.S) {
+                handleSaveAs(null);
             }
         }
     }
@@ -58,33 +82,45 @@ public class Controller implements Initializable {
      */
     private void provideAboutFunctionality()
     {
-        System.out.println("You clicked on About!");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("APOZ");
+        alert.setHeaderText("O programie");
+        alert.setContentText("Autor: Robert Sotomski");
+        alert.showAndWait();
     }
 
-    @Override
-    public void initialize(java.net.URL arg0, ResourceBundle arg1) {
-        menuBar.setFocusTraversable(true);
-
-    }
 
     public void handleExit(ActionEvent actionEvent) {
         System.exit(0);
     }
 
     public void handleOpen(ActionEvent actionEvent) {
-        final FileChooser fileChooser = new FileChooser();
-        Window window = menuBar.getScene().getWindow();
-        File file = fileChooser.showOpenDialog(window);
-        Image image = new Image(file.toURI().toString());
-        ImageView imageView = new ImageView();
-        imageView.setImage(image);
-        HBox pictureRegion = new HBox();
-        pictureRegion.getChildren().add(imageView);
-        BorderPane root = (BorderPane) window.getScene().getRoot();
-        root.setCenter(imageView);
-        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
-        Histogram histogram = new Histogram(bufferedImage);
-        root.setLeft(histogram);
+        openedFile = FileMenuUtils.openDialog(rootLayout);
+        bufferedImage = FileMenuUtils.loadImage(openedFile);
+        Image fximage = new Image(openedFile.toURI().toString());
+        imageCanvas.setImage(fximage);
+        histogram = new Histogram(bufferedImage);
+        histogramPane.getChildren().add(histogram.getAreaChart());
     }
 
+    public void handleSaveAs(ActionEvent actionEvent) {
+        openedFile = FileMenuUtils.saveAsDialog(rootLayout, bufferedImage);
+    }
+
+    public void handleSave(ActionEvent actionEvent) {
+        FileMenuUtils.saveDialog(bufferedImage, openedFile);
+    }
+
+    public void handleHistogramEqualisation() {
+//        toolbox.getChildren().clear();
+        toolbox.getChildren().add(new HistogramEq().getRoot());
+    }
+
+    public void switchHistogram(Event event) {
+        histogram.switchType();
+    }
+
+    public void handleSampleTool(ActionEvent actionEvent) {
+        toolbox.getChildren().add(new SampleTool());
+    }
 }
