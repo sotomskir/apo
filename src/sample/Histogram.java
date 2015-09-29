@@ -1,8 +1,6 @@
 package sample;
 
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,8 +9,8 @@ import java.awt.image.BufferedImage;
  * Created by sotomski on 23/09/15.
  */
 public class Histogram {
-    private LineChart<Number, Number> areaChart;
-    private NumberAxis xAxis;
+    private BarChart<String, Number> areaChart;
+    private CategoryAxis xAxis;
     private NumberAxis yAxis;
     private XYChart.Series seriesR;
     private XYChart.Series seriesG;
@@ -64,20 +62,20 @@ public class Histogram {
         seriesG = new XYChart.Series();
         seriesB = new XYChart.Series();
         seriesM = new XYChart.Series();
-        xAxis = new NumberAxis();
-        xAxis.setAutoRanging(false);
-        xAxis.setLowerBound(0d);
-        xAxis.setTickUnit(25);
+        xAxis = new CategoryAxis();
+//        xAxis.setAutoRanging(false);
+//        xAxis.setLowerBound(0d);
+//        xAxis.setTickUnit(25);
         yAxis = new NumberAxis();
 
-        areaChart = new LineChart<Number, Number>(xAxis, yAxis);
+        areaChart = new BarChart<String, Number>(xAxis, yAxis);
         update(image);
         areaChart.getData().addAll(seriesM);
-        seriesM.getNode().getStyleClass().add("series-mono");
+//        seriesM.getNode().getStyleClass().add("series-mono");
         applyStyle();
     }
 
-    public LineChart getAreaChart() {
+    public BarChart getAreaChart() {
         return areaChart;
     }
 
@@ -90,7 +88,7 @@ public class Histogram {
         int width = image.getWidth();
         int bitDepth = image.getColorModel().getPixelSize()/3;
         int levels = (int)Math.pow(2, bitDepth);
-        xAxis.setUpperBound(levels-1);
+//        xAxis.setUpperBound(levels-1);
 
         hR = new int[levels];
         hG = new int[levels];
@@ -105,10 +103,10 @@ public class Histogram {
                 ++hG[rgb.getGreen()];
             }
         for (int i=0;i<levels;++i) {
-            seriesR.getData().add(new XYChart.Data<Number, Number>(i, hR[i]));
-            seriesG.getData().add(new XYChart.Data<Number, Number>(i, hG[i]));
-            seriesB.getData().add(new XYChart.Data<Number, Number>(i, hB[i]));
-            seriesM.getData().add(new XYChart.Data<Number, Number>(i, hR[i]+ hG[i]+ hB[i]));
+            seriesR.getData().add(new XYChart.Data<String, Number>(Integer.toString(i), hR[i]));
+            seriesG.getData().add(new XYChart.Data<String, Number>(Integer.toString(i), hG[i]));
+            seriesB.getData().add(new XYChart.Data<String, Number>(Integer.toString(i), hB[i]));
+            seriesM.getData().add(new XYChart.Data<String, Number>(Integer.toString(i), hR[i]+ hG[i]+ hB[i]));
             hM[i]= hR[i]+ hG[i]+ hB[i];
             Hsum += hM[i];
             hRsum += hR[i];
@@ -125,13 +123,18 @@ public class Histogram {
 
     private void applyStyle() {
         areaChart.setHorizontalGridLinesVisible(false);
+        areaChart.setVerticalGridLinesVisible(false);
         areaChart.setVerticalZeroLineVisible(false);
+        areaChart.setCategoryGap(0d);
+        areaChart.setBarGap(0d);
         areaChart.setAnimated(false);
         areaChart.setLegendVisible(false);
-        areaChart.setCreateSymbols(false);
+//        areaChart.setCreateSymbols(false);
         yAxis.setMinorTickVisible(false);
         yAxis.setTickMarkVisible(false);
+        xAxis.setTickMarkVisible(false);
         yAxis.setTickLabelsVisible(false);
+        xAxis.setTickLabelsVisible(false);
         areaChart.setMaxHeight(200.0);
         mono = true;
     }
@@ -140,14 +143,14 @@ public class Histogram {
         if (mono) {
             areaChart.getData().remove(seriesM);
             areaChart.getData().addAll(seriesR, seriesG, seriesB);
-            seriesR.getNode().getStyleClass().addAll("series-red");
-            seriesG.getNode().getStyleClass().addAll("series-green");
-            seriesB.getNode().getStyleClass().addAll("series-blue");
+//            seriesR.getNode().getStyleClass().addAll("series-red");
+//            seriesG.getNode().getStyleClass().addAll("series-green");
+//            seriesB.getNode().getStyleClass().addAll("series-blue");
             mono = false;
         } else {
             areaChart.getData().removeAll(seriesR, seriesG, seriesB);
             areaChart.getData().add(seriesM);
-            seriesM.getNode().getStyleClass().add("series-mono");
+//            seriesM.getNode().getStyleClass().add("series-mono");
             mono = true;
         }
     }
