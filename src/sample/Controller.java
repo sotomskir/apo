@@ -47,7 +47,7 @@ public class Controller implements Initializable, ToolController {
     @FXML
     TextField zoomField;
     @FXML
-    Label fileName;
+    Label fileNameLabel;
     @FXML
     private ImageView imageCanvas;
     private ImageObservable image;
@@ -129,12 +129,14 @@ public class Controller implements Initializable, ToolController {
 
     public void handleOpen(ActionEvent actionEvent) {
         openedFile = FileMenuUtils.openDialog(rootLayout);
-        fileName.setText(openedFile.getName());
+        fileNameLabel.setText(openedFile.getName());
         image.setBufferedImage(FileMenuUtils.loadImage(openedFile));
     }
 
     public void handleSaveAs(ActionEvent actionEvent) {
         openedFile = FileMenuUtils.saveAsDialog(rootLayout, image.getBufferedImage());
+        fileNameLabel.setText(openedFile.getName());
+
     }
 
     public void handleSave(ActionEvent actionEvent) {
@@ -147,7 +149,7 @@ public class Controller implements Initializable, ToolController {
     }
 
     public void switchHistogram(Event event) {
-        if(image.getChannels()==3) histogram.switchType();
+        histogram.switchType();
     }
 
     @Override
@@ -184,12 +186,12 @@ public class Controller implements Initializable, ToolController {
 
     public void handleConvertToGrayscale(ActionEvent actionEvent) {
         image.setBufferedImage(ImageUtils.rgbToGrayscale(image.getBufferedImage()));
+        histogram.switchType();
     }
 
     public void handleRevert(ActionEvent actionEvent) {
         image.setBufferedImage(FileMenuUtils.loadImage(openedFile));
         imageCanvas.setImage(SwingFXUtils.toFXImage(image.getBufferedImage(), null));
-        histogramPane.getChildren().add(histogram.getAreaChart());
     }
 
     public void handleZoomIn(Event event) {

@@ -22,7 +22,7 @@ public class Histogram {
     private int hM[];
     private double hRavg, hGavg, hBavg, Havg;
     private boolean mono;
-
+    private int channels;
     public int[] gethM() {
         return hM;
     }
@@ -85,7 +85,8 @@ public class Histogram {
         seriesM.getData().clear();
         int height = image.getHeight();
         int width = image.getWidth();
-        int bitDepth = image.getColorModel().getPixelSize()/image.getColorModel().getNumComponents();
+        channels = image.getColorModel().getNumComponents();
+        int bitDepth = image.getColorModel().getPixelSize()/channels;
         int levels = (int)Math.pow(2, bitDepth);
 //        xAxis.setUpperBound(levels-1);
 
@@ -139,7 +140,7 @@ public class Histogram {
     }
 
     public void switchType() {
-        if (mono) {
+        if (mono && channels>1) {
             areaChart.getData().remove(seriesM);
             areaChart.getData().addAll(seriesR, seriesG, seriesB);
 //            seriesR.getNode().getStyleClass().addAll("series-red");

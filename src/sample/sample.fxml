@@ -70,7 +70,7 @@
             <TextField fx:id="zoomField" text="100%" prefWidth="55"/>
             <Button text="-" onMouseClicked="#handleZoomOut"/>
             <Button text="+" onMouseClicked="#handleZoomIn"/>
-            <Label fx:id="fileName"/>
+            <Label fx:id="fileNameLabel"/>
         </ToolBar>
     </bottom>
 </BorderPane>

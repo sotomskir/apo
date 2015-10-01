@@ -26,6 +26,6 @@
 .hidden {
     visibility: hidden;
 }
-.default-color0.chart-series-line { -fx-stroke: #e90000; }
-.default-color1.chart-series-line { -fx-stroke: #1be900; }
-.default-color2.chart-series-line { -fx-stroke: #0029e9; }
+.default-color0.chart-bar { -fx-bar-fill: #e90000; }
+.default-color1.chart-bar { -fx-bar-fill: #1be900; }
+.default-color2.chart-bar { -fx-bar-fill: #0029e9; }

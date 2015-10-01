@@ -22,6 +22,7 @@ public class ImageUtils {
     }
 
     private static int convertPixel(int rgb) {
+        //TODO Add LUT
         /*
         rPerc+gPerc+bPerc == 1
          */
