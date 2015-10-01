@@ -22,6 +22,7 @@
                 </Menu>
                 <Menu text="Narzędzia">
                     <items>
+                        <MenuItem text="konwersja do odcieni szarości" onAction="#handleConvertToGrayscale"/>
                         <MenuItem text="wyrównywanie histogramu" onAction="#handleHistogramEqualisation"/>
                         <MenuItem text="Sample tool" onAction="#handleSampleTool"/>
                     </items>

@@ -48,15 +48,15 @@ public class Controller implements Initializable, ToolController {
     Label labelDepth;
     @FXML
     private ImageView imageCanvas;
-    private BufferedImage bufferedImage;
+    private ImageObservable image;
     private File openedFile;
     private Histogram histogram;
-    private int depth;
-    private int channels;
 
     @Override
     public void initialize(java.net.URL arg0, ResourceBundle arg1) {
         menuBar.setFocusTraversable(true);
+        image = new ImageObservable(labelDepth, labelHeight, labelWidth);
+
     }
 
     public ImageView getImageCanvas() {
@@ -65,7 +65,7 @@ public class Controller implements Initializable, ToolController {
 
     @Override
     public void setBufferedImage(BufferedImage image) {
-        this.bufferedImage = image;
+        this.image.setBufferedImage(image);
     }
 
     /**
@@ -122,23 +122,18 @@ public class Controller implements Initializable, ToolController {
 
     public void handleOpen(ActionEvent actionEvent) {
         openedFile = FileMenuUtils.openDialog(rootLayout);
-        bufferedImage = FileMenuUtils.loadImage(openedFile);
-        imageCanvas.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-        histogram = new Histogram(bufferedImage);
-        channels = +bufferedImage.getColorModel().getColorSpace().getNumComponents();
-        depth = bufferedImage.getColorModel().getPixelSize();
-        labelDepth.setText("Depth: " + depth + "bit, "+channels+" channel");
-        labelWidth.setText("Width: " +bufferedImage.getWidth());
-        labelHeight.setText("Heigth: " +bufferedImage.getHeight());
+        image.setBufferedImage(FileMenuUtils.loadImage(openedFile));
+        imageCanvas.setImage(SwingFXUtils.toFXImage(image.getBufferedImage(), null));
+        histogram = new Histogram(image.getBufferedImage());
         histogramPane.getChildren().add(histogram.getAreaChart());
     }
 
     public void handleSaveAs(ActionEvent actionEvent) {
-        openedFile = FileMenuUtils.saveAsDialog(rootLayout, bufferedImage);
+        openedFile = FileMenuUtils.saveAsDialog(rootLayout, image.getBufferedImage());
     }
 
     public void handleSave(ActionEvent actionEvent) {
-        FileMenuUtils.saveDialog(bufferedImage, openedFile);
+        FileMenuUtils.saveDialog(image.getBufferedImage(), openedFile);
     }
 
     public void handleHistogramEqualisation() {
@@ -147,7 +142,7 @@ public class Controller implements Initializable, ToolController {
     }
 
     public void switchHistogram(Event event) {
-        if(channels==3) histogram.switchType();
+        if(image.getChannels()==3) histogram.switchType();
     }
 
     public void handleSampleTool(ActionEvent actionEvent) {
@@ -162,7 +157,7 @@ public class Controller implements Initializable, ToolController {
 
     @Override
     public BufferedImage getBufferedImage() {
-        return bufferedImage;
+        return image.getBufferedImage();
     }
 
     public void handleMouseMoved(MouseEvent event) {
@@ -171,12 +166,12 @@ public class Controller implements Initializable, ToolController {
         int y = (int)event.getY();
         labelX.setText("X: "+x);
         labelY.setText("Y: "+y);
-        int rgb = bufferedImage.getRGB(x, y);
+        int rgb = image.getBufferedImage().getRGB(x, y);
         int r, g, b;
         r = (rgb >> 16 ) & 0xFF;
         g = (rgb >> 8 ) & 0xFF;
         b = rgb & 0xFF;
-        if(channels==3) {
+        if(image.getChannels()==3) {
             labelR.setText("R: "+r);
             labelG.setText("G: "+g);
             labelB.setText("B: "+b);
@@ -185,5 +180,9 @@ public class Controller implements Initializable, ToolController {
             labelG.setText("");
             labelB.setText("");
         }
+    }
+
+    public void handleConvertToGrayscale(ActionEvent actionEvent) {
+        image.setBufferedImage(ImageUtils.rgbToGrayscale(image.getBufferedImage()));
     }
 }
