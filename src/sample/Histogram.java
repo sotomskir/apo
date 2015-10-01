@@ -57,7 +57,7 @@ public class Histogram {
         return Havg;
     }
 
-    public Histogram(BufferedImage image) {
+    public Histogram() {
         seriesR = new XYChart.Series();
         seriesG = new XYChart.Series();
         seriesB = new XYChart.Series();
@@ -69,7 +69,6 @@ public class Histogram {
         yAxis = new NumberAxis();
 
         areaChart = new BarChart<String, Number>(xAxis, yAxis);
-        update(image);
         areaChart.getData().addAll(seriesM);
 //        seriesM.getNode().getStyleClass().add("series-mono");
         applyStyle();

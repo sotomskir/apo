@@ -14,6 +14,7 @@
                 <Menu text="Plik">
                     <items>
                         <MenuItem text="Otwórz Ctrl+O" onAction="#handleOpen"/>
+                        <MenuItem text="Przywróć Ctrl+R" onAction="#handleRevert"/>
                         <MenuItem text="Zapisz Ctrl+S" onAction="#handleSave"/>
                         <MenuItem text="Zapisz jako Ctrl+Shift+S" onAction="#handleSaveAs"/>
                         <SeparatorMenuItem  />
@@ -24,7 +25,6 @@
                     <items>
                         <MenuItem text="konwersja do odcieni szarości" onAction="#handleConvertToGrayscale"/>
                         <MenuItem text="wyrównywanie histogramu" onAction="#handleHistogramEqualisation"/>
-                        <MenuItem text="Sample tool" onAction="#handleSampleTool"/>
                     </items>
                 </Menu>
                 <Menu text="Pomoc">
@@ -39,32 +39,39 @@
         </MenuBar>
     </top>
     <center>
-        <ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
-            <ImageView fx:id="imageCanvas" pickOnBounds="true" preserveRatio="true" onMouseMoved="#handleMouseMoved"/>
-        </ScrollPane>
+                <ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+                    <ImageView fx:id="imageCanvas" pickOnBounds="true" preserveRatio="true" onMouseMoved="#handleMouseMoved"/>
+                </ScrollPane>
     </center>
     <right>
         <VBox BorderPane.alignment="CENTER" styleClass="center">
             <Pane fx:id="histogramPane" onMouseClicked="#switchHistogram"/>
             <HBox>
                 <VBox>
-
-                <Label fx:id="labelDepth" text="depth: -"/>
-                <Label fx:id="labelR" text="R: -"/>
-                <Label fx:id="labelG" text="G: -"/>
-                <Label fx:id="labelB" text="B: -"/>
+                    <Label fx:id="labelDepth" text="depth: -"/>
+                    <Label fx:id="labelR" text="R: -"/>
+                    <Label fx:id="labelG" text="G: -"/>
+                    <Label fx:id="labelB" text="B: -"/>
                 </VBox>
                 <Separator orientation="VERTICAL"/>
                 <VBox>
 
-                <Label fx:id="labelWidth" text="width: -"/>
-                <Label fx:id="labelHeight" text="width: -"/>
-                <Label fx:id="labelX" text="x: -"/>
-                <Label fx:id="labelY" text="y: -"/>
+                    <Label fx:id="labelWidth" text="width: -"/>
+                    <Label fx:id="labelHeight" text="width: -"/>
+                    <Label fx:id="labelX" text="x: -"/>
+                    <Label fx:id="labelY" text="y: -"/>
                 </VBox>
             </HBox>
             <VBox fx:id="toolbox" BorderPane.alignment="CENTER"/>
         </VBox>
     </right>
+    <bottom>
+        <ToolBar>
+            <TextField fx:id="zoomField" text="100%" prefWidth="55"/>
+            <Button text="-" onMouseClicked="#handleZoomOut"/>
+            <Button text="+" onMouseClicked="#handleZoomIn"/>
+            <Label fx:id="fileName"/>
+        </ToolBar>
+    </bottom>
 </BorderPane>
 

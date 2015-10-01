@@ -5,9 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
@@ -47,16 +45,23 @@ public class Controller implements Initializable, ToolController {
     @FXML
     Label labelDepth;
     @FXML
+    TextField zoomField;
+    @FXML
+    Label fileName;
+    @FXML
     private ImageView imageCanvas;
     private ImageObservable image;
     private File openedFile;
     private Histogram histogram;
+    private double zoomProperty;
 
     @Override
     public void initialize(java.net.URL arg0, ResourceBundle arg1) {
         menuBar.setFocusTraversable(true);
-        image = new ImageObservable(labelDepth, labelHeight, labelWidth);
-
+        histogram = new Histogram();
+        histogramPane.getChildren().add(histogram.getAreaChart());
+        image = new ImageObservable(labelDepth, labelHeight, labelWidth, imageCanvas, histogram);
+        zoomProperty = 1;
     }
 
     public ImageView getImageCanvas() {
@@ -97,6 +102,8 @@ public class Controller implements Initializable, ToolController {
                 handleOpen(null);
             } else if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.S) {
                 handleSave(null);
+            } else if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.R) {
+                handleRevert(null);
             } else if (keyEvent.isControlDown() && keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.S) {
                 handleSaveAs(null);
             }
@@ -122,10 +129,8 @@ public class Controller implements Initializable, ToolController {
 
     public void handleOpen(ActionEvent actionEvent) {
         openedFile = FileMenuUtils.openDialog(rootLayout);
+        fileName.setText(openedFile.getName());
         image.setBufferedImage(FileMenuUtils.loadImage(openedFile));
-        imageCanvas.setImage(SwingFXUtils.toFXImage(image.getBufferedImage(), null));
-        histogram = new Histogram(image.getBufferedImage());
-        histogramPane.getChildren().add(histogram.getAreaChart());
     }
 
     public void handleSaveAs(ActionEvent actionEvent) {
@@ -145,11 +150,6 @@ public class Controller implements Initializable, ToolController {
         if(image.getChannels()==3) histogram.switchType();
     }
 
-    public void handleSampleTool(ActionEvent actionEvent) {
-        toolbox.getChildren().clear();
-        toolbox.getChildren().add(SampleTool.getInstance(this));
-    }
-
     @Override
     public Histogram getHistogram() {
         return histogram;
@@ -160,23 +160,23 @@ public class Controller implements Initializable, ToolController {
         return image.getBufferedImage();
     }
 
-    public void handleMouseMoved(MouseEvent event) {
+    public void handleMouseMoved(MouseEvent event) throws Exception {
 
         int x = (int)event.getX();
         int y = (int)event.getY();
-        labelX.setText("X: "+x);
-        labelY.setText("Y: "+y);
+        labelX.setText("X: " + x);
+        labelY.setText("Y: " + y);
         int rgb = image.getBufferedImage().getRGB(x, y);
         int r, g, b;
         r = (rgb >> 16 ) & 0xFF;
         g = (rgb >> 8 ) & 0xFF;
         b = rgb & 0xFF;
-        if(image.getChannels()==3) {
-            labelR.setText("R: "+r);
-            labelG.setText("G: "+g);
-            labelB.setText("B: "+b);
+        if(image.getChannels() == 3) {
+            labelR.setText("R: " + r);
+            labelG.setText("G: " + g);
+            labelB.setText("B: " + b);
         } else {
-            labelR.setText("K: "+b);
+            labelR.setText("K: " + b);
             labelG.setText("");
             labelB.setText("");
         }
@@ -184,5 +184,26 @@ public class Controller implements Initializable, ToolController {
 
     public void handleConvertToGrayscale(ActionEvent actionEvent) {
         image.setBufferedImage(ImageUtils.rgbToGrayscale(image.getBufferedImage()));
+    }
+
+    public void handleRevert(ActionEvent actionEvent) {
+        image.setBufferedImage(FileMenuUtils.loadImage(openedFile));
+        imageCanvas.setImage(SwingFXUtils.toFXImage(image.getBufferedImage(), null));
+        histogramPane.getChildren().add(histogram.getAreaChart());
+    }
+
+    public void handleZoomIn(Event event) {
+        zoomProperty*=1.25;
+        zoomProperty=zoomProperty>1?1:zoomProperty;
+        imageCanvas.setFitWidth(zoomProperty*image.getBufferedImage().getWidth());
+        imageCanvas.setFitHeight(zoomProperty+image.getBufferedImage().getHeight());
+        zoomField.setText(zoomProperty*100+"%");
+    }
+
+    public void handleZoomOut(Event event) {
+        zoomProperty/=1.25;
+        imageCanvas.setFitWidth(zoomProperty*image.getBufferedImage().getWidth());
+        imageCanvas.setFitHeight(zoomProperty+image.getBufferedImage().getHeight());
+        zoomField.setText(zoomProperty*100+"%");
     }
 }
