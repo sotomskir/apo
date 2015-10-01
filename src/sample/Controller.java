@@ -1,16 +1,18 @@
 package sample;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -29,10 +31,28 @@ public class Controller implements Initializable, ToolController {
     @FXML
     private BorderPane rootLayout;
     @FXML
+    Label labelR;
+    @FXML
+    Label labelG;
+    @FXML
+    Label labelB;
+    @FXML
+    Label labelX;
+    @FXML
+    Label labelY;
+    @FXML
+    Label labelWidth;
+    @FXML
+    Label labelHeight;
+    @FXML
+    Label labelDepth;
+    @FXML
     private ImageView imageCanvas;
     private BufferedImage bufferedImage;
     private File openedFile;
-    Histogram histogram;
+    private Histogram histogram;
+    private int depth;
+    private int channels;
 
     @Override
     public void initialize(java.net.URL arg0, ResourceBundle arg1) {
@@ -103,9 +123,13 @@ public class Controller implements Initializable, ToolController {
     public void handleOpen(ActionEvent actionEvent) {
         openedFile = FileMenuUtils.openDialog(rootLayout);
         bufferedImage = FileMenuUtils.loadImage(openedFile);
-        Image fximage = new Image(openedFile.toURI().toString());
-        imageCanvas.setImage(fximage);
+        imageCanvas.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
         histogram = new Histogram(bufferedImage);
+        channels = +bufferedImage.getColorModel().getColorSpace().getNumComponents();
+        depth = bufferedImage.getColorModel().getPixelSize();
+        labelDepth.setText("Depth: " + depth + "bit, "+channels+" channel");
+        labelWidth.setText("Width: " +bufferedImage.getWidth());
+        labelHeight.setText("Heigth: " +bufferedImage.getHeight());
         histogramPane.getChildren().add(histogram.getAreaChart());
     }
 
@@ -123,7 +147,7 @@ public class Controller implements Initializable, ToolController {
     }
 
     public void switchHistogram(Event event) {
-        histogram.switchType();
+        if(channels==3) histogram.switchType();
     }
 
     public void handleSampleTool(ActionEvent actionEvent) {
@@ -139,5 +163,27 @@ public class Controller implements Initializable, ToolController {
     @Override
     public BufferedImage getBufferedImage() {
         return bufferedImage;
+    }
+
+    public void handleMouseMoved(MouseEvent event) {
+
+        int x = (int)event.getX();
+        int y = (int)event.getY();
+        labelX.setText("X: "+x);
+        labelY.setText("Y: "+y);
+        int rgb = bufferedImage.getRGB(x, y);
+        int r, g, b;
+        r = (rgb >> 16 ) & 0xFF;
+        g = (rgb >> 8 ) & 0xFF;
+        b = rgb & 0xFF;
+        if(channels==3) {
+            labelR.setText("R: "+r);
+            labelG.setText("G: "+g);
+            labelB.setText("B: "+b);
+        } else {
+            labelR.setText("K: "+b);
+            labelG.setText("");
+            labelB.setText("");
+        }
     }
 }

@@ -1,7 +1,5 @@
 package sample;
 
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
@@ -47,8 +45,13 @@ public class FileMenuUtils {
     }
 
     public static BufferedImage loadImage(File file) {
-        Image fximage = new Image(file.toURI().toString());
-        return SwingFXUtils.fromFXImage(fximage, null);
+        try {
+            return ImageIO.read(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            new ExceptionDialog(e, "Error loading file");
+        }
+        return null;
     }
 
 

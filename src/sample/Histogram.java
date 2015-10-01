@@ -86,7 +86,7 @@ public class Histogram {
         seriesM.getData().clear();
         int height = image.getHeight();
         int width = image.getWidth();
-        int bitDepth = image.getColorModel().getPixelSize()/3;
+        int bitDepth = image.getColorModel().getPixelSize()/image.getColorModel().getNumComponents();
         int levels = (int)Math.pow(2, bitDepth);
 //        xAxis.setUpperBound(levels-1);
 

@@ -1,3 +1,8 @@
+.center {
+    -fx-alignment: top-center;
+    -fx-padding: 5;
+}
+
 .series-red {
     -fx-stroke-width: 1px;
     -fx-stroke: red;
