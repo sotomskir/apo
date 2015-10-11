@@ -1,4 +1,4 @@
-package sample;
+package pl.sotomski.apoz;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -14,11 +14,10 @@ public class Main extends Application {
         try {
             root = FXMLLoader.load(getClass().getResource("sample.fxml"));
             primaryStage.setTitle("APOZ");
-
             Scene scene = new Scene(root, 800, 600);
             scene.getStylesheets().add("resources/style.css");
-            primaryStage.setScene(scene);
             primaryStage.setMaximized(true);
+            primaryStage.setScene(scene);
             primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,6 +1,5 @@
-package sample;
+package pl.sotomski.apoz.tools;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
@@ -8,47 +7,64 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
+import pl.sotomski.apoz.ImageTab;
+import pl.sotomski.apoz.utils.Histogram;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-public class HistogramEq extends VBox {
+public class HistogramEqTool extends VBox {
+
     private static VBox instance;
     private ToolController toolController;
     private ChoiceBox<String> choiceBox;
-    protected HistogramEq(ToolController controller) {
+    private String methods[] = {"metoda średnich", "metoda losowa", "metoda sąsiedztwa", "metoda własna"};
+
+    protected HistogramEqTool(ToolController controller) {
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label("Histogram equalisation");
         this.choiceBox = new ChoiceBox<String>();
-        choiceBox.getItems().addAll("method 1", "method 2", "method 3");
+        choiceBox.getItems().addAll(methods);
         Button button = new Button("Apply");
         button.setOnAction(this::handleApply);
         getChildren().addAll(separator, label, choiceBox, button);
     }
 
     public static VBox getInstance(ToolController controller) {
-        if(instance == null) instance = new HistogramEq(controller);
+        if(instance == null) instance = new HistogramEqTool(controller);
         return instance;
     }
 
     public void handleApply(ActionEvent actionEvent) {
         String method = choiceBox.getValue();
-        if("method 1".equals(method)) method1();
-        else if("method 2".equals(method)) method2();
-        else if("method 3".equals(method)) method3();
+        if(methods[0].equals(method)) {
+            ImageTab imageTab = toolController.getActiveTabProperty();
+            imageTab.setImage(method1(imageTab.getImage(), imageTab.getHistogram()));
+        }
+        else if(methods[1].equals(method)) {
+            ImageTab imageTab = toolController.getActiveTabProperty();
+            imageTab.setImage(method2(imageTab.getImage(), imageTab.getHistogram()));
+        }
+        else if(methods[2].equals(method)) {
+            ImageTab imageTab = toolController.getActiveTabProperty();
+            imageTab.setImage(method3(imageTab.getImage(), imageTab.getHistogram()));
+        }
+        else if(methods[3].equals(method)) {
+            ImageTab imageTab = toolController.getActiveTabProperty();
+            imageTab.setImage(method4(imageTab.getImage(), imageTab.getHistogram()));
+        }
 
     }
 
-    private void method1() {
-        BufferedImage bufferedImage = toolController.getBufferedImage();
-        int hR[] = toolController.getHistogram().gethR();
-        int hG[] = toolController.getHistogram().gethG();
-        int hB[] = toolController.getHistogram().gethB();
-        double hRavg = toolController.getHistogram().gethRavg();
-        double hGavg = toolController.getHistogram().gethGavg();
-        double hBavg = toolController.getHistogram().gethBavg();
+    private static BufferedImage method1(BufferedImage bufferedImage, Histogram histogram) {
+        int hR[] = histogram.gethR();
+        int hG[] = histogram.gethG();
+        int hB[] = histogram.gethB();
+        double hRavg = histogram.gethRavg();
+        double hGavg = histogram.gethGavg();
+        double hBavg = histogram.gethBavg();
         int rR = 0, hRint = 0;
         int rG = 0, hGint = 0;
         int rB = 0, hBint = 0;
@@ -112,19 +128,16 @@ public class HistogramEq extends VBox {
 
             }
         }
-
-        toolController.getImageCanvas().setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-        toolController.getHistogram().update(bufferedImage);
-
+        return bufferedImage;
     }
-    private void method2() {
-        BufferedImage bufferedImage = toolController.getBufferedImage();
-        int hR[] = toolController.getHistogram().gethR();
-        int hG[] = toolController.getHistogram().gethG();
-        int hB[] = toolController.getHistogram().gethB();
-        double hRavg = toolController.getHistogram().gethRavg();
-        double hGavg = toolController.getHistogram().gethGavg();
-        double hBavg = toolController.getHistogram().gethBavg();
+
+    private BufferedImage method2(BufferedImage bufferedImage, Histogram histogram) {
+        int hR[] = histogram.gethR();
+        int hG[] = histogram.gethG();
+        int hB[] = histogram.gethB();
+        double hRavg = histogram.gethRavg();
+        double hGavg = histogram.gethGavg();
+        double hBavg = histogram.gethBavg();
         int rR = 0, hRint = 0;
         int rG = 0, hGint = 0;
         int rB = 0, hBint = 0;
@@ -190,18 +203,17 @@ public class HistogramEq extends VBox {
             }
         }
 
-        toolController.getImageCanvas().setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-        toolController.getHistogram().update(bufferedImage);
+        return bufferedImage;
 
     }
-    private void method3() {
-        BufferedImage bufferedImage = toolController.getBufferedImage();
-        int hR[] = toolController.getHistogram().gethR();
-        int hG[] = toolController.getHistogram().gethG();
-        int hB[] = toolController.getHistogram().gethB();
-        double hRavg = toolController.getHistogram().gethRavg();
-        double hGavg = toolController.getHistogram().gethGavg();
-        double hBavg = toolController.getHistogram().gethBavg();
+
+    private BufferedImage method3(BufferedImage bufferedImage, Histogram histogram) {
+        int hR[] = histogram.gethR();
+        int hG[] = histogram.gethG();
+        int hB[] = histogram.gethB();
+        double hRavg = histogram.gethRavg();
+        double hGavg = histogram.gethGavg();
+        double hBavg = histogram.gethBavg();
         int rR = 0, hRint = 0;
         int rG = 0, hGint = 0;
         int rB = 0, hBint = 0;
@@ -234,6 +246,7 @@ public class HistogramEq extends VBox {
                 hBint-=hBavg;
                 ++rB;
             }
+
             rightR[z]=rR;
             rightG[z]=rG;
             rightB[z]=rB;
@@ -252,23 +265,60 @@ public class HistogramEq extends VBox {
                 int green = rgb.getGreen();
                 int blue = rgb.getBlue();
 
-                if(leftR[red]==rightR[red]) red=leftR[red];
-                else red=newR[red];
+                Color avg = getAverage(bufferedImage, x, y);
 
-                if(leftG[green]==rightG[green]) green=leftG[green];
-                else green=newG[green];
+                if(avg.getRed() < leftR[red]) red=leftR[red];
+                else if(avg.getRed() > rightR[red]) red = rightR[red];
+                else red = avg.getRed();
 
-                if(leftB[blue]==rightB[blue]) blue=leftB[blue];
-                else blue=newB[blue];
+                if(avg.getGreen() < leftG[green]) green=leftG[green];
+                else if(avg.getGreen() > rightG[green]) green = rightG[green];
+                else green = avg.getGreen();
+
+                if(avg.getBlue() < leftB[blue]) blue=leftB[blue];
+                else if(avg.getBlue() > rightB[blue]) blue = rightB[blue];
+                else blue = avg.getBlue();
 
                 bufferedImage.setRGB(x, y, new Color(red, green, blue).getRGB());
 
             }
         }
+        return bufferedImage;
+    }
 
-        toolController.getImageCanvas().setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-        toolController.getHistogram().update(bufferedImage);
+    private Color getAverage(BufferedImage bufferedImage, int px, int py) {
+        int avg[] = new int[3];
+        for (int x=-1;x<2;++x) {
+            for (int y=-1;y<2;++y) {
+                int xc = px+x;
+                int yc = py+y;
+                if(xc<0) xc=0;
+                if(yc<0) yc=0;
+                if(xc>=bufferedImage.getWidth()) xc = bufferedImage.getWidth()-1;
+                if(yc>=bufferedImage.getHeight()) yc = bufferedImage.getHeight()-1;
+                int rgb = bufferedImage.getRGB(xc, yc);
+                for(int i=0;i<3;++i) avg[i]+=getRGB(rgb)[i];
+            }
+        }
+        int rgb = bufferedImage.getRGB(px, py);
+        for(int i=0;i<3;++i) {
+            avg[i]-=getRGB(rgb)[i];
+            avg[i]/=8;
+        }
+        return new Color(avg[0], avg[1], avg[2]);
+    }
 
+    private int[] getRGB(int rgb) {
+        int a[] = new int[3];
+        a[0] = (rgb >> 16) & 0xff;
+        a[1] = (rgb >>  8) & 0xff;
+        a[2] = rgb & 0xff;
+        return a;
+    }
+
+    private BufferedImage method4(BufferedImage bufferedImage, Histogram histogram) {
+
+        return bufferedImage;
     }
 
     private static int randomInRange(int aStart, int aEnd, Random aRandom){

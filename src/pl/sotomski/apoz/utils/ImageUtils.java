@@ -1,6 +1,7 @@
-package sample;
+package pl.sotomski.apoz.utils;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 
 /**
@@ -34,5 +35,12 @@ public class ImageUtils {
         int b = rgb & 0xFF;
         int k = (int)(r*rPerc + g*gPerc + b*bPerc) ;
         return k;
+    }
+
+    public static BufferedImage deepCopy(BufferedImage bi) {
+        ColorModel cm = bi.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = bi.copyData(null);
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
 }

@@ -1,4 +1,4 @@
-package sample;
+package pl.sotomski.apoz.utils;
 
 import javafx.scene.chart.*;
 
@@ -8,8 +8,9 @@ import java.awt.image.BufferedImage;
 /**
  * Created by sotomski on 23/09/15.
  */
-public class Histogram {
-    private BarChart<String, Number> areaChart;
+public class HistogramChart {
+
+    private BarChart<String, Number> barChart;
     private CategoryAxis xAxis;
     private NumberAxis yAxis;
     private XYChart.Series seriesR;
@@ -57,7 +58,7 @@ public class Histogram {
         return Havg;
     }
 
-    public Histogram() {
+    public HistogramChart() {
         seriesR = new XYChart.Series();
         seriesG = new XYChart.Series();
         seriesB = new XYChart.Series();
@@ -68,14 +69,14 @@ public class Histogram {
 //        xAxis.setTickUnit(25);
         yAxis = new NumberAxis();
 
-        areaChart = new BarChart<String, Number>(xAxis, yAxis);
-        areaChart.getData().addAll(seriesM);
+        barChart = new BarChart<String, Number>(xAxis, yAxis);
+        barChart.getData().addAll(seriesM);
 //        seriesM.getNode().getStyleClass().add("series-mono");
         applyStyle();
     }
 
-    public BarChart getAreaChart() {
-        return areaChart;
+    public BarChart getBarChart() {
+        return barChart;
     }
 
     public void update(BufferedImage image) {
@@ -94,6 +95,7 @@ public class Histogram {
         hG = new int[levels];
         hB =  new int[levels];
         hM =  new int[levels];
+
         double Hsum = 0, hRsum = 0, hGsum = 0, hBsum = 0;
         for (int x=0;x<width;++x)
             for (int y=0;y<height;++y) {
@@ -102,6 +104,7 @@ public class Histogram {
                 ++hB[rgb.getBlue()];
                 ++hG[rgb.getGreen()];
             }
+
         for (int i=0;i<levels;++i) {
             seriesR.getData().add(new XYChart.Data<String, Number>(Integer.toString(i), hR[i]));
             seriesG.getData().add(new XYChart.Data<String, Number>(Integer.toString(i), hG[i]));
@@ -122,35 +125,31 @@ public class Histogram {
     }
 
     private void applyStyle() {
-        areaChart.setHorizontalGridLinesVisible(false);
-        areaChart.setVerticalGridLinesVisible(false);
-        areaChart.setVerticalZeroLineVisible(false);
-        areaChart.setCategoryGap(0d);
-        areaChart.setBarGap(0d);
-        areaChart.setAnimated(false);
-        areaChart.setLegendVisible(false);
-//        areaChart.setCreateSymbols(false);
+//        barChart.setHorizontalGridLinesVisible(false);
+        barChart.setVerticalGridLinesVisible(false);
+        barChart.setVerticalZeroLineVisible(false);
+        barChart.setCategoryGap(0d);
+        barChart.setBarGap(0d);
+        barChart.setAnimated(false);
+        barChart.setLegendVisible(false);
+//        barChart.setCreateSymbols(false);
         yAxis.setMinorTickVisible(false);
         yAxis.setTickMarkVisible(false);
-        xAxis.setTickMarkVisible(false);
+//        xAxis.setTickMarkVisible(false);
         yAxis.setTickLabelsVisible(false);
-        xAxis.setTickLabelsVisible(false);
-        areaChart.setMaxHeight(200.0);
+//        xAxis.setTickLabelsVisible(false);
+        barChart.setMaxHeight(200.0);
         mono = true;
     }
 
     public void switchType() {
         if (mono && channels>1) {
-            areaChart.getData().remove(seriesM);
-            areaChart.getData().addAll(seriesR, seriesG, seriesB);
-//            seriesR.getNode().getStyleClass().addAll("series-red");
-//            seriesG.getNode().getStyleClass().addAll("series-green");
-//            seriesB.getNode().getStyleClass().addAll("series-blue");
+            barChart.getData().remove(seriesM);
+            barChart.getData().addAll(seriesR, seriesG, seriesB);
             mono = false;
         } else {
-            areaChart.getData().removeAll(seriesR, seriesG, seriesB);
-            areaChart.getData().add(seriesM);
-//            seriesM.getNode().getStyleClass().add("series-mono");
+            barChart.getData().removeAll(seriesR, seriesG, seriesB);
+            barChart.getData().add(seriesM);
             mono = true;
         }
     }

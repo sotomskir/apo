@@ -1,6 +1,7 @@
-package sample;
+package pl.sotomski.apoz.tools;
 
-import javafx.scene.image.ImageView;
+import pl.sotomski.apoz.ImageTab;
+import pl.sotomski.apoz.utils.HistogramChart;
 
 import java.awt.image.BufferedImage;
 
@@ -8,8 +9,9 @@ import java.awt.image.BufferedImage;
  * Created by sotomski on 27/09/15.
  */
 public interface ToolController {
-    public Histogram getHistogram();
+    public HistogramChart getHistogramChart();
     public BufferedImage getBufferedImage();
-    public ImageView getImageCanvas();
     public void setBufferedImage(BufferedImage image);
+
+    ImageTab getActiveTabProperty();
 }

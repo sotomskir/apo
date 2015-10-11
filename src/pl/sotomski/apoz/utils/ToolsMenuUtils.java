@@ -1,4 +1,4 @@
-package sample;
+package pl.sotomski.apoz.utils;
 
 import javafx.scene.control.MenuButton;
 import javafx.scene.layout.GridPane;

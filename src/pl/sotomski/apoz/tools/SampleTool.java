@@ -1,4 +1,4 @@
-package sample;
+package pl.sotomski.apoz.tools;
 
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
@@ -9,7 +9,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 
 
-public class SampleTool extends VBox{
+public class SampleTool extends VBox {
     private static SampleTool instance;
     private final ToolController toolControler;
 

@@ -1,9 +1,9 @@
-package sample;
+package pl.sotomski.apoz;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import pl.sotomski.apoz.utils.HistogramChart;
 
 import java.awt.image.BufferedImage;
 import java.util.Observable;
@@ -20,10 +20,10 @@ public class ImageObservable extends Observable  {
     Label labelWidth;
     Label labelHeight;
     Label labelDepth;
-    ImageView imageView;
-    Histogram histogram;
+    HistogramChart histogram;
 
     public ImageObservable() {
+
     }
 
     public ImageObservable(BufferedImage bufferedImage) {
@@ -31,11 +31,10 @@ public class ImageObservable extends Observable  {
         this.zoom = 100;
     }
 
-    public ImageObservable(Label labelDepth, Label labelHeight, Label labelWidth, ImageView imageView, Histogram histogram) {
+    public ImageObservable(Label labelDepth, Label labelHeight, Label labelWidth, HistogramChart histogram) {
         this.labelDepth = labelDepth;
         this.labelHeight = labelHeight;
         this.labelWidth = labelWidth;
-        this.imageView = imageView;
         this.histogram = histogram;
     }
 
@@ -58,7 +57,6 @@ public class ImageObservable extends Observable  {
         labelDepth.setText("Depth: " + depth + "bit, "+channels+" channel");
         labelWidth.setText("Width: " +bufferedImage.getWidth());
         labelHeight.setText("Heigth: " +bufferedImage.getHeight());
-        imageView.setImage(getFxImage());
         histogram.update(bufferedImage);
     }
 

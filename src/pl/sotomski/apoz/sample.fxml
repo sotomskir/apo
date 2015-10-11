@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="rootLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.sotomski.apoz.Controller">
+    <top>
+      <VBox>
+         <children>
+              <MenuBar fx:id="menuBar" onKeyPressed="#handleKeyInput">
+                  <menus>
+                      <Menu text="Plik">
+                          <items>
+                              <MenuItem onAction="#handleOpen" text="Otwórz Ctrl+O" />
+                              <MenuItem onAction="#handleRevert" text="Przywróć Ctrl+R" />
+                              <MenuItem onAction="#handleDuplicate" text="Duplikuj Ctrl+D" />
+                              <MenuItem onAction="#handleSave" text="Zapisz Ctrl+S" />
+                              <MenuItem onAction="#handleSaveAs" text="Zapisz jako Ctrl+Shift+S" />
+                              <SeparatorMenuItem />
+                              <MenuItem onAction="#handleExit" text="Zamknij Ctrl+Q" />
+                          </items>
+                      </Menu>
+                      <Menu text="Narzędzia">
+                          <items>
+                              <MenuItem onAction="#handleConvertToGrayscale" text="konwersja do odcieni szarości" />
+                              <MenuItem onAction="#handleHistogramEqualisation" text="wyrównywanie histogramu" />
+                          </items>
+                      </Menu>
+                      <Menu text="Pomoc">
+                          <items>
+                              <MenuItem disable="true" text="Szukaj" />
+                              <MenuItem text="Online Manual" visible="false" />
+                              <SeparatorMenuItem />
+                              <MenuItem onAction="#handleAboutAction" text="O programie" />
+                          </items>
+                      </Menu>
+                  </menus>
+              </MenuBar>
+            <ToolBar prefHeight="40.0" prefWidth="200.0">
+              <items>
+                <Button mnemonicParsing="false" text="Otwórz" onAction="#handleOpen"/>
+                <Button mnemonicParsing="false" text="Przywróć" onAction="#handleRevert"/>
+                <Button mnemonicParsing="false" text="Duplikuj" onAction="#handleDuplicate"/>
+                <Button mnemonicParsing="false" text="Zapisz" onAction="#handleSave"/>
+                <Button mnemonicParsing="false" text="ScreenShot" onAction="#handleScreenShot"/>
+              </items>
+            </ToolBar>
+         </children>
+      </VBox>
+    </top>
+    <center>
+        <TabPane fx:id="tabPane">
+            <!--<Tab>-->
+
+                <!--<ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" BorderPane.alignment="CENTER">-->
+                    <!--<ImageView fx:id="imageCanvas" pickOnBounds="true" preserveRatio="true" onMouseMoved="#handleMouseMoved"/>-->
+                <!--</ScrollPane>-->
+            <!--</Tab>-->
+        </TabPane>
+    </center>
+    <right>
+        <VBox styleClass="center" BorderPane.alignment="CENTER">
+            <Pane fx:id="histogramPane" onMouseClicked="#switchHistogram" />
+            <HBox>
+                <VBox>
+                    <Label fx:id="labelDepth" text="depth: -" />
+                    <Label fx:id="labelR" text="R: -" />
+                    <Label fx:id="labelG" text="G: -" />
+                    <Label fx:id="labelB" text="B: -" />
+                </VBox>
+                <Separator orientation="VERTICAL" />
+                <VBox>
+
+                    <Label fx:id="labelWidth" text="width: -" />
+                    <Label fx:id="labelHeight" text="width: -" />
+                    <Label fx:id="labelX" text="x: -" />
+                    <Label fx:id="labelY" text="y: -" />
+                </VBox>
+            </HBox>
+            <VBox fx:id="toolbox" BorderPane.alignment="CENTER" />
+        </VBox>
+    </right>
+    <bottom>
+        <ToolBar>
+            <Label fx:id="zoomLabel" prefWidth="55" text="100%" />
+            <Button onMouseClicked="#handleZoomOut" text="-" />
+            <Button onMouseClicked="#handleZoomIn" text="+" />
+            <Label fx:id="fileNameLabel" />
+        </ToolBar>
+    </bottom>
+</BorderPane>
