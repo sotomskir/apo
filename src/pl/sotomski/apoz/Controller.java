@@ -2,14 +2,17 @@ package pl.sotomski.apoz;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -23,9 +26,11 @@ import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.HistogramChart;
 import pl.sotomski.apoz.utils.ImageUtils;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable, ToolController {
@@ -231,5 +236,31 @@ public class Controller implements Initializable, ToolController {
 
     public void handleScreenShot(ActionEvent actionEvent) {
         //TODO
+        Scene scene = tabPane.getScene();
+        WritableImage image = new WritableImage((int)scene.getWidth(), (int)scene.getHeight());
+        scene.snapshot(image);
+        String path = System.getProperty("user.home") + "/apoz_screenshots/";
+        File apozDir = new File(path);
+        try {
+            apozDir.mkdir();
+            String[] snapshots = apozDir.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    String lowercaseName = name.toLowerCase();
+                    if (lowercaseName.endsWith(".png") && lowercaseName.startsWith("snapshot")) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            });
+            String lastSnapshot = snapshots[snapshots.length-1];
+            String snumber = lastSnapshot.substring(8, 11);
+            int number = Integer.valueOf(snumber)+1;
+            File file = new File(path + "snapshot" + String.format("%03d", number) + ".png");
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
