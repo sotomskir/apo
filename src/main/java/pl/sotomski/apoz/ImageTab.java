@@ -15,6 +15,7 @@ public class ImageTab extends Tab {
     }
 
     public ImageTab(ImagePane imagePane) {
+        super();
         this.pane = imagePane;
         this.setContent(imagePane);
         this.setText(imagePane.getFile().getName());

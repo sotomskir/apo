@@ -2,6 +2,8 @@ package pl.sotomski.apoz;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -28,7 +30,6 @@ import pl.sotomski.apoz.utils.ImageUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ResourceBundle;
@@ -57,19 +58,24 @@ public class Controller implements Initializable, ToolController {
 
         tabPane.getSelectionModel().selectedItemProperty().addListener(e ->
         {
-            ImagePane oldActiveTab = activePaneProperty.getValue();
+            ImagePane oldActivePane = activePaneProperty.getValue();
             ImageTab newActiveTab = (ImageTab)tabPane.getSelectionModel().getSelectedItem();
             if (newActiveTab!=null){
-
                 activePaneProperty.setValue(newActiveTab.getPane());
-                ColorModel cm = newActiveTab.getPane().getImage().getColorModel();
-                labelDepth.setText("Depth: " + cm.getPixelSize()/cm.getNumComponents());
-                labelWidth.setText("Width: " + newActiveTab.getPane().getImage().getWidth());
-                labelHeight.setText("Heigth: " + newActiveTab.getPane().getImage().getHeight());
+                newActiveTab.getPane().getImageProperty().addListener(ev -> {
+                    updateLabels(activePaneProperty.getValue());
+                });
+                updateLabels(newActiveTab.getPane());
             }
         });
 
     }
+
+private void updateLabels(ImagePane pane) {
+    labelDepth.setText("Depth: " + (pane.getImage().getColorModel().getNumComponents()>1?"RGB":"Gray"));
+    labelWidth.setText("Width: " + pane.getImage().getWidth());
+    labelHeight.setText("Heigth: " + pane.getImage().getHeight());
+}
 
     private void handleActiveTabChanged() {
         histogramPane.getChildren().clear();
@@ -153,10 +159,6 @@ public class Controller implements Initializable, ToolController {
     public void handleOpen(ActionEvent actionEvent) {
         File file = FileMenuUtils.openDialog(rootLayout);
         ImagePane pane = new ImagePane(file);
-        pane.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Gained");
-            System.out.println("Lost");
-        });
         ImageTab tab = new ImageTab(pane);
         attachTab(tab);
     }
@@ -267,9 +269,23 @@ public class Controller implements Initializable, ToolController {
         //TODO
         ImageTab tab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
         tabPane.getTabs().remove(tab);
-        new ImageWindow(tab.getPane()).iconifiedProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Gained");
-            System.out.println("Lost");
+        ImageWindow window = new ImageWindow(rootLayout.getScene().getWindow(), tab.getPane());
+        window.focusedProperty().addListener(new ChangeListener<Boolean>()
+        {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue)
+            {
+                if (newPropertyValue)
+                {
+                    activePaneProperty.setValue(window.getImagePane());
+                    window.toFront();
+                    System.out.println("Textfield on focus: "+window.getTitle());
+                }
+                else
+                {
+                    System.out.println("Textfield out focus: "+window.getTitle());
+                }
+            }
         });
 
 

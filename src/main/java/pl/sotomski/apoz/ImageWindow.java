@@ -3,6 +3,7 @@ package pl.sotomski.apoz;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 
 /**
@@ -12,17 +13,19 @@ public class ImageWindow extends Stage {
 
     private ImagePane imagePane;
 
-    public ImageWindow(ImagePane pane) {
-        Stage newStage = new Stage();
+    public ImageWindow(Window owner, ImagePane pane) {
+        super();
         Scene newScene = new Scene(new VBox(pane));
-        newStage.setScene(newScene);
-        newStage.setTitle(pane.getFile().getName());
-        newStage.setAlwaysOnTop(true);
-        newStage.show();
+        this.setScene(newScene);
+        this.setTitle(pane.getFile().getName());
+        this.setAlwaysOnTop(false);
+        this.initOwner(owner);
+        this.show();
         this.imagePane = pane;
     }
 
     public ImagePane getImagePane() {
         return imagePane;
     }
+
 }

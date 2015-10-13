@@ -1,7 +1,9 @@
 package pl.sotomski.apoz;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
@@ -23,7 +25,7 @@ import java.io.File;
 public class ImagePane extends Pane {
 
     ImageView imageView;
-    BufferedImage bufferedImage;
+    ObjectProperty<BufferedImage> bufferedImage;
     HistogramChart histogramChart;
     Histogram histogram;
     private DoubleProperty zoomProperty;
@@ -32,9 +34,11 @@ public class ImagePane extends Pane {
        private ScrollPane scrollPane;
 
     public ImagePane() {
+        super();
         this.zoomProperty = new SimpleDoubleProperty(1);
         this.histogramChart = new HistogramChart();
         this.imageView = new ImageView();
+        this.bufferedImage = new SimpleObjectProperty<>();
         scrollPane= new ScrollPane();
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -66,7 +70,7 @@ public class ImagePane extends Pane {
     }
 
     public void setImage(BufferedImage bufferedImage) {
-        this.bufferedImage = bufferedImage;
+        this.bufferedImage.setValue(bufferedImage);
         imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
         this.histogram = new Histogram(bufferedImage);
         this.histogramChart.update(bufferedImage);
@@ -74,7 +78,7 @@ public class ImagePane extends Pane {
     }
 
     public BufferedImage getImage() {
-        return bufferedImage;
+        return bufferedImage.getValue();
     }
 
     public Histogram getHistogram() {
@@ -121,6 +125,14 @@ public class ImagePane extends Pane {
 
     public void setFile(File file) {
         this.file = file;
+    }
+
+    public ObjectProperty<BufferedImage> getImageProperty() {
+        return bufferedImage;
+    }
+
+    public ObjectProperty<BufferedImage> bufferedImageProperty() {
+        return bufferedImage;
     }
 
     public File getFile() {
