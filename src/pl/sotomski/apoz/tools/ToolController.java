@@ -1,5 +1,6 @@
 package pl.sotomski.apoz.tools;
 
+import pl.sotomski.apoz.ImagePane;
 import pl.sotomski.apoz.ImageTab;
 import pl.sotomski.apoz.utils.HistogramChart;
 
@@ -13,5 +14,5 @@ public interface ToolController {
     public BufferedImage getBufferedImage();
     public void setBufferedImage(BufferedImage image);
 
-    ImageTab getActiveTabProperty();
+    ImagePane getActivePaneProperty();
 }

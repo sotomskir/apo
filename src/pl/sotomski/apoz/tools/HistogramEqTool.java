@@ -7,7 +7,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
-import pl.sotomski.apoz.ImageTab;
+import pl.sotomski.apoz.ImagePane;
 import pl.sotomski.apoz.utils.Histogram;
 
 import java.awt.*;
@@ -40,19 +40,18 @@ public class HistogramEqTool extends VBox {
     public void handleApply(ActionEvent actionEvent) {
         String method = choiceBox.getValue();
         if(methods[0].equals(method)) {
-            ImageTab imageTab = toolController.getActiveTabProperty();
+            ImagePane imageTab = toolController.getActivePaneProperty();
             imageTab.setImage(method1(imageTab.getImage(), imageTab.getHistogram()));
         }
         else if(methods[1].equals(method)) {
-            ImageTab imageTab = toolController.getActiveTabProperty();
-            imageTab.setImage(method2(imageTab.getImage(), imageTab.getHistogram()));
-        }
+            ImagePane imageTab = toolController.getActivePaneProperty();
+            imageTab.setImage(method2(imageTab.getImage(), imageTab.getHistogram()));      }
         else if(methods[2].equals(method)) {
-            ImageTab imageTab = toolController.getActiveTabProperty();
+            ImagePane imageTab = toolController.getActivePaneProperty();
             imageTab.setImage(method3(imageTab.getImage(), imageTab.getHistogram()));
         }
         else if(methods[3].equals(method)) {
-            ImageTab imageTab = toolController.getActiveTabProperty();
+            ImagePane imageTab = toolController.getActivePaneProperty();
             imageTab.setImage(method4(imageTab.getImage(), imageTab.getHistogram()));
         }
 

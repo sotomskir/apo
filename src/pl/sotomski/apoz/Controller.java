@@ -46,42 +46,45 @@ public class Controller implements Initializable, ToolController {
     Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
     @FXML
     TabPane tabPane;
-    private ObjectProperty<ImageTab> activeTabProperty;
+    private ObjectProperty<ImagePane> activePaneProperty;
 
     @Override
     public void initialize(java.net.URL arg0, ResourceBundle arg1) {
-        activeTabProperty = new SimpleObjectProperty<>();
-        activeTabProperty.addListener(e -> handleActiveTabChanged());
+        activePaneProperty = new SimpleObjectProperty<>();
+        activePaneProperty.addListener(e -> handleActiveTabChanged());
         menuBar.setFocusTraversable(true);
-        zoomLabel.setOnInputMethodTextChanged(e -> activeTabProperty.getValue().handleZoomChange(zoomLabel.getText()));
+        zoomLabel.setOnInputMethodTextChanged(e -> activePaneProperty.getValue().handleZoomChange(zoomLabel.getText()));
 
         tabPane.getSelectionModel().selectedItemProperty().addListener(e ->
         {
-            ImageTab oldActiveTab = activeTabProperty.getValue();
-            ImageTab newActiveTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
-            activeTabProperty.setValue(newActiveTab);
-            ColorModel cm = newActiveTab.getImage().getColorModel();
-            labelDepth.setText("Depth: " + cm.getPixelSize()/cm.getNumComponents());
-            labelWidth.setText("Width: " + newActiveTab.getImage().getWidth());
-            labelHeight.setText("Heigth: " + newActiveTab.getImage().getHeight());
+            ImagePane oldActiveTab = activePaneProperty.getValue();
+            ImageTab newActiveTab = (ImageTab)tabPane.getSelectionModel().getSelectedItem();
+            if (newActiveTab!=null){
+
+                activePaneProperty.setValue(newActiveTab.getPane());
+                ColorModel cm = newActiveTab.getPane().getImage().getColorModel();
+                labelDepth.setText("Depth: " + cm.getPixelSize()/cm.getNumComponents());
+                labelWidth.setText("Width: " + newActiveTab.getPane().getImage().getWidth());
+                labelHeight.setText("Heigth: " + newActiveTab.getPane().getImage().getHeight());
+            }
         });
 
     }
 
     private void handleActiveTabChanged() {
         histogramPane.getChildren().clear();
-        histogramPane.getChildren().add(activeTabProperty.getValue().getHistogramChart().getBarChart());
-        zoomLabel.setText(activeTabProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
+        histogramPane.getChildren().add(activePaneProperty.getValue().getHistogramChart().getBarChart());
+        zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
     }
 
     @Override
     public void setBufferedImage(BufferedImage image) {
-        this.activeTabProperty.getValue().setImage(image);
+        this.activePaneProperty.getValue().setImage(image);
     }
 
     @Override
-    public ImageTab getActiveTabProperty() {
-        return activeTabProperty.getValue();
+    public ImagePane getActivePaneProperty() {
+        return activePaneProperty.getValue();
     }
 
     /**
@@ -143,39 +146,40 @@ public class Controller implements Initializable, ToolController {
 
     private void attachTab(ImageTab imageTab) {
         tabPane.getTabs().add(imageTab);
-
-//        imageTab.setOnSelectionChanged(e -> {
-//            ImageTab tab = (ImageTab) e.getSource();
-//            if (activeTabProperty.getValue() != tab) activeTabProperty.setValue(tab);
-//        });
-        imageTab.getImageView().addEventHandler(MouseEvent.MOUSE_MOVED, this::handleMouseMoved);
+        imageTab.getPane().getImageView().addEventHandler(MouseEvent.MOUSE_MOVED, this::handleMouseMoved);
         tabPane.getSelectionModel().select(imageTab);
     }
 
     public void handleOpen(ActionEvent actionEvent) {
         File file = FileMenuUtils.openDialog(rootLayout);
-        ImageTab tab = new ImageTab(file);
+        ImagePane pane = new ImagePane(file);
+        pane.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Gained");
+            System.out.println("Lost");
+        });
+        ImageTab tab = new ImageTab(pane);
         attachTab(tab);
     }
 
     public void handleDuplicate(ActionEvent actionEvent) {
-        ImageTab activeTab = activeTabProperty.getValue();
-        ImageTab tab = new ImageTab(activeTab);
+        ImagePane activePane = activePaneProperty.getValue();
+        ImagePane pane = new ImagePane(activePane);
+        ImageTab tab = new ImageTab(pane);
         attachTab(tab);
     }
 
     public void handleRevert(ActionEvent actionEvent) {
-        activeTabProperty.getValue().handleRevert(actionEvent);
+        activePaneProperty.getValue().handleRevert(actionEvent);
     }
 
     public void handleSaveAs(ActionEvent actionEvent) {
-        BufferedImage image = activeTabProperty.getValue().getImage();
-        activeTabProperty.getValue().setFile(FileMenuUtils.saveAsDialog(rootLayout,image));
+        BufferedImage image = activePaneProperty.getValue().getImage();
+        activePaneProperty.getValue().setFile(FileMenuUtils.saveAsDialog(rootLayout, image));
     }
 
     public void handleSave(ActionEvent actionEvent) {
-        File file = activeTabProperty.getValue().getFile();
-        FileMenuUtils.saveDialog(activeTabProperty.getValue().getImage(), file);
+        File file = activePaneProperty.getValue().getFile();
+        FileMenuUtils.saveDialog(activePaneProperty.getValue().getImage(), file);
     }
 
     public void handleHistogramEqualisation() {
@@ -189,28 +193,28 @@ public class Controller implements Initializable, ToolController {
 
     @Override
     public HistogramChart getHistogramChart() {
-        return activeTabProperty.getValue().getHistogramChart();
+        return activePaneProperty.getValue().getHistogramChart();
     }
 
     @Override
     public BufferedImage getBufferedImage() {
-        return activeTabProperty.getValue().getImage();
+        return activePaneProperty.getValue().getImage();
     }
 
     public void handleMouseMoved(MouseEvent event) {
 
         int x = (int)event.getX();
         int y = (int)event.getY();
-        x/= activeTabProperty.getValue().getZoomProperty().getValue();
-        y/= activeTabProperty.getValue().getZoomProperty().getValue();
+        x/= activePaneProperty.getValue().getZoomProperty().getValue();
+        y/= activePaneProperty.getValue().getZoomProperty().getValue();
         labelX.setText("X: " + x);
         labelY.setText("Y: " + y);
-        int rgb = activeTabProperty.getValue().getImage().getRGB(x, y);
+        int rgb = activePaneProperty.getValue().getImage().getRGB(x, y);
         int r, g, b;
         r = (rgb >> 16 ) & 0xFF;
         g = (rgb >> 8 ) & 0xFF;
         b = rgb & 0xFF;
-        if(activeTabProperty.getValue().getChannels() == 3) {
+        if(activePaneProperty.getValue().getChannels() == 3) {
             labelR.setText("R: " + r);
             labelG.setText("G: " + g);
             labelB.setText("B: " + b);
@@ -222,20 +226,19 @@ public class Controller implements Initializable, ToolController {
     }
 
     public void handleConvertToGrayscale(ActionEvent actionEvent) {
-        activeTabProperty.getValue().setImage(ImageUtils.rgbToGrayscale(activeTabProperty.getValue().getImage()));
+        activePaneProperty.getValue().setImage(ImageUtils.rgbToGrayscale(activePaneProperty.getValue().getImage()));
         getHistogramChart().switchType();
     }
 
     public void handleZoomOut(Event event) {
-        activeTabProperty.getValue().handleZoomOut(zoomLabel);
+        activePaneProperty.getValue().handleZoomOut(zoomLabel);
     }
 
     public void handleZoomIn(Event event) {
-        activeTabProperty.getValue().handleZoomIn(zoomLabel);
+        activePaneProperty.getValue().handleZoomIn(zoomLabel);
     }
 
     public void handleScreenShot(ActionEvent actionEvent) {
-        //TODO
         Scene scene = tabPane.getScene();
         WritableImage image = new WritableImage((int)scene.getWidth(), (int)scene.getHeight());
         scene.snapshot(image);
@@ -247,11 +250,7 @@ public class Controller implements Initializable, ToolController {
                 @Override
                 public boolean accept(File dir, String name) {
                     String lowercaseName = name.toLowerCase();
-                    if (lowercaseName.endsWith(".png") && lowercaseName.startsWith("snapshot")) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return lowercaseName.endsWith(".png") && lowercaseName.startsWith("snapshot");
                 }
             });
             String lastSnapshot = snapshots[snapshots.length-1];
@@ -262,5 +261,17 @@ public class Controller implements Initializable, ToolController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void handleUnpinTab(ActionEvent actionEvent) {
+        //TODO
+        ImageTab tab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
+        tabPane.getTabs().remove(tab);
+        new ImageWindow(tab.getPane()).iconifiedProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Gained");
+            System.out.println("Lost");
+        });
+
+
     }
 }

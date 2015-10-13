@@ -45,6 +45,7 @@
                 <Button mnemonicParsing="false" text="Duplikuj" onAction="#handleDuplicate"/>
                 <Button mnemonicParsing="false" text="Zapisz" onAction="#handleSave"/>
                 <Button mnemonicParsing="false" text="ScreenShot" onAction="#handleScreenShot"/>
+                <Button mnemonicParsing="false" text="Odepnij" onAction="#handleUnpinTab"/>
               </items>
             </ToolBar>
          </children>
