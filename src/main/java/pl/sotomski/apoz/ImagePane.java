@@ -12,7 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.Histogram;
-import pl.sotomski.apoz.utils.HistogramChart;
+import pl.sotomski.apoz.utils.HistogramManager;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
@@ -26,17 +26,16 @@ public class ImagePane extends Pane {
 
     ImageView imageView;
     ObjectProperty<BufferedImage> bufferedImage;
-    HistogramChart histogramChart;
+    HistogramManager histogramChart;
     Histogram histogram;
     private DoubleProperty zoomProperty;
 //    private ImageObservable image;
     private File file;
        private ScrollPane scrollPane;
 
-    public ImagePane() {
+    private ImagePane() {
         super();
         this.zoomProperty = new SimpleDoubleProperty(1);
-        this.histogramChart = new HistogramChart();
         this.imageView = new ImageView();
         this.bufferedImage = new SimpleObjectProperty<>();
         scrollPane= new ScrollPane();
@@ -48,12 +47,15 @@ public class ImagePane extends Pane {
 
     public ImagePane(File file) {
         this();
-        setImage(FileMenuUtils.loadImage(file));
+        BufferedImage bi = FileMenuUtils.loadImage(file);
+        this.histogramChart = new HistogramManager(bi);
+        setImage(bi);
         this.file = file;
     }
 
     public ImagePane(BufferedImage image, String name) {
         this();
+        this.histogramChart = new HistogramManager(image);
         setImage(image);
     }
 
@@ -73,7 +75,7 @@ public class ImagePane extends Pane {
         this.bufferedImage.setValue(bufferedImage);
         imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
         this.histogram = new Histogram(bufferedImage);
-        this.histogramChart.update(bufferedImage);
+        this.histogramChart.update();
 
     }
 
@@ -143,7 +145,7 @@ public class ImagePane extends Pane {
         return getImage().getColorModel().getColorSpace().getNumComponents();
     }
 
-    public HistogramChart getHistogramChart() {
+    public HistogramManager getHistogramChart() {
         return histogramChart;
     }
 

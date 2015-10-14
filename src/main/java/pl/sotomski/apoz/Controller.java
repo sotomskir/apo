@@ -25,7 +25,7 @@ import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.tools.HistogramEqTool;
 import pl.sotomski.apoz.tools.ToolController;
 import pl.sotomski.apoz.utils.FileMenuUtils;
-import pl.sotomski.apoz.utils.HistogramChart;
+import pl.sotomski.apoz.utils.HistogramManager;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import javax.imageio.ImageIO;
@@ -194,7 +194,7 @@ private void updateLabels(ImagePane pane) {
     }
 
     @Override
-    public HistogramChart getHistogramChart() {
+    public HistogramManager getHistogramChart() {
         return activePaneProperty.getValue().getHistogramChart();
     }
 
@@ -279,11 +279,11 @@ private void updateLabels(ImagePane pane) {
                 {
                     activePaneProperty.setValue(window.getImagePane());
                     window.toFront();
-                    System.out.println("Textfield on focus: "+window.getTitle());
+                    System.out.println("Window on focus: "+window.getTitle());
                 }
                 else
                 {
-                    System.out.println("Textfield out focus: "+window.getTitle());
+                    System.out.println("Window out focus: "+window.getTitle());
                 }
             }
         });

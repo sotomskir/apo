@@ -11,7 +11,6 @@ public class ImageTab extends Tab {
     ImagePane pane;
 
     public ImageTab() {
-        this.pane = new ImagePane();
     }
 
     public ImageTab(ImagePane imagePane) {

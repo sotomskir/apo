@@ -3,7 +3,7 @@ package pl.sotomski.apoz;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import pl.sotomski.apoz.utils.HistogramChart;
+import pl.sotomski.apoz.utils.HistogramManager;
 
 import java.awt.image.BufferedImage;
 import java.util.Observable;
@@ -20,7 +20,7 @@ public class ImageObservable extends Observable  {
     Label labelWidth;
     Label labelHeight;
     Label labelDepth;
-    HistogramChart histogram;
+    HistogramManager histogram;
 
     public ImageObservable() {
 
@@ -31,7 +31,7 @@ public class ImageObservable extends Observable  {
         this.zoom = 100;
     }
 
-    public ImageObservable(Label labelDepth, Label labelHeight, Label labelWidth, HistogramChart histogram) {
+    public ImageObservable(Label labelDepth, Label labelHeight, Label labelWidth, HistogramManager histogram) {
         this.labelDepth = labelDepth;
         this.labelHeight = labelHeight;
         this.labelWidth = labelWidth;
@@ -57,7 +57,7 @@ public class ImageObservable extends Observable  {
         labelDepth.setText("Depth: " + depth + "bit, "+channels+" channel");
         labelWidth.setText("Width: " +bufferedImage.getWidth());
         labelHeight.setText("Heigth: " +bufferedImage.getHeight());
-        histogram.update(bufferedImage);
+        histogram.update();
     }
 
     public void zoomIn() {

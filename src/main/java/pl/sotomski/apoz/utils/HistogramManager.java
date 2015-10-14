@@ -8,8 +8,8 @@ import java.awt.image.BufferedImage;
 /**
  * Created by sotomski on 23/09/15.
  */
-public class HistogramChart {
-
+public class HistogramManager {
+    private BufferedImage image;
     private BarChart<String, Number> barChart;
     private CategoryAxis xAxis;
     private NumberAxis yAxis;
@@ -58,7 +58,7 @@ public class HistogramChart {
         return Havg;
     }
 
-    public HistogramChart() {
+    private HistogramManager() {
         seriesR = new XYChart.Series();
         seriesG = new XYChart.Series();
         seriesB = new XYChart.Series();
@@ -75,11 +75,17 @@ public class HistogramChart {
         applyStyle();
     }
 
+    public HistogramManager(BufferedImage image) {
+        this();
+        this.image = image;
+        update();
+    }
+
     public BarChart getBarChart() {
         return barChart;
     }
 
-    public void update(BufferedImage image) {
+    public void update() {
         seriesR.getData().clear();
         seriesG.getData().clear();
         seriesB.getData().clear();

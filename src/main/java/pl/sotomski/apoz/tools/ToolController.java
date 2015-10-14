@@ -1,8 +1,7 @@
 package pl.sotomski.apoz.tools;
 
 import pl.sotomski.apoz.ImagePane;
-import pl.sotomski.apoz.ImageTab;
-import pl.sotomski.apoz.utils.HistogramChart;
+import pl.sotomski.apoz.utils.HistogramManager;
 
 import java.awt.image.BufferedImage;
 
@@ -10,7 +9,7 @@ import java.awt.image.BufferedImage;
  * Created by sotomski on 27/09/15.
  */
 public interface ToolController {
-    public HistogramChart getHistogramChart();
+    public HistogramManager getHistogramChart();
     public BufferedImage getBufferedImage();
     public void setBufferedImage(BufferedImage image);
 
