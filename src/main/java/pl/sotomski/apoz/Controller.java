@@ -22,11 +22,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import pl.sotomski.apoz.commands.CommandManager;
+import pl.sotomski.apoz.commands.ConvertToGrayCommand;
 import pl.sotomski.apoz.tools.HistogramEqTool;
 import pl.sotomski.apoz.tools.ToolController;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.HistogramManager;
-import pl.sotomski.apoz.utils.ImageUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -79,7 +80,7 @@ private void updateLabels(ImagePane pane) {
 
     private void handleActiveTabChanged() {
         histogramPane.getChildren().clear();
-        histogramPane.getChildren().add(activePaneProperty.getValue().getHistogramChart().getBarChart());
+        histogramPane.getChildren().add(activePaneProperty.getValue().getHistogramManager().getBarChart());
         zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
     }
 
@@ -195,7 +196,7 @@ private void updateLabels(ImagePane pane) {
 
     @Override
     public HistogramManager getHistogramChart() {
-        return activePaneProperty.getValue().getHistogramChart();
+        return activePaneProperty.getValue().getHistogramManager();
     }
 
     @Override
@@ -228,8 +229,10 @@ private void updateLabels(ImagePane pane) {
     }
 
     public void handleConvertToGrayscale(ActionEvent actionEvent) {
-        activePaneProperty.getValue().setImage(ImageUtils.rgbToGrayscale(activePaneProperty.getValue().getImage()));
-        getHistogramChart().switchType();
+        CommandManager manager = activePaneProperty.getValue().getCommandManager();
+        manager.executeCommand(new ConvertToGrayCommand(activePaneProperty.getValue().getImageProperty()));
+//        activePaneProperty.getValue().setImage(activePaneProperty.getValue().getImage());
+//        getHistogramChart().switchType();
     }
 
     public void handleZoomOut(Event event) {
@@ -289,5 +292,16 @@ private void updateLabels(ImagePane pane) {
         });
 
 
+    }
+
+    public void handleUndo(ActionEvent actionEvent) {
+        CommandManager manager = activePaneProperty.getValue().getCommandManager();
+        manager.undo();
+
+    }
+
+    public void handleRedo(ActionEvent actionEvent) {
+        CommandManager manager = activePaneProperty.getValue().getCommandManager();
+        manager.redo();
     }
 }

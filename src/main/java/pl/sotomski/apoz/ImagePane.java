@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.Histogram;
 import pl.sotomski.apoz.utils.HistogramManager;
@@ -24,10 +25,11 @@ import java.io.File;
  */
 public class ImagePane extends Pane {
 
-    ImageView imageView;
-    ObjectProperty<BufferedImage> bufferedImage;
-    HistogramManager histogramChart;
-    Histogram histogram;
+    private ImageView imageView;
+    private ObjectProperty<BufferedImage> bufferedImage;
+    private HistogramManager histogramManager;
+    private CommandManager commandManager;
+    private Histogram histogram;
     private DoubleProperty zoomProperty;
 //    private ImageObservable image;
     private File file;
@@ -35,9 +37,15 @@ public class ImagePane extends Pane {
 
     private ImagePane() {
         super();
+        this.commandManager = new CommandManager();
         this.zoomProperty = new SimpleDoubleProperty(1);
         this.imageView = new ImageView();
         this.bufferedImage = new SimpleObjectProperty<>();
+        this.bufferedImage.addListener(e -> {
+            imageView.setImage(SwingFXUtils.toFXImage(getImage(), null));
+            this.histogram = new Histogram(getImage());
+            this.histogramManager.update();
+        });
         scrollPane= new ScrollPane();
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -48,22 +56,23 @@ public class ImagePane extends Pane {
     public ImagePane(File file) {
         this();
         BufferedImage bi = FileMenuUtils.loadImage(file);
-        this.histogramChart = new HistogramManager(bi);
+        this.histogramManager = new HistogramManager(bi);
         setImage(bi);
         this.file = file;
     }
 
     public ImagePane(BufferedImage image, String name) {
         this();
-        this.histogramChart = new HistogramManager(image);
+        this.histogramManager = new HistogramManager(image);
         setImage(image);
     }
 
     public ImagePane(ImagePane imagePane) {
         this();
         setFile(new File(imagePane.getFile().getPath()));
-        BufferedImage image = imagePane.getImage();
-        setImage(ImageUtils.deepCopy(image));
+        BufferedImage image = ImageUtils.deepCopy(imagePane.getImage());
+        this.histogramManager = new HistogramManager(image);
+        setImage(image);
 
     }
 
@@ -75,8 +84,7 @@ public class ImagePane extends Pane {
         this.bufferedImage.setValue(bufferedImage);
         imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
         this.histogram = new Histogram(bufferedImage);
-        this.histogramChart.update();
-
+        this.histogramManager.update();
     }
 
     public BufferedImage getImage() {
@@ -85,6 +93,10 @@ public class ImagePane extends Pane {
 
     public Histogram getHistogram() {
         return histogram;
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 
     public void setFitHeight(double fitHeight) {
@@ -145,8 +157,8 @@ public class ImagePane extends Pane {
         return getImage().getColorModel().getColorSpace().getNumComponents();
     }
 
-    public HistogramManager getHistogramChart() {
-        return histogramChart;
+    public HistogramManager getHistogramManager() {
+        return histogramManager;
     }
 
     public ImageView getImageView() {

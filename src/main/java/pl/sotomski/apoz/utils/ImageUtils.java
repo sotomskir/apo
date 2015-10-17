@@ -8,6 +8,7 @@ import java.awt.image.WritableRaster;
  * Created by sotomski on 01/10/15.
  */
 public class ImageUtils {
+
     public static BufferedImage rgbToGrayscale(BufferedImage bufferedImage){
         BufferedImage grayscaleImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
         WritableRaster wr = grayscaleImage.getRaster();

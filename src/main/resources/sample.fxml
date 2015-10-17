@@ -41,6 +41,8 @@
             <ToolBar prefHeight="40.0" prefWidth="200.0">
               <items>
                 <Button mnemonicParsing="false" text="Otwórz" onAction="#handleOpen"/>
+                <Button mnemonicParsing="false" text="Cofnij" onAction="#handleUndo"/>
+                <Button mnemonicParsing="false" text="Powtórz" onAction="#handleRedo"/>
                 <Button mnemonicParsing="false" text="Przywróć" onAction="#handleRevert"/>
                 <Button mnemonicParsing="false" text="Duplikuj" onAction="#handleDuplicate"/>
                 <Button mnemonicParsing="false" text="Zapisz" onAction="#handleSave"/>

@@ -26,7 +26,7 @@ public class ImageWindow extends Stage {
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(pane);
         borderPane.setRight(tabPane);
-        histogramPane.getChildren().add(pane.getHistogramChart().getBarChart());
+        histogramPane.getChildren().add(pane.getHistogramManager().getBarChart());
         Scene newScene = new Scene(borderPane);
         this.setScene(newScene);
         this.setTitle(pane.getFile().getName());
