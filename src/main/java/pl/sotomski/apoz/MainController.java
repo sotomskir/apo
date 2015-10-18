@@ -50,9 +50,11 @@ public class MainController implements Initializable, ToolController {
     private Button undoButton;
     @FXML
     private Button redoButton;
+    private ResourceBundle bundle;
 
     @Override
-    public void initialize(java.net.URL arg0, ResourceBundle arg1) {
+    public void initialize(java.net.URL arg0, ResourceBundle resources) {
+        bundle = resources;
         activePaneProperty = new SimpleObjectProperty<>();
 
         activePaneProperty.addListener(e -> {
@@ -89,10 +91,14 @@ public class MainController implements Initializable, ToolController {
 
     }
 
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+
     private void updateLabels(ImagePane pane) {
-        labelDepth.setText("Depth: " + (pane.getImage().getColorModel().getNumComponents()>1?"RGB":"Gray"));
-        labelWidth.setText("Width: " + pane.getImage().getWidth());
-        labelHeight.setText("Heigth: " + pane.getImage().getHeight());
+        labelDepth.setText(bundle.getString("Depth") + ": " + (pane.getImage().getColorModel().getNumComponents()>1?"RGB":"Gray"));
+        labelWidth.setText(bundle.getString("Width") + ": " + pane.getImage().getWidth());
+        labelHeight.setText(bundle.getString("Heigth") + ": " + pane.getImage().getHeight());
     }
 
     private void updateUndoRedoListeners() {
@@ -166,8 +172,8 @@ public class MainController implements Initializable, ToolController {
     {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("APOZ");
-        alert.setHeaderText("O programie");
-        alert.setContentText("Autor: Robert Sotomski");
+        alert.setHeaderText(bundle.getString("About"));
+        alert.setContentText(bundle.getString("Author"));
         alert.showAndWait();
     }
 

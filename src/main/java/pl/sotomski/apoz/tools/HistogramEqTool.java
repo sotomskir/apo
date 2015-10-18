@@ -11,21 +11,29 @@ import pl.sotomski.apoz.ImagePane;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.HistogramEqCommand;
 
+import java.util.ResourceBundle;
+
 public class HistogramEqTool extends VBox {
 
     private static VBox instance;
     private ToolController toolController;
     private ChoiceBox<String> choiceBox;
-    private String methods[] = {"metoda średnich", "metoda losowa", "metoda sąsiedztwa", "metoda własna"};
+    private String[] methods;
 
     protected HistogramEqTool(ToolController controller) {
+        ResourceBundle bundle = controller.getBundle();
+        methods = new String[4];
+        methods[0] = bundle.getString("HEmethod1");
+        methods[1] = bundle.getString("HEmethod2");
+        methods[2] = bundle.getString("HEmethod3");
+        methods[3] = bundle.getString("HEmethod4");
         this.choiceBox = new ChoiceBox<>();
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);
-        Label label = new Label("wyrównywanie histogramu");
+        Label label = new Label(bundle.getString("HistogramEqualisation"));
         choiceBox.getItems().addAll(methods);
         choiceBox.getSelectionModel().select(0);
-        Button button = new Button("Zastosuj");
+        Button button = new Button(bundle.getString("Apply"));
         button.setOnAction((actionEvent) -> {
             try {
                 handleApply(actionEvent);
