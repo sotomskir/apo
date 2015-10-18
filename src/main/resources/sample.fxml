@@ -7,59 +7,161 @@
 
 <BorderPane fx:id="rootLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.sotomski.apoz.MainController">
     <top>
-      <VBox>
-         <children>
-              <MenuBar fx:id="menuBar" onKeyPressed="#handleKeyInput">
-                  <menus>
-                      <Menu text="Plik">
-                          <items>
-                              <MenuItem onAction="#handleOpen" text="Otwórz Ctrl+O" />
-                              <MenuItem onAction="#handleRevert" text="Przywróć Ctrl+R" />
-                              <MenuItem onAction="#handleDuplicate" text="Duplikuj Ctrl+D" />
-                              <MenuItem onAction="#handleSave" text="Zapisz Ctrl+S" />
-                              <MenuItem onAction="#handleSaveAs" text="Zapisz jako Ctrl+Shift+S" />
-                              <SeparatorMenuItem />
-                              <MenuItem onAction="#handleExit" text="Zamknij Ctrl+Q" />
-                          </items>
-                      </Menu>
-                      <Menu text="Narzędzia">
-                          <items>
-                              <MenuItem onAction="#handleConvertToGrayscale" text="konwersja do odcieni szarości" />
-                              <MenuItem onAction="#handleHistogramEqualisation" text="wyrównywanie histogramu" />
-                          </items>
-                      </Menu>
-                      <Menu text="Pomoc">
-                          <items>
-                              <MenuItem disable="true" text="Szukaj" />
-                              <MenuItem text="Online Manual" visible="false" />
-                              <SeparatorMenuItem />
-                              <MenuItem onAction="#handleAboutAction" text="O programie" />
-                          </items>
-                      </Menu>
-                  </menus>
-              </MenuBar>
-            <ToolBar prefHeight="40.0" prefWidth="200.0">
-              <items>
-                <Button mnemonicParsing="false" text="Otwórz" onAction="#handleOpen"/>
-                <Button fx:id="undoButton" mnemonicParsing="false" text="Cofnij" onAction="#handleUndo" disable="true"/>
-                <Button fx:id="redoButton" mnemonicParsing="false" text="Powtórz" onAction="#handleRedo" disable="true"/>
-                <Button mnemonicParsing="false" text="Przywróć" onAction="#handleRevert"/>
-                <Button mnemonicParsing="false" text="Duplikuj" onAction="#handleDuplicate"/>
-                <Button mnemonicParsing="false" text="Zapisz" onAction="#handleSave"/>
-                <Button mnemonicParsing="false" text="ScreenShot" onAction="#handleScreenShot"/>
-                <Button mnemonicParsing="false" text="Odepnij" onAction="#handleUnpinTab"/>
-              </items>
-            </ToolBar>
-         </children>
-      </VBox>
+        <VBox>
+            <children>
+                <MenuBar fx:id="menuBar" onKeyPressed="#handleKeyInput">
+                    <menus>
+                        <Menu text="Plik">
+                            <items>
+                                <MenuItem onAction="#handleOpen" text="Otwórz Ctrl+O" />
+                                <MenuItem onAction="#handleRevert" text="Przywróć Ctrl+R" />
+                                <MenuItem onAction="#handleDuplicate" text="Duplikuj Ctrl+D" />
+                                <MenuItem onAction="#handleSave" text="Zapisz Ctrl+S" />
+                                <MenuItem onAction="#handleSaveAs" text="Zapisz jako Ctrl+Shift+S" />
+                                <SeparatorMenuItem />
+                                <MenuItem onAction="#handleExit" text="Zamknij Ctrl+Q" />
+                            </items>
+                        </Menu>
+                        <Menu text="Edycja">
+                            <items>
+                                <MenuItem onAction="#handleUndo" text="Cofnij Ctrl+Z" />
+                                <MenuItem onAction="#handleRedo" text="Powtórz Ctrl+Shift+Z" />
+                            </items>
+                        </Menu>
+                        <Menu text="Narzędzia">
+                            <items>
+                                <MenuItem onAction="#handleConvertToGrayscale" text="konwersja do odcieni szarości" />
+                                <MenuItem onAction="#handleHistogramEqualisation" text="wyrównywanie histogramu" />
+                            </items>
+                        </Menu>
+                        <Menu text="Pomoc">
+                            <items>
+                                <MenuItem disable="true" text="Szukaj" />
+                                <MenuItem text="Online Manual" visible="false" />
+                                <SeparatorMenuItem />
+                                <MenuItem onAction="#handleAboutAction" text="O programie" />
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+                <ToolBar prefHeight="40.0" prefWidth="240.0">
+                    <items>
+                        <Button contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#handleOpen">
+                            <tooltip>
+                                <Tooltip text="Otwórz" />
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <image>
+                                        <Image url="@icons/Folder.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+
+                        <Button mnemonicParsing="false" onAction="#handleRevert" prefHeight="24.0" prefWidth="24.0">
+                            <tooltip>
+                                <Tooltip text="Przywróć" />
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <image>
+                                        <Image url="@icons/Open.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+
+                        <Button mnemonicParsing="false" onAction="#handleSave">
+                            <tooltip>
+                                <Tooltip text="Zapisz" />
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <image>
+                                        <Image url="@icons/Save.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+
+                        <Button fx:id="undoButton" disable="true" mnemonicParsing="false" onAction="#handleUndo">
+                            <tooltip>
+                                <Tooltip text="Cofnij" />
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <image>
+                                        <Image url="@icons/Undo.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+
+                        <Button fx:id="redoButton" disable="true" mnemonicParsing="false" onAction="#handleRedo">
+                            <tooltip>
+                                <Tooltip text="Powtórz" />
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <image>
+                                        <Image url="@icons/Redo.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+
+                        <Button mnemonicParsing="false" onAction="#handleDuplicate">
+                            <tooltip>
+                                <Tooltip text="Duplikuj" />
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <image>
+                                        <Image url="@icons/Add.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+
+                        <Button mnemonicParsing="false" onAction="#handleScreenShot">
+                            <tooltip>
+                                <Tooltip text="ScreenShot" />
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <image>
+                                        <Image url="@icons/Picture.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+
+                        <Button mnemonicParsing="false" onAction="#handleUnpinTab">
+                            <tooltip>
+                                <Tooltip text="Odepnij" />
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <image>
+                                        <Image url="@icons/Stock_Index_Up.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+
+                    </items>
+                </ToolBar>
+            </children>
+        </VBox>
     </top>
     <center>
         <TabPane fx:id="tabPane">
             <!--<Tab>-->
 
-                <!--<ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" BorderPane.alignment="CENTER">-->
-                    <!--<ImageView fx:id="imageCanvas" pickOnBounds="true" preserveRatio="true" onMouseMoved="#handleMouseMoved"/>-->
-                <!--</ScrollPane>-->
+            <!--<ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" BorderPane.alignment="CENTER">-->
+            <!--<ImageView fx:id="imageCanvas" pickOnBounds="true" preserveRatio="true" onMouseMoved="#handleMouseMoved"/>-->
+            <!--</ScrollPane>-->
             <!--</Tab>-->
         </TabPane>
     </center>
@@ -88,8 +190,30 @@
     <bottom>
         <ToolBar>
             <Label fx:id="zoomLabel" prefWidth="55" text="100%" />
-            <Button onMouseClicked="#handleZoomOut" text="-" />
-            <Button onMouseClicked="#handleZoomIn" text="+" />
+            <Button onMouseClicked="#handleZoomOut">
+                <tooltip>
+                    <Tooltip text="Pomniejsz" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitWidth="24" preserveRatio="true">
+                        <image>
+                            <Image url="@icons/Zoom_Out.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button onMouseClicked="#handleZoomIn">
+                <tooltip>
+                    <Tooltip text="Powiększ" />
+                </tooltip>
+                <graphic>
+                    <ImageView fitWidth="24" preserveRatio="true">
+                        <image>
+                            <Image url="@icons/Zoom_In.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
             <Label fx:id="fileNameLabel" />
         </ToolBar>
     </bottom>

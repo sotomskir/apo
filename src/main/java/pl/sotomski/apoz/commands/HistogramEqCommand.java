@@ -234,9 +234,6 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
             rightR[z]=rR;
             rightG[z]=rG;
             rightB[z]=rB;
-//            newR[z]=(leftR[z]+rightR[z])/2;
-//            newG[z]=(leftG[z]+rightG[z])/2;
-//            newB[z]=(leftB[z]+rightB[z])/2;
         }
 
         int width = bufferedImage.getWidth();
@@ -270,6 +267,12 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
         return bufferedImage;
     }
 
+    private BufferedImage method4(BufferedImage bufferedImage) {
+        Histogram histogram = new Histogram(bufferedImage);
+
+        return bufferedImage;
+    }
+
     private Color getAverage(BufferedImage bufferedImage, int px, int py) {
         int avg[] = new int[3];
         for (int x=-1;x<2;++x) {
@@ -298,12 +301,6 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
         a[1] = (rgb >>  8) & 0xff;
         a[2] = rgb & 0xff;
         return a;
-    }
-
-    private BufferedImage method4(BufferedImage bufferedImage) {
-        Histogram histogram = new Histogram(bufferedImage);
-
-        return bufferedImage;
     }
 
     private static int randomInRange(int aStart, int aEnd, Random aRandom){

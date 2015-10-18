@@ -2,8 +2,6 @@ package pl.sotomski.apoz;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -152,6 +150,10 @@ public class MainController implements Initializable, ToolController {
                 handleDuplicate(null);
             } else if (keyEvent.isControlDown() && keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.S) {
                 handleSaveAs(null);
+            } else if (keyEvent.isControlDown() && keyEvent.isShiftDown() && keyEvent.getCode() == KeyCode.Z) {
+                handleRedo(null);
+            } else if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.Z) {
+                handleUndo(null);
             }
         }
     }
@@ -292,25 +294,18 @@ public class MainController implements Initializable, ToolController {
         tabPane.getTabs().remove(selectedTab);
         Window parent = rootLayout.getScene().getWindow();
         ImageWindow window = new ImageWindow(parent, selectedTab.getPane());
-        window.focusedProperty().addListener(new ChangeListener<Boolean>()
-        {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue)
+        window.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
+            if (newPropertyValue)
             {
-                if (newPropertyValue)
-                {
-                    activePaneProperty.setValue(window.getImagePane());
-                    window.toFront();
-                    System.out.println("Window on focus: "+window.getTitle());
-                }
-                else
-                {
-                    System.out.println("Window out focus: "+window.getTitle());
-                }
+                activePaneProperty.setValue(window.getImagePane());
+                window.toFront();
+                System.out.println("Window on focus: "+window.getTitle());
+            }
+            else
+            {
+                System.out.println("Window out focus: "+window.getTitle());
             }
         });
-
-
     }
 
     public void handleUndo(ActionEvent actionEvent) {
