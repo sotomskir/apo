@@ -15,9 +15,10 @@ import javafx.stage.Window;
 public class ImageWindow extends Stage {
 
     private ImagePane imagePane;
+    private Pane histogramPane;
     public ImageWindow(Window owner, ImagePane pane) {
         super();
-        Pane histogramPane = new Pane();
+        histogramPane = new Pane();
         TabPane tabPane = new TabPane();
         Tab tab1 = new Tab("histogram");
         Tab tab2 = new Tab("linia profilu");

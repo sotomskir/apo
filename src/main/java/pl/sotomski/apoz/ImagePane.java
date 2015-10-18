@@ -34,9 +34,11 @@ public class ImagePane extends Pane {
     private DoubleProperty zoomProperty;
     private File file;
     private ScrollPane scrollPane;
+    private boolean tabbed;
 
     private ImagePane() {
         super();
+        this.tabbed = true;
         this.commandManager = new CommandManager();
         this.zoomProperty = new SimpleDoubleProperty(1);
         this.imageVersion = new SimpleIntegerProperty(0);
@@ -165,5 +167,13 @@ public class ImagePane extends Pane {
         this.histogramManager.setImage(bufferedImage);
         this.histogramManager.update();
         this.imageVersionProperty().setValue(getImageVersion()+1);
+    }
+
+    public boolean isTabbed() {
+        return tabbed;
+    }
+
+    public void setTabbed(boolean tabbed) {
+        this.tabbed = tabbed;
     }
 }

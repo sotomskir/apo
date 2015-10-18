@@ -19,12 +19,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.ConvertToGrayCommand;
 import pl.sotomski.apoz.tools.HistogramEqTool;
 import pl.sotomski.apoz.tools.ToolController;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.HistogramManager;
+import pl.sotomski.apoz.utils.ImageUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -54,21 +56,37 @@ public class MainController implements Initializable, ToolController {
     @Override
     public void initialize(java.net.URL arg0, ResourceBundle arg1) {
         activePaneProperty = new SimpleObjectProperty<>();
-        activePaneProperty.addListener(e -> handleActiveTabChanged());
-        menuBar.setFocusTraversable(true);
+
+        activePaneProperty.addListener(e -> {
+            if (activePaneProperty.getValue().isTabbed()) {
+                histogramPane.getChildren().clear();
+                histogramPane.getChildren().add(activePaneProperty.getValue().getHistogramManager().getBarChart());
+            }
+            zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
+            updateUndoRedoListeners();
+        });
+
+        menuBar.setFocusTraversable(false);
         zoomLabel.setOnInputMethodTextChanged(e -> activePaneProperty.getValue().handleZoomChange(zoomLabel.getText()));
 
         tabPane.getSelectionModel().selectedItemProperty().addListener(e ->
         {
             ImagePane oldActivePane = activePaneProperty.getValue();
-            ImageTab newActiveTab = (ImageTab)tabPane.getSelectionModel().getSelectedItem();
-            if (newActiveTab!=null){
+            ImageTab newActiveTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
+
+            if (newActiveTab != null) {
                 activePaneProperty.setValue(newActiveTab.getPane());
                 newActiveTab.getPane().imageVersionProperty().addListener(ev -> {
                     updateLabels(activePaneProperty.getValue());
                 });
                 updateLabels(newActiveTab.getPane());
             }
+
+        });
+
+        tabPane.focusedProperty().addListener(e -> {
+            ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
+            activePaneProperty.setValue(selectedTab.getPane());
         });
 
     }
@@ -79,14 +97,7 @@ public class MainController implements Initializable, ToolController {
         labelHeight.setText("Heigth: " + pane.getImage().getHeight());
     }
 
-    private void handleActiveTabChanged() {
-        histogramPane.getChildren().clear();
-        histogramPane.getChildren().add(activePaneProperty.getValue().getHistogramManager().getBarChart());
-        zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
-        updateListeners();
-    }
-
-    private void updateListeners() {
+    private void updateUndoRedoListeners() {
         activePaneProperty.getValue().getCommandManager().undoAvailableProperty().addListener(e -> {
             undoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getUndoAvailable());
         });
@@ -119,8 +130,7 @@ public class MainController implements Initializable, ToolController {
     }
 
     /**
-     * Handle action related to input (in this case specifically only responds to
-     * keyboard event CTRL-A).
+     * Handle action related to keyboard input.
      *
      * @param event Input event.
      */
@@ -173,8 +183,8 @@ public class MainController implements Initializable, ToolController {
     public void handleOpen(ActionEvent actionEvent) {
         File file = FileMenuUtils.openDialog(rootLayout);
         ImagePane pane = new ImagePane(file);
-        ImageTab tab = new ImageTab(pane);
-        attachTab(tab);
+        ImageTab imageTab = new ImageTab(pane);
+        attachTab(imageTab);
     }
 
     public void handleDuplicate(ActionEvent actionEvent) {
@@ -218,7 +228,6 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleMouseMoved(MouseEvent event) {
-
         int x = (int)event.getX();
         int y = (int)event.getY();
         x/= activePaneProperty.getValue().getZoomProperty().getValue();
@@ -226,16 +235,12 @@ public class MainController implements Initializable, ToolController {
         labelX.setText("X: " + x);
         labelY.setText("Y: " + y);
         int rgb = activePaneProperty.getValue().getImage().getRGB(x, y);
-        int r, g, b;
-        r = (rgb >> 16 ) & 0xFF;
-        g = (rgb >> 8 ) & 0xFF;
-        b = rgb & 0xFF;
         if(activePaneProperty.getValue().getChannels() == 3) {
-            labelR.setText("R: " + r);
-            labelG.setText("G: " + g);
-            labelB.setText("B: " + b);
+            labelR.setText("R: " + ImageUtils.getR(rgb));
+            labelG.setText("G: " + ImageUtils.getG(rgb));
+            labelB.setText("B: " + ImageUtils.getB(rgb));
         } else {
-            labelR.setText("K: " + b);
+            labelR.setText("K: " + ImageUtils.getB(rgb));
             labelG.setText("");
             labelB.setText("");
         }
@@ -282,9 +287,11 @@ public class MainController implements Initializable, ToolController {
 
     public void handleUnpinTab(ActionEvent actionEvent) {
         //TODO
-        ImageTab tab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
-        tabPane.getTabs().remove(tab);
-        ImageWindow window = new ImageWindow(rootLayout.getScene().getWindow(), tab.getPane());
+        ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
+        selectedTab.getPane().setTabbed(false);
+        tabPane.getTabs().remove(selectedTab);
+        Window parent = rootLayout.getScene().getWindow();
+        ImageWindow window = new ImageWindow(parent, selectedTab.getPane());
         window.focusedProperty().addListener(new ChangeListener<Boolean>()
         {
             @Override

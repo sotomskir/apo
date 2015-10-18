@@ -17,13 +17,13 @@ public class ImageUtils {
         for(int x=0;x<width;++x) {
             for(int y=0;y<height;++y) {
                 int rgb = bufferedImage.getRGB(x,y);
-                wr.setSample(x, y, 0, convertPixel(rgb));
+                wr.setSample(x, y, 0, convertPixelToGray(rgb));
             }
         }
         return grayscaleImage;
     }
 
-    private static int convertPixel(int rgb) {
+    private static int convertPixelToGray(int rgb) {
         //TODO Add LUT
         /*
         rPerc+gPerc+bPerc == 1
@@ -36,6 +36,16 @@ public class ImageUtils {
         int b = rgb & 0xFF;
         int k = (int)(r*rPerc + g*gPerc + b*bPerc) ;
         return k;
+    }
+
+    public static int getR(int rgb) {
+        return (rgb >> 16) & 0xFF;
+    }
+    public static int getG(int rgb) {
+        return (rgb >> 8) & 0xFF;
+    }
+    public static int getB(int rgb) {
+        return rgb & 0xFF;
     }
 
     public static BufferedImage deepCopy(BufferedImage bi) {
