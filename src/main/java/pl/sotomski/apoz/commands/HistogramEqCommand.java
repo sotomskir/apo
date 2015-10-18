@@ -1,9 +1,7 @@
 package pl.sotomski.apoz.commands;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import pl.sotomski.apoz.ImagePane;
 import pl.sotomski.apoz.utils.Histogram;
-import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,32 +10,34 @@ import java.util.Random;
 /**
  * Created by sotomski on 17/10/15.
  */
-public class HistogramEqCommand implements Command {
-    private ObjectProperty<BufferedImage> image;
-    private ObjectProperty<BufferedImage> previousImage;
+public class HistogramEqCommand extends UndoableCommand implements Command {
     private int method;
 
-    public HistogramEqCommand(ObjectProperty<BufferedImage> image, int method) throws Exception {
-        if (method < 1 || method > 4) throw new Exception("Bad method");
-        this.image = image;
-        this.previousImage = new SimpleObjectProperty<>();
-        this.previousImage.setValue(ImageUtils.deepCopy(image.getValue()));
+    public HistogramEqCommand(ImagePane imagePane, int method) throws Exception {
+        super(imagePane);
+        if (method < 1 || method > 4) throw new IllegalArgumentException("Bad method. Eligible methods: 1, 2, 3, 4");
         this.method = method;
     }
 
     @Override
     public void execute() {
-        if (method==1) method1(image.getValue());
-        else if (method==2) method2(image.getValue());
-        else if (method==3) method3(image.getValue());
-        else if (method==4) method4(image.getValue());
+        if (method==1)      {
+            method1(imagePane.getImage());
+            imagePane.refresh();
+        }
+        else if (method==2) {
+            method2(imagePane.getImage());
+            imagePane.refresh();
+        }
+        else if (method == 3) {
+            method3(imagePane.getImage());
+            imagePane.refresh();
+        }
+        else if (method == 4) {
+            method4(imagePane.getImage());
+            imagePane.refresh();
+        }
     }
-
-    @Override
-    public void undo() {
-        this.image.setValue(ImageUtils.deepCopy(previousImage.getValue()));
-    }
-
 
     private BufferedImage method1(BufferedImage bufferedImage) {
         Histogram histogram = new Histogram(bufferedImage);

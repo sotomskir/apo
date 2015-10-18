@@ -1,6 +1,7 @@
 package pl.sotomski.apoz.commands;
 
-import pl.sotomski.apoz.commands.Command;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 import java.util.Stack;
 
@@ -10,16 +11,24 @@ import java.util.Stack;
 public class CommandManager {
     private Stack<Command> undoStack;
     private Stack<Command> redoStack;
+    private BooleanProperty undoAvailable;
+    private BooleanProperty redoAvailable;
 
     public CommandManager() {
-        this.undoStack = new Stack<>();
-        this.redoStack = new Stack<>();
+        undoStack = new Stack<>();
+        redoStack = new Stack<>();
+        undoAvailable = new SimpleBooleanProperty(false);
+        redoAvailable = new SimpleBooleanProperty(false);
     }
 
     public void executeCommand(Command command) {
         command.execute();
         undoStack.push(command);
-        if (redoStack.size()>0) redoStack.clear();
+        undoAvailable.setValue(true);
+        if (redoStack.size()>0) {
+            redoStack.clear();
+            redoAvailable.setValue(false);
+        }
     }
 
     public void undo() {
@@ -27,6 +36,8 @@ public class CommandManager {
             Command lastCommand = undoStack.pop();
             lastCommand.undo();
             redoStack.push(lastCommand);
+            redoAvailable.setValue(true);
+            if (undoStack.size()==0) undoAvailable.setValue(false);
         }
     }
 
@@ -35,14 +46,24 @@ public class CommandManager {
             Command lastCommand = redoStack.pop();
             lastCommand.execute();
             undoStack.push(lastCommand);
+            undoAvailable.setValue(true);
+            if (redoStack.size()==0) redoAvailable.setValue(false);
         }
     }
 
-    public boolean isUndoAvailable() {
-        return undoStack.size() > 0;
+    public boolean getUndoAvailable() {
+        return undoAvailable.get();
     }
 
-   public boolean isRedoAvailable() {
-        return redoStack.size() > 0;
+    public BooleanProperty undoAvailableProperty() {
+        return undoAvailable;
+    }
+
+    public boolean getRedoAvailable() {
+        return redoAvailable.get();
+    }
+
+    public BooleanProperty redoAvailableProperty() {
+        return redoAvailable;
     }
 }

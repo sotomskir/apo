@@ -9,9 +9,9 @@ import java.awt.image.BufferedImage;
  * Created by sotomski on 27/09/15.
  */
 public interface ToolController {
-    public HistogramManager getHistogramChart();
-    public BufferedImage getBufferedImage();
-    public void setBufferedImage(BufferedImage image);
+    HistogramManager getHistogramChart();
+    BufferedImage getBufferedImage();
+    void setBufferedImage(BufferedImage image);
 
     ImagePane getActivePaneProperty();
 }

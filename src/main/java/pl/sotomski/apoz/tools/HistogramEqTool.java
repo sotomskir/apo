@@ -19,12 +19,13 @@ public class HistogramEqTool extends VBox {
     private String methods[] = {"metoda średnich", "metoda losowa", "metoda sąsiedztwa", "metoda własna"};
 
     protected HistogramEqTool(ToolController controller) {
+        this.choiceBox = new ChoiceBox<>();
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);
-        Label label = new Label("Histogram equalisation");
-        this.choiceBox = new ChoiceBox<>();
+        Label label = new Label("wyrównywanie histogramu");
         choiceBox.getItems().addAll(methods);
-        Button button = new Button("Apply");
+        choiceBox.getSelectionModel().select(0);
+        Button button = new Button("Zastosuj");
         button.setOnAction((actionEvent) -> {
             try {
                 handleApply(actionEvent);
@@ -45,22 +46,22 @@ public class HistogramEqTool extends VBox {
         if(methods[0].equals(method)) {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
-            manager.executeCommand(new HistogramEqCommand(imagePane.getImageProperty(), 1));
+            manager.executeCommand(new HistogramEqCommand(imagePane, 1));
             imagePane.setImage(imagePane.getImage());
         } else       if(methods[1].equals(method)) {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
-            manager.executeCommand(new HistogramEqCommand(imagePane.getImageProperty(), 2));
+            manager.executeCommand(new HistogramEqCommand(imagePane, 2));
             imagePane.setImage(imagePane.getImage());
         } else       if(methods[2].equals(method)) {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
-            manager.executeCommand(new HistogramEqCommand(imagePane.getImageProperty(), 3));
+            manager.executeCommand(new HistogramEqCommand(imagePane, 3));
             imagePane.setImage(imagePane.getImage());
         } else       if(methods[3].equals(method)) {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
-            manager.executeCommand(new HistogramEqCommand(imagePane.getImageProperty(), 4));
+            manager.executeCommand(new HistogramEqCommand(imagePane, 4));
             imagePane.setImage(imagePane.getImage());
         }
     }

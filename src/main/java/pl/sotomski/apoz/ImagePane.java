@@ -1,9 +1,9 @@
 package pl.sotomski.apoz;
 
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
@@ -26,27 +26,22 @@ import java.io.File;
 public class ImagePane extends Pane {
 
     private ImageView imageView;
-    private ObjectProperty<BufferedImage> bufferedImage;
+    private BufferedImage bufferedImage;
+    private IntegerProperty imageVersion;
     private HistogramManager histogramManager;
     private CommandManager commandManager;
     private Histogram histogram;
     private DoubleProperty zoomProperty;
-//    private ImageObservable image;
     private File file;
-       private ScrollPane scrollPane;
+    private ScrollPane scrollPane;
 
     private ImagePane() {
         super();
         this.commandManager = new CommandManager();
         this.zoomProperty = new SimpleDoubleProperty(1);
+        this.imageVersion = new SimpleIntegerProperty(0);
         this.imageView = new ImageView();
-        this.bufferedImage = new SimpleObjectProperty<>();
-        this.bufferedImage.addListener(e -> {
-            imageView.setImage(SwingFXUtils.toFXImage(getImage(), null));
-            this.histogram = new Histogram(getImage());
-            this.histogramManager.update();
-        });
-        scrollPane= new ScrollPane();
+        scrollPane = new ScrollPane();
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setContent(imageView);
@@ -59,12 +54,14 @@ public class ImagePane extends Pane {
         this.histogramManager = new HistogramManager(bi);
         setImage(bi);
         this.file = file;
+        refresh();
     }
 
     public ImagePane(BufferedImage image, String name) {
         this();
         this.histogramManager = new HistogramManager(image);
-        setImage(image);
+        this.bufferedImage = image;
+        refresh();
     }
 
     public ImagePane(ImagePane imagePane) {
@@ -72,8 +69,8 @@ public class ImagePane extends Pane {
         setFile(new File(imagePane.getFile().getPath()));
         BufferedImage image = ImageUtils.deepCopy(imagePane.getImage());
         this.histogramManager = new HistogramManager(image);
-        setImage(image);
-
+        this.bufferedImage = image;
+        refresh();
     }
 
     public ScrollPane getScrollPane() {
@@ -81,14 +78,11 @@ public class ImagePane extends Pane {
     }
 
     public void setImage(BufferedImage bufferedImage) {
-        this.bufferedImage.setValue(bufferedImage);
-        imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-        this.histogram = new Histogram(bufferedImage);
-        this.histogramManager.update();
+        this.bufferedImage = bufferedImage;
     }
 
     public BufferedImage getImage() {
-        return bufferedImage.getValue();
+        return bufferedImage;
     }
 
     public Histogram getHistogram() {
@@ -137,16 +131,16 @@ public class ImagePane extends Pane {
         return zoomProperty;
     }
 
+    public int getImageVersion() {
+        return imageVersion.get();
+    }
+
+    public IntegerProperty imageVersionProperty() {
+        return imageVersion;
+    }
+
     public void setFile(File file) {
         this.file = file;
-    }
-
-    public ObjectProperty<BufferedImage> getImageProperty() {
-        return bufferedImage;
-    }
-
-    public ObjectProperty<BufferedImage> bufferedImageProperty() {
-        return bufferedImage;
     }
 
     public File getFile() {
@@ -163,5 +157,13 @@ public class ImagePane extends Pane {
 
     public ImageView getImageView() {
         return imageView;
+    }
+
+    public void refresh() {
+        imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
+        this.histogram = new Histogram(bufferedImage);
+        this.histogramManager.setImage(bufferedImage);
+        this.histogramManager.update();
+        this.imageVersionProperty().setValue(getImageVersion()+1);
     }
 }

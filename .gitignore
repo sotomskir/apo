@@ -16,3 +16,7 @@ hs_err_pid*
 
 
 POB2.iml
+target
+*.DS_Store
+.idea
+out

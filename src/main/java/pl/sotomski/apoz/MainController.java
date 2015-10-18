@@ -10,10 +10,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
@@ -35,7 +32,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable, ToolController {
+public class MainController implements Initializable, ToolController {
     @FXML
     private MenuBar menuBar;
     @FXML
@@ -49,6 +46,10 @@ public class Controller implements Initializable, ToolController {
     @FXML
     TabPane tabPane;
     private ObjectProperty<ImagePane> activePaneProperty;
+    @FXML
+    private Button undoButton;
+    @FXML
+    private Button redoButton;
 
     @Override
     public void initialize(java.net.URL arg0, ResourceBundle arg1) {
@@ -63,7 +64,7 @@ public class Controller implements Initializable, ToolController {
             ImageTab newActiveTab = (ImageTab)tabPane.getSelectionModel().getSelectedItem();
             if (newActiveTab!=null){
                 activePaneProperty.setValue(newActiveTab.getPane());
-                newActiveTab.getPane().getImageProperty().addListener(ev -> {
+                newActiveTab.getPane().imageVersionProperty().addListener(ev -> {
                     updateLabels(activePaneProperty.getValue());
                 });
                 updateLabels(newActiveTab.getPane());
@@ -72,16 +73,28 @@ public class Controller implements Initializable, ToolController {
 
     }
 
-private void updateLabels(ImagePane pane) {
-    labelDepth.setText("Depth: " + (pane.getImage().getColorModel().getNumComponents()>1?"RGB":"Gray"));
-    labelWidth.setText("Width: " + pane.getImage().getWidth());
-    labelHeight.setText("Heigth: " + pane.getImage().getHeight());
-}
+    private void updateLabels(ImagePane pane) {
+        labelDepth.setText("Depth: " + (pane.getImage().getColorModel().getNumComponents()>1?"RGB":"Gray"));
+        labelWidth.setText("Width: " + pane.getImage().getWidth());
+        labelHeight.setText("Heigth: " + pane.getImage().getHeight());
+    }
 
     private void handleActiveTabChanged() {
         histogramPane.getChildren().clear();
         histogramPane.getChildren().add(activePaneProperty.getValue().getHistogramManager().getBarChart());
         zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
+        updateListeners();
+    }
+
+    private void updateListeners() {
+        activePaneProperty.getValue().getCommandManager().undoAvailableProperty().addListener(e -> {
+            undoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getUndoAvailable());
+        });
+        activePaneProperty.getValue().getCommandManager().redoAvailableProperty().addListener(e -> {
+            redoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getRedoAvailable());
+        });
+        undoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getUndoAvailable());
+        redoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getRedoAvailable());
     }
 
     @Override
@@ -230,9 +243,8 @@ private void updateLabels(ImagePane pane) {
 
     public void handleConvertToGrayscale(ActionEvent actionEvent) {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
-        manager.executeCommand(new ConvertToGrayCommand(activePaneProperty.getValue().getImageProperty()));
-//        activePaneProperty.getValue().setImage(activePaneProperty.getValue().getImage());
-//        getHistogramChart().switchType();
+        manager.executeCommand(new ConvertToGrayCommand(activePaneProperty.getValue()));
+        getHistogramChart().switchType();
     }
 
     public void handleZoomOut(Event event) {

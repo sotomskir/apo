@@ -8,12 +8,12 @@ import java.awt.image.BufferedImage;
  */
 public class Histogram {
 
-        private int hR[];
+    private final int levels;
+    private int hR[];
         private int hG[];
         private int hB[];
         private int hM[];
         private double hRavg, hGavg, hBavg, Havg;
-        private boolean mono;
         private int channels;
         public int[] gethM() {
             return hM;
@@ -48,13 +48,20 @@ public class Histogram {
             return Havg;
         }
 
+    public int getLevels() {
+        return levels;
+    }
+
+    public int getChannels() {
+        return channels;
+    }
 
     public Histogram(BufferedImage image) {
         int height = image.getHeight();
         int width = image.getWidth();
         channels = image.getColorModel().getNumComponents();
         int bitDepth = image.getColorModel().getPixelSize()/channels;
-        int levels = (int)Math.pow(2, bitDepth);
+        levels = (int)Math.pow(2, bitDepth);
 
         hR = new int[levels];
         hG = new int[levels];
