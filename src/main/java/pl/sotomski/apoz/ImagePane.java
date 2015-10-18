@@ -105,6 +105,7 @@ public class ImagePane extends Pane {
 
     public void handleRevert(ActionEvent actionEvent) {
         setImage(FileMenuUtils.loadImage(file));
+        refresh();
     }
 
     public void handleZoomIn(Label textField) {
