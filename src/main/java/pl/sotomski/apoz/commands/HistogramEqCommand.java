@@ -270,34 +270,28 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
     }
 
     private BufferedImage method4(BufferedImage bufferedImage) {
+//        http://www.generation5.org/content/2004/histogramEqualization.asp
         Histogram histogram = new Histogram(bufferedImage);
         double alpha = (double)histogram.getLevels() / (bufferedImage.getWidth()*bufferedImage.getHeight());
-        double[][] cumulativeFrequency = new double[3][histogram.getLevels()];
-        double[] sum = new double[3];
-        for (int i=0;i<histogram.getLevels();++i) {
-            sum[0]+=histogram.gethR()[i];
-            sum[1]+=histogram.gethG()[i];
-            sum[2]+=histogram.gethB()[i];
-            cumulativeFrequency[0][i]=sum[0];
-            cumulativeFrequency[1][i]=sum[1];
-            cumulativeFrequency[2][i]=sum[2];
-        }
+        int[][] cumulativeFrequency = histogram.getCumulative();
         WritableRaster raster = bufferedImage.getRaster();
-        int rgb;
-        int[] rgb2 = new int[3];
+        int rgb2;
+        int[] rgb = new int[3];
+
         for (int x=0;x<bufferedImage.getWidth();++x) {
             for (int y=0;y<bufferedImage.getHeight();++y) {
-                rgb = bufferedImage.getRGB(x, y);
-                rgb2[0] = ImageUtils.getR(rgb);
-                rgb2[1] = ImageUtils.getG(rgb);
-                rgb2[2] = ImageUtils.getB(rgb);
-                rgb2[0] = (int) (cumulativeFrequency[0][rgb2[0]] * alpha);
-                rgb2[1] = (int) (cumulativeFrequency[1][rgb2[1]] * alpha);
-                rgb2[2] = (int) (cumulativeFrequency[2][rgb2[2]] * alpha);
-                for (int i=0;i<3;++i) if (rgb2[i]>255) rgb2[i]=255;
-                raster.setPixel(x, y, rgb2);
+                rgb2 = bufferedImage.getRGB(x, y);
+                rgb[0] = ImageUtils.getR(rgb2);
+                rgb[1] = ImageUtils.getG(rgb2);
+                rgb[2] = ImageUtils.getB(rgb2);
+                rgb[0] = (int) (cumulativeFrequency[0][rgb[0]] * alpha);
+                rgb[1] = (int) (cumulativeFrequency[1][rgb[1]] * alpha);
+                rgb[2] = (int) (cumulativeFrequency[2][rgb[2]] * alpha);
+                for (int i=0;i<3;++i) if (rgb[i]>255) rgb[i]=255;
+                raster.setPixel(x, y, rgb);
             }
         }
+
         return bufferedImage;
     }
 

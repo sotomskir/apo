@@ -282,10 +282,14 @@ public class MainController implements Initializable, ToolController {
                     return lowercaseName.endsWith(".png") && lowercaseName.startsWith("snapshot");
                 }
             });
-            String lastSnapshot = snapshots[snapshots.length-1];
-            String snumber = lastSnapshot.substring(8, 11);
-            int number = Integer.valueOf(snumber)+1;
-            File file = new File(path + "snapshot" + String.format("%03d", number) + ".png");
+
+            int currentSnapshotNumber;
+            if(snapshots.length>0) {
+                String lastSnapshot = snapshots[snapshots.length-1];
+                String snumber = lastSnapshot.substring(8, 11);
+                currentSnapshotNumber = Integer.valueOf(snumber)+1;
+            } else currentSnapshotNumber = 1;
+            File file = new File(path + "snapshot" + String.format("%03d", currentSnapshotNumber) + ".png");
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
         } catch (Exception e) {
             e.printStackTrace();
