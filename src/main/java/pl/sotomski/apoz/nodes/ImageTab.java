@@ -1,4 +1,4 @@
-package pl.sotomski.apoz;
+package pl.sotomski.apoz.nodes;
 
 import javafx.scene.control.Tab;
 

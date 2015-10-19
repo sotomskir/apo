@@ -1,4 +1,4 @@
-package pl.sotomski.apoz;
+package pl.sotomski.apoz.utils;
 
 import java.io.IOException;
 import java.io.InputStream;

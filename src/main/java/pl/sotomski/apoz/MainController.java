@@ -20,10 +20,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.ConvertToGrayCommand;
+import pl.sotomski.apoz.nodes.ImagePane;
+import pl.sotomski.apoz.nodes.ImageTab;
+import pl.sotomski.apoz.nodes.ImageWindow;
 import pl.sotomski.apoz.tools.HistogramEqTool;
 import pl.sotomski.apoz.tools.ToolController;
 import pl.sotomski.apoz.utils.FileMenuUtils;
-import pl.sotomski.apoz.utils.HistogramManager;
+import pl.sotomski.apoz.nodes.HistogramPane;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import javax.imageio.ImageIO;
@@ -38,7 +41,8 @@ public class MainController implements Initializable, ToolController {
     @FXML
     private VBox toolbox;
     @FXML
-    private Pane histogramPane;
+    private Pane histogramPaneContainer;
+    private HistogramPane histogramPane;
     @FXML
     private BorderPane rootLayout;
     @FXML
@@ -56,11 +60,11 @@ public class MainController implements Initializable, ToolController {
     public void initialize(java.net.URL arg0, ResourceBundle resources) {
         bundle = resources;
         activePaneProperty = new SimpleObjectProperty<>();
-
+        histogramPane = new HistogramPane(bundle);
+        histogramPaneContainer.getChildren().add(histogramPane);
         activePaneProperty.addListener(e -> {
             if (activePaneProperty.getValue().isTabbed()) {
-                histogramPane.getChildren().clear();
-                histogramPane.getChildren().add(activePaneProperty.getValue().getHistogramManager().getBarChart());
+                histogramPane.update(activePaneProperty.getValue().getImage());
             }
             zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
             updateUndoRedoListeners();
@@ -190,14 +194,14 @@ public class MainController implements Initializable, ToolController {
 
     public void handleOpen(ActionEvent actionEvent) {
         File file = FileMenuUtils.openDialog(rootLayout);
-        ImagePane pane = new ImagePane(file);
+        ImagePane pane = new ImagePane(histogramPane, file);
         ImageTab imageTab = new ImageTab(pane);
         attachTab(imageTab);
     }
 
     public void handleDuplicate(ActionEvent actionEvent) {
         ImagePane activePane = activePaneProperty.getValue();
-        ImagePane pane = new ImagePane(activePane);
+        ImagePane pane = new ImagePane(histogramPane, activePane);
         ImageTab tab = new ImageTab(pane);
         attachTab(tab);
     }
@@ -221,13 +225,9 @@ public class MainController implements Initializable, ToolController {
         toolbox.getChildren().add(HistogramEqTool.getInstance(this));
     }
 
-    public void switchHistogram(Event event) {
-        getHistogramChart().switchType();
-    }
-
     @Override
-    public HistogramManager getHistogramChart() {
-        return activePaneProperty.getValue().getHistogramManager();
+    public HistogramPane getHistogramChart() {
+        return activePaneProperty.getValue().getHistogramPane();
     }
 
     @Override
@@ -257,7 +257,6 @@ public class MainController implements Initializable, ToolController {
     public void handleConvertToGrayscale(ActionEvent actionEvent) {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
         manager.executeCommand(new ConvertToGrayCommand(activePaneProperty.getValue()));
-        getHistogramChart().switchType();
     }
 
     public void handleZoomOut(Event event) {
@@ -299,7 +298,8 @@ public class MainController implements Initializable, ToolController {
         selectedTab.getPane().setTabbed(false);
         tabPane.getTabs().remove(selectedTab);
         Window parent = rootLayout.getScene().getWindow();
-        ImageWindow window = new ImageWindow(parent, selectedTab.getPane());
+        ImagePane imagePane = selectedTab.getPane();
+        ImageWindow window = new ImageWindow(parent, imagePane, new HistogramPane(bundle, imagePane.getImage()));
         window.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
             if (newPropertyValue)
             {

@@ -167,7 +167,7 @@
     </center>
     <right>
         <VBox styleClass="center" BorderPane.alignment="CENTER">
-            <Pane fx:id="histogramPane" onMouseClicked="#switchHistogram" />
+            <Pane fx:id="histogramPaneContainer" />
             <HBox>
                 <VBox>
                     <Label fx:id="labelDepth" text="%Depth" />

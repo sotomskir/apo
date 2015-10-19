@@ -3,7 +3,6 @@ package pl.sotomski.apoz.utils;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-import pl.sotomski.apoz.ExceptionDialog;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

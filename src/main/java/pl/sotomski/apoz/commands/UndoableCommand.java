@@ -1,6 +1,6 @@
 package pl.sotomski.apoz.commands;
 
-import pl.sotomski.apoz.ImagePane;
+import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;

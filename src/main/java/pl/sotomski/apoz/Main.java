@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import pl.sotomski.apoz.utils.ExceptionDialog;
+import pl.sotomski.apoz.utils.UTF8Control;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

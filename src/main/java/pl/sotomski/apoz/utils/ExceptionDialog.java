@@ -1,4 +1,4 @@
-package pl.sotomski.apoz;
+package pl.sotomski.apoz.utils;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;

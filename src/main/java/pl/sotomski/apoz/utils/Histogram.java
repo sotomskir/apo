@@ -13,6 +13,8 @@ public class Histogram {
         private int hG[];
         private int hB[];
         private int hM[];
+    private int rgb[][];
+    private int cumulative[][];
         private double hRavg, hGavg, hBavg, Havg;
         private int channels;
         public int[] gethM() {
@@ -52,6 +54,10 @@ public class Histogram {
         return levels;
     }
 
+    public int[][] getCumulative() {
+        return cumulative;
+    }
+
     public int getChannels() {
         return channels;
     }
@@ -67,14 +73,20 @@ public class Histogram {
         hG = new int[levels];
         hB =  new int[levels];
         hM =  new int[levels];
-
+        rgb =  new int[channels][levels];
+        cumulative =  new int[3][levels];
+        int rgb;
         double Hsum = 0, hRsum = 0, hGsum = 0, hBsum = 0;
         for (int x=0;x<width;++x)
             for (int y=0;y<height;++y) {
-                Color rgb = new Color(image.getRGB(x, y));
-                ++hR[rgb.getRed()];
-                ++hB[rgb.getBlue()];
-                ++hG[rgb.getGreen()];
+                rgb = image.getRGB(x, y);
+                Color color = new Color(rgb);
+                ++hR[color.getRed()];
+                ++hG[color.getGreen()];
+                ++hB[color.getBlue()];
+                for (int i=0;i<channels;++i) ++this.rgb[i][(rgb >> ((channels-i)*8)) & 0xFF];
+
+
             }
 
         for (int i=0;i<levels;++i) {
@@ -83,6 +95,9 @@ public class Histogram {
             hRsum += hR[i];
             hGsum += hG[i];
             hBsum += hB[i];
+            cumulative[0][i] = (int) hRsum;
+            cumulative[1][i] = (int) hGsum;
+            cumulative[2][i] = (int) hBsum;
         }
 
         hRavg=hRsum/levels;
