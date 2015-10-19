@@ -1,4 +1,4 @@
-package pl.sotomski.apoz;
+package pl.sotomski.apoz.controllers;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -6,7 +6,9 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
@@ -17,47 +19,48 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.stage.Window;
+import pl.sotomski.apoz.Main;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.ConvertToGrayCommand;
+import pl.sotomski.apoz.nodes.HistogramPane;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.nodes.ImageTab;
 import pl.sotomski.apoz.nodes.ImageWindow;
 import pl.sotomski.apoz.tools.HistogramEqTool;
 import pl.sotomski.apoz.tools.ToolController;
 import pl.sotomski.apoz.utils.FileMenuUtils;
-import pl.sotomski.apoz.nodes.HistogramPane;
 import pl.sotomski.apoz.utils.ImageUtils;
+import pl.sotomski.apoz.utils.UTF8Control;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 public class MainController implements Initializable, ToolController {
-    @FXML
-    private MenuBar menuBar;
-    @FXML
-    private VBox toolbox;
-    @FXML
-    private Pane histogramPaneContainer;
-    private HistogramPane histogramPane;
-    @FXML
-    private BorderPane rootLayout;
-    @FXML
-    Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
-    @FXML
-    TabPane tabPane;
-    private ObjectProperty<ImagePane> activePaneProperty;
-    @FXML
-    private Button undoButton;
-    @FXML
-    private Button redoButton;
     private ResourceBundle bundle;
+    private HistogramPane histogramPane;
+    private ObjectProperty<ImagePane> activePaneProperty;
+    private Preferences prefs;
+    @FXML private MenuBar menuBar;
+    @FXML private VBox toolbox;
+    @FXML private Pane histogramPaneContainer;
+    @FXML private BorderPane rootLayout;
+    @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
+    @FXML TabPane tabPane;
+    @FXML private Button undoButton;
+    @FXML private Button redoButton;
 
     @Override
     public void initialize(java.net.URL arg0, ResourceBundle resources) {
+        prefs = Preferences.userNodeForPackage(Main.class);
+
         bundle = resources;
         activePaneProperty = new SimpleObjectProperty<>();
         histogramPane = new HistogramPane(bundle);
@@ -271,7 +274,7 @@ public class MainController implements Initializable, ToolController {
         Scene scene = tabPane.getScene();
         WritableImage image = new WritableImage((int)scene.getWidth(), (int)scene.getHeight());
         scene.snapshot(image);
-        String path = System.getProperty("user.home") + "/apoz_screenshots/";
+        String path = prefs.get(PrefsController.SCREENSHOT_PATH, System.getProperty("user.home") + "/apoz_screenshots/");
         File apozDir = new File(path);
         try {
             apozDir.mkdir();
@@ -297,7 +300,6 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleUnpinTab(ActionEvent actionEvent) {
-        //TODO
         ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
         selectedTab.getPane().setTabbed(false);
         tabPane.getTabs().remove(selectedTab);
@@ -327,5 +329,24 @@ public class MainController implements Initializable, ToolController {
     public void handleRedo(ActionEvent actionEvent) {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
         manager.redo();
+    }
+
+    public void handlePreferences(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            String lang = prefs.get(PrefsController.LANGUAGE, Locale.getDefault().getLanguage());
+            Locale locale = new Locale(lang);
+            ResourceBundle bundle = ResourceBundle.getBundle("bundles.ApozBundle", locale, new UTF8Control());
+            loader.setResources(bundle);
+            Parent root = loader.load(getClass().getClassLoader().getResource("Preferences.fxml").openStream());
+            Stage preferencesStage = new Stage();
+            preferencesStage.setTitle("Preferences");
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(String.valueOf(getClass().getClassLoader().getResource("style.css")));
+            preferencesStage.setScene(scene);
+            preferencesStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

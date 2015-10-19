@@ -5,7 +5,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.sotomski.apoz.MainController">
+<BorderPane fx:id="rootLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.sotomski.apoz.controllers.MainController">
     <top>
         <VBox>
             <children>
@@ -18,6 +18,8 @@
                                 <MenuItem onAction="#handleDuplicate" text="%Duplicate" />
                                 <MenuItem onAction="#handleSave" text="%Save" />
                                 <MenuItem onAction="#handleSaveAs" text="%SaveAs" />
+                                <SeparatorMenuItem />
+                                <MenuItem onAction="#handlePreferences" text="%Preferences" />
                                 <SeparatorMenuItem />
                                 <MenuItem onAction="#handleExit" text="%Quit" />
                             </items>

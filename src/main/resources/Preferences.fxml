@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.ComboBox?>
+
+<?import javafx.scene.control.Button?>
+<GridPane fx:id="rootLayout" alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.sotomski.apoz.controllers.PrefsController">
+    <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
+    <Text text="%Preferences"
+          GridPane.columnIndex="0" GridPane.rowIndex="0"
+          GridPane.columnSpan="2"/>
+
+    <Label text="%ScreenshotPath" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <TextField fx:id="screenshotPath" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+    <Button GridPane.columnIndex="2" GridPane.rowIndex="1" onAction="#selectFile" text=".."/>
+
+    <Label text="%Language" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+    <ComboBox fx:id="languageBox" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+    <Label GridPane.columnIndex="0" GridPane.rowIndex="3" text="%ChangesInfo" GridPane.columnSpan="3"/>
+    <Button GridPane.columnIndex="0" GridPane.rowIndex="4" text="%Save" onAction="#handleSave"/>
+</GridPane>

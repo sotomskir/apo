@@ -1,6 +1,7 @@
 package pl.sotomski.apoz.utils;
 
 import javafx.scene.layout.Pane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -42,6 +43,12 @@ public class FileMenuUtils {
         Window window = layoutRoot.getScene().getWindow();
         final FileChooser fileChooser = new FileChooser();
         return fileChooser.showOpenDialog(window);
+    }
+
+    public static File openDirDialog(Pane layoutRoot) {
+        Window window = layoutRoot.getScene().getWindow();
+        final DirectoryChooser directoryChooser = new DirectoryChooser();
+        return directoryChooser.showDialog(window);
     }
 
     public static BufferedImage loadImage(File file) {
