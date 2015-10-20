@@ -305,7 +305,7 @@ public class MainController implements Initializable, ToolController {
         tabPane.getTabs().remove(selectedTab);
         Window parent = rootLayout.getScene().getWindow();
         ImagePane imagePane = selectedTab.getPane();
-        ImageWindow window = new ImageWindow(parent, imagePane, new HistogramPane(bundle, imagePane.getImage()));
+        ImageWindow window = new ImageWindow(parent, imagePane, new HistogramPane(bundle));
         window.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
             if (newPropertyValue)
             {

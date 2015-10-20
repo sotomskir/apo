@@ -1,7 +1,7 @@
 package pl.sotomski.apoz.utils;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 
 /**
  * Created by sotomski on 23/09/15.
@@ -63,6 +63,8 @@ public class Histogram {
     }
 
     public Histogram(BufferedImage image) {
+        long startTime1 = System.currentTimeMillis();
+
         int height = image.getHeight();
         int width = image.getWidth();
         channels = image.getColorModel().getNumComponents();
@@ -77,17 +79,12 @@ public class Histogram {
         cumulative =  new int[3][levels];
         int rgb;
         double Hsum = 0, hRsum = 0, hGsum = 0, hBsum = 0;
-        for (int x=0;x<width;++x)
-            for (int y=0;y<height;++y) {
-                rgb = image.getRGB(x, y);
-                Color color = new Color(rgb);
-                ++hR[color.getRed()];
-                ++hG[color.getGreen()];
-                ++hB[color.getBlue()];
-                for (int i=0;i<channels;++i) ++this.rgb[i][(rgb >> ((channels-i)*8)) & 0xFF];
-
-
-            }
+        final byte[] a = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        for (int p = 0; p < width*height*3; p+=3 ) {
+                ++hR[a[p+2] & 0xFF];
+                ++hG[a[p+1] & 0xFF];
+                ++hB[a[p] & 0xFF];
+        }
 
         for (int i=0;i<levels;++i) {
             hM[i]= hR[i]+ hG[i]+ hB[i];
@@ -104,5 +101,6 @@ public class Histogram {
         hGavg=hGsum/levels;
         hBavg=hBsum/levels;
         Havg=Hsum/levels;
+        System.out.println(this.getClass() + ": " + (System.currentTimeMillis()-startTime1));
     }
 }

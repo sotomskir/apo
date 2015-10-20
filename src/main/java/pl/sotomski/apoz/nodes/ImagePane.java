@@ -164,11 +164,9 @@ public class ImagePane extends Pane {
         long startTime;
         startTime = System.currentTimeMillis();
         imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-        System.out.println("SwingFXUtils.toFXImage: " + (System.currentTimeMillis()-startTime));
-        startTime = System.currentTimeMillis();
 //        this.histogramPane.update(bufferedImage);
-        System.out.println("HistogramPane.update(): " + (System.currentTimeMillis()-startTime));
         this.imageVersionProperty().setValue(getImageVersion()+1);
+        System.out.println("ImagePane.refresh(): " + (System.currentTimeMillis()-startTime));
     }
 
     public boolean isTabbed() {

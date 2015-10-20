@@ -45,22 +45,11 @@ public class HistogramPane extends TabPane {
     }
 
     public void update(BufferedImage image) {
-        long startTime;
-        startTime = System.currentTimeMillis();
         histogram = new Histogram(image);
-        System.out.println(histogram.getClass() + ": " + (System.currentTimeMillis()-startTime));
-        startTime = System.currentTimeMillis();
         rgbHistogramChart.update(histogram);
-        System.out.println(rgbHistogramChart.getClass() + ": " + (System.currentTimeMillis()-startTime));
-        startTime = System.currentTimeMillis();
         monoHistogramChart.update(histogram);
-        System.out.println(monoHistogramChart.getClass() + ": " + (System.currentTimeMillis()-startTime));
-        startTime = System.currentTimeMillis();
         cumulativeHistogramChart.update(histogram);
-        System.out.println(cumulativeHistogramChart.getClass() + ": " + (System.currentTimeMillis()-startTime));
-        startTime = System.currentTimeMillis();
         lineProfileChart.update(histogram);
-        System.out.println(lineProfileChart.getClass() + ": " + (System.currentTimeMillis()-startTime));
     }
 
 }
