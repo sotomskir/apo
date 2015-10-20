@@ -24,7 +24,7 @@ public class MonoHistogramChart extends BarChart<String, Number> {
 
     public void update(Histogram histogram) {
 //        xAxis.setUpperBound(levels-1);
-        for (int i=0;i<histogram.getLevels();++i) data[i].setYValue(histogram.gethM()[i]);
+        for (int i=0;i<histogram.getLevels();++i) data[i].setYValue(histogram.getMono()[i]);
     }
 
     private void applyStyle() {

@@ -37,9 +37,9 @@ public class RGBHistogramChart extends BarChart<String, Number> {
         if (histogram.getChannels()>1) {
 //        xAxis.setUpperBound(levels-1);
             for (int i = 0; i < histogram.getLevels(); ++i) {
-                dataR[i].setYValue(histogram.gethR()[i]);
-                dataG[i].setYValue(histogram.gethG()[i]);
-                dataB[i].setYValue(histogram.gethB()[i]);
+                dataR[i].setYValue(histogram.getRGB()[0][i]);
+                dataG[i].setYValue(histogram.getRGB()[1][i]);
+                dataB[i].setYValue(histogram.getRGB()[2][i]);
             }
         } else {
             for (int i = 0; i < histogram.getLevels(); ++i) {

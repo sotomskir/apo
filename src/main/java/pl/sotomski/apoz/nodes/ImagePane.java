@@ -164,7 +164,7 @@ public class ImagePane extends Pane {
         long startTime;
         startTime = System.currentTimeMillis();
         imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-//        this.histogramPane.update(bufferedImage);
+        this.histogramPane.update(bufferedImage);
         this.imageVersionProperty().setValue(getImageVersion()+1);
         System.out.println("ImagePane.refresh(): " + (System.currentTimeMillis()-startTime));
     }

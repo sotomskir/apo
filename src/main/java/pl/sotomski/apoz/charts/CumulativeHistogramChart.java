@@ -24,7 +24,7 @@ public class CumulativeHistogramChart extends LineChart<Number, Number> {
     public void update(Histogram histogram) {
 //        xAxis.setUpperBound(levels-1);
         for (int i = 0; i < histogram.getLevels(); ++i) {
-            int[][] c = histogram.getCumulative();
+            int[][] c = histogram.getCumulativeRGB();
             data[i].setYValue(c[0][i]+c[1][i]+c[2][i]);
         }
     }

@@ -6,6 +6,7 @@ import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.util.Random;
 
@@ -43,229 +44,118 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
 
     private BufferedImage method1(BufferedImage bufferedImage) {
         Histogram histogram = new Histogram(bufferedImage);
-        int hR[] = histogram.gethR();
-        int hG[] = histogram.gethG();
-        int hB[] = histogram.gethB();
-        double hRavg = histogram.gethRavg();
-        double hGavg = histogram.gethGavg();
-        double hBavg = histogram.gethBavg();
-        int rR = 0, hRint = 0;
-        int rG = 0, hGint = 0;
-        int rB = 0, hBint = 0;
-        int leftR[] = new int[hR.length];
-        int leftG[] = new int[hR.length];
-        int leftB[] = new int[hR.length];
-        int rightR[] = new int[hR.length];
-        int rightG[] = new int[hR.length];
-        int rightB[] = new int[hR.length];
-        int newR[] = new int[hR.length];
-        int newG[] = new int[hR.length];
-        int newB[] = new int[hR.length];
+        int h[][] = histogram.getRGB();
+        int r[] = new int[3], hint[] = new int[3];
+        int left[][] = new int[3][histogram.getLevels()];
+        int right[][] = new int[3][histogram.getLevels()];
+        int newValue[][] = new int[3][histogram.getLevels()];
 
-        for (int z = 0; z<hR.length; ++z) {
-            leftR[z] = rR;
-            leftG[z] = rG;
-            leftB[z] = rB;
-            hRint+=hR[z];
-            hGint+=hG[z];
-            hBint+=hB[z];
-            while (hRint>hRavg) {
-                hRint-=hRavg;
-                ++rR;
+        for (int z = 0; z<histogram.getLevels(); ++z) {
+            for (int ch = 0;ch<3;++ch) {
+                left[ch][z] = r[ch];
+                hint[ch] += h[ch][z];
+                while (hint[ch] > histogram.getHRGBAvg()[ch]) {
+                    hint[ch] -= histogram.getHRGBAvg()[ch];
+                    ++r[ch];
+                }
+                right[ch][z] = r[ch];
+                newValue[ch][z] = (left[ch][z] + right[ch][z]) / 2;
             }
-            while (hGint>hGavg) {
-                hGint-=hGavg;
-                ++rG;
-            }
-            while (hBint>hBavg) {
-                hBint-=hBavg;
-                ++rB;
-            }
-            rightR[z]=rR;
-            rightG[z]=rG;
-            rightB[z]=rB;
-            newR[z]=(leftR[z]+rightR[z])/2;
-            newG[z]=(leftG[z]+rightG[z])/2;
-            newB[z]=(leftB[z]+rightB[z])/2;
         }
 
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
 
-        for (int x=0;x<width;++x) {
-            for (int y=0;y<height;++y) {
-                Color rgb = new Color(bufferedImage.getRGB(x, y));
-                int red = rgb.getRed();
-                int green = rgb.getGreen();
-                int blue = rgb.getBlue();
+        final byte[] a = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
+        for (int p = 0; p < width*height*histogram.getChannels(); p+=histogram.getChannels() ) {
 
-                if(leftR[red]==rightR[red]) red=leftR[red];
-                else red=newR[red];
-
-                if(leftG[green]==rightG[green]) green=leftG[green];
-                else green=newG[green];
-
-                if(leftB[blue]==rightB[blue]) blue=leftB[blue];
-                else blue=newB[blue];
-
-                bufferedImage.setRGB(x, y, new Color(red, green, blue).getRGB());
-
+            for (int ch = 0;ch<histogram.getChannels();++ch) {
+                int chInv = histogram.getChannels()-1-ch;
+                if (left[ch][a[p+chInv] & 0xFF] == right[ch][a[p+chInv] & 0xFF]) a[p+chInv] = (byte) (left[ch][a[p+chInv] & 0xFF] & 0xFF);
+                else a[p+chInv] = (byte) (newValue[ch][a[p+chInv] & 0xFF] & 0xFF);
             }
         }
+
         return bufferedImage;
     }
 
     private BufferedImage method2(BufferedImage bufferedImage) {
         Histogram histogram = new Histogram(bufferedImage);
-        int hR[] = histogram.gethR();
-        int hG[] = histogram.gethG();
-        int hB[] = histogram.gethB();
-        double hRavg = histogram.gethRavg();
-        double hGavg = histogram.gethGavg();
-        double hBavg = histogram.gethBavg();
-        int rR = 0, hRint = 0;
-        int rG = 0, hGint = 0;
-        int rB = 0, hBint = 0;
-        int leftR[] = new int[hR.length];
-        int leftG[] = new int[hR.length];
-        int leftB[] = new int[hR.length];
-        int rightR[] = new int[hR.length];
-        int rightG[] = new int[hR.length];
-        int rightB[] = new int[hR.length];
-        int newR[] = new int[hR.length];
-        int newG[] = new int[hR.length];
-        int newB[] = new int[hR.length];
+        int h[][] = histogram.getRGB();
+        int r[] = new int[3], hint[] = new int[3];
+        int left[][] = new int[3][histogram.getLevels()];
+        int right[][] = new int[3][histogram.getLevels()];
+        int newValue[][] = new int[3][histogram.getLevels()];
 
-        for (int z = 0; z<hR.length; ++z) {
-            leftR[z] = rR;
-            leftG[z] = rG;
-            leftB[z] = rB;
-            hRint+=hR[z];
-            hGint+=hG[z];
-            hBint+=hB[z];
-            while (hRint>hRavg) {
-                hRint-=hRavg;
-                ++rR;
+        for (int z = 0; z<histogram.getLevels(); ++z) {
+            for (int ch = 0;ch<3;++ch) {
+                left[ch][z] = r[ch];
+                hint[ch] += h[ch][z];
+                while (hint[ch] > histogram.getHRGBAvg()[ch]) {
+                    hint[ch] -= histogram.getHRGBAvg()[ch];
+                    ++r[ch];
+                }
+                right[ch][z] = r[ch];
+                newValue[ch][z] = right[ch][z] - left[ch][z];
             }
-            while (hGint>hGavg) {
-                hGint-=hGavg;
-                ++rG;
-            }
-            while (hBint>hBavg) {
-                hBint-=hBavg;
-                ++rB;
-            }
-            rightR[z]=rR;
-            rightG[z]=rG;
-            rightB[z]=rB;
-            newR[z]=rightR[z]-leftR[z];
-            newG[z]=rightG[z]-leftG[z];
-            newB[z]=rightB[z]-leftB[z];
         }
 
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
-
         Random random = new Random();
-        for (int x=0;x<width;++x) {
-            for (int y=0;y<height;++y) {
-                Color rgb = new Color(bufferedImage.getRGB(x, y));
-                int red = rgb.getRed();
-                int green = rgb.getGreen();
-                int blue = rgb.getBlue();
 
-                if(leftR[red]==rightR[red]) red=leftR[red];
-                else red = randomInRange(0, newR[red], random) + leftR[red];
+        final byte[] a = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
+        for (int p = 0; p < width*height*histogram.getChannels(); p+=histogram.getChannels() ) {
 
-                if(leftG[green]==rightG[green]) green=leftG[green];
-                else green = randomInRange(0, newG[green], random) + leftG[green];
-
-                if(leftB[blue]==rightB[blue]) blue=leftB[blue];
-                else blue = randomInRange(0, newB[blue], random) + leftB[blue];
-
-                bufferedImage.setRGB(x, y, new Color(red, green, blue).getRGB());
-
+            for (int ch = 0;ch<histogram.getChannels();++ch) {
+                int chInv = histogram.getChannels()-1-ch;
+                int i = a[p+chInv] & 0xFF;
+                if (left[ch][i] == right[ch][i]) a[p+chInv] = (byte) (left[ch][i] & 0xFF);
+                else a[p+chInv] = (byte) ((randomInRange(0, newValue[ch][i], random) + left[ch][i]) & 0xFF);
             }
         }
 
         return bufferedImage;
-
     }
 
     private BufferedImage method3(BufferedImage bufferedImage) {
         Histogram histogram = new Histogram(bufferedImage);
-        int hR[] = histogram.gethR();
-        int hG[] = histogram.gethG();
-        int hB[] = histogram.gethB();
-        double hRavg = histogram.gethRavg();
-        double hGavg = histogram.gethGavg();
-        double hBavg = histogram.gethBavg();
-        int rR = 0, hRint = 0;
-        int rG = 0, hGint = 0;
-        int rB = 0, hBint = 0;
-        int leftR[] = new int[hR.length];
-        int leftG[] = new int[hR.length];
-        int leftB[] = new int[hR.length];
-        int rightR[] = new int[hR.length];
-        int rightG[] = new int[hR.length];
-        int rightB[] = new int[hR.length];
-        int newR[] = new int[hR.length];
-        int newG[] = new int[hR.length];
-        int newB[] = new int[hR.length];
+        int h[][] = histogram.getRGB();
+        int r[] = new int[3], hint[] = new int[3];
+        int left[][] = new int[3][histogram.getLevels()];
+        int right[][] = new int[3][histogram.getLevels()];
+        int newValue[][] = new int[3][histogram.getLevels()];
 
-        for (int z = 0; z<hR.length; ++z) {
-            leftR[z] = rR;
-            leftG[z] = rG;
-            leftB[z] = rB;
-            hRint+=hR[z];
-            hGint+=hG[z];
-            hBint+=hB[z];
-            while (hRint>hRavg) {
-                hRint-=hRavg;
-                ++rR;
+        for (int z = 0; z<histogram.getLevels(); ++z) {
+            for (int ch = 0;ch<3;++ch) {
+                left[ch][z] = r[ch];
+                hint[ch] += h[ch][z];
+                while (hint[ch] > histogram.getHRGBAvg()[ch]) {
+                    hint[ch] -= histogram.getHRGBAvg()[ch];
+                    ++r[ch];
+                }
+                right[ch][z] = r[ch];
+                newValue[ch][z] = right[ch][z] - left[ch][z];
             }
-            while (hGint>hGavg) {
-                hGint-=hGavg;
-                ++rG;
-            }
-            while (hBint>hBavg) {
-                hBint-=hBavg;
-                ++rB;
-            }
-
-            rightR[z]=rR;
-            rightG[z]=rG;
-            rightB[z]=rB;
         }
 
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
+        Random random = new Random();
 
-        for (int x=0;x<width;++x) {
-            for (int y=0;y<height;++y) {
-                Color rgb = new Color(bufferedImage.getRGB(x, y));
-                int red = rgb.getRed();
-                int green = rgb.getGreen();
-                int blue = rgb.getBlue();
+        final byte[] a = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
+        for (int p = 0; p < width*height*histogram.getChannels(); p+=histogram.getChannels() ) {
 
-                Color avg = getAverage(bufferedImage, x, y);
-
-                if(avg.getRed() < leftR[red]) red=leftR[red];
-                else if(avg.getRed() > rightR[red]) red = rightR[red];
-                else red = avg.getRed();
-
-                if(avg.getGreen() < leftG[green]) green=leftG[green];
-                else if(avg.getGreen() > rightG[green]) green = rightG[green];
-                else green = avg.getGreen();
-
-                if(avg.getBlue() < leftB[blue]) blue=leftB[blue];
-                else if(avg.getBlue() > rightB[blue]) blue = rightB[blue];
-                else blue = avg.getBlue();
-
-                bufferedImage.setRGB(x, y, new Color(red, green, blue).getRGB());
-
+            for (int ch = 0;ch<histogram.getChannels();++ch) {
+                int chInv = histogram.getChannels()-1-ch;
+                int i = a[p+chInv] & 0xFF;
+                int avg = getAverage(a, width, height, histogram.getChannels(), p);
+                if(avg < left[ch][i]) a[p+chInv] = (byte) (left[ch][i] & 0xFF);
+                else if(avg > right[ch][i]) a[p+chInv] = (byte) (right[ch][i] & 0xFF);
+                else a[p+chInv] = (byte) (avg & 0xFF);
             }
         }
+
         return bufferedImage;
     }
 
@@ -273,7 +163,7 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
 //        http://www.generation5.org/content/2004/histogramEqualization.asp
         Histogram histogram = new Histogram(bufferedImage);
         double alpha = (double)histogram.getLevels() / (bufferedImage.getWidth()*bufferedImage.getHeight());
-        int[][] cumulativeFrequency = histogram.getCumulative();
+        int[][] cumulativeFrequency = histogram.getCumulativeRGB();
         WritableRaster raster = bufferedImage.getRaster();
         int rgb2;
         int[] rgb = new int[3];
@@ -315,6 +205,21 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
             avg[i]/=8;
         }
         return new Color(avg[0], avg[1], avg[2]);
+    }
+
+
+    private int getAverage(byte[] a, int width, int height, int ch ,int p) {
+        //TODO dodać obsługę skrajnych pikseli
+        if (p<width*ch || p>a.length-width*ch-3 || p%width*ch <ch || p%width*ch>width*ch-ch) return a[p] & 0xFF;
+        int sum;
+        try {
+            sum = a[p-((width+1)*ch)] & 0xFF + a[p-((width)*ch)] & 0xFF + a[p-((width-1)*ch)] & 0xFF +
+                    a[p-ch] & 0xFF + a[p+ch] & 0xFF +
+                    a[p+((width+1)*ch)] & 0xFF + a[p+((width)*ch)] & 0xFF + a[p+((width-1)*ch)] & 0xFF;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return a[p] & 0xFF;
+        }
+        return sum/8;
     }
 
     private int[] getRGB(int rgb) {
