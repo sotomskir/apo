@@ -22,7 +22,10 @@ public class CommandManager {
     }
 
     public void executeCommand(Command command) {
+        long startTime = System.currentTimeMillis();
         command.execute();
+        long stopTime = System.currentTimeMillis();
+        System.out.println(command.getClass() + ": " + (stopTime-startTime));
         undoStack.push(command);
         undoAvailable.setValue(true);
         if (redoStack.size()>0) {

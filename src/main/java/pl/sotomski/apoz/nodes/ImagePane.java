@@ -12,7 +12,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.utils.FileMenuUtils;
-import pl.sotomski.apoz.utils.Histogram;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
@@ -29,7 +28,6 @@ public class ImagePane extends Pane {
     private IntegerProperty imageVersion;
     private HistogramPane histogramPane;
     private CommandManager commandManager;
-    private Histogram histogram;
     private DoubleProperty zoomProperty;
     private File file;
     private ScrollPane scrollPane;
@@ -89,10 +87,6 @@ public class ImagePane extends Pane {
     public void setHistogramPane(HistogramPane histogramPane) {
         this.histogramPane = histogramPane;
         histogramPane.update(bufferedImage);
-    }
-
-    public Histogram getHistogram() {
-        return histogram;
     }
 
     public CommandManager getCommandManager() {
@@ -167,9 +161,13 @@ public class ImagePane extends Pane {
     }
 
     public void refresh() {
+        long startTime;
+        startTime = System.currentTimeMillis();
         imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-        this.histogram = new Histogram(bufferedImage);
-        this.histogramPane.update(bufferedImage);
+        System.out.println("SwingFXUtils.toFXImage: " + (System.currentTimeMillis()-startTime));
+        startTime = System.currentTimeMillis();
+//        this.histogramPane.update(bufferedImage);
+        System.out.println("HistogramPane.update(): " + (System.currentTimeMillis()-startTime));
         this.imageVersionProperty().setValue(getImageVersion()+1);
     }
 

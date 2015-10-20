@@ -10,30 +10,42 @@ import pl.sotomski.apoz.utils.Histogram;
  * Created by sotomski on 19/10/15.
  */
 public class RGBHistogramChart extends BarChart<String, Number> {
-    private XYChart.Series<String, Number> seriesR;
-    private XYChart.Series<String, Number> seriesG;
-    private XYChart.Series<String, Number> seriesB;
+    private XYChart.Data<String, Number> dataR[] = new XYChart.Data[256];
+    private XYChart.Data<String, Number> dataG[] = new XYChart.Data[256];
+    private XYChart.Data<String, Number> dataB[] = new XYChart.Data[256];
 
     public RGBHistogramChart() {
         super(new CategoryAxis(), new NumberAxis());
-        seriesR = new XYChart.Series<>();
-        seriesG = new XYChart.Series<>();
-        seriesB = new XYChart.Series<>();
+        Series<String, Number> seriesR = new Series<>();
+        Series<String, Number> seriesG = new Series<>();
+        Series<String, Number> seriesB = new Series<>();
+        for (int i=0;i<256;++i) {
+            dataR[i] = new XYChart.Data<>(Integer.toString(i), 0);
+            dataG[i] = new XYChart.Data<>(Integer.toString(i), 0);
+            dataB[i] = new XYChart.Data<>(Integer.toString(i), 0);
+            seriesR.getData().add(dataR[i]);
+            seriesG.getData().add(dataG[i]);
+            seriesB.getData().add(dataB[i]);
+        }
         this.getData().addAll(seriesR, seriesG, seriesB);
 //        seriesM.getNode().getStyleClass().add("series-mono");
         applyStyle();
     }
 
     public void update(Histogram histogram) {
-        seriesR.getData().clear();
-        seriesG.getData().clear();
-        seriesB.getData().clear();
+        long startTime;
         if (histogram.getChannels()>1) {
 //        xAxis.setUpperBound(levels-1);
             for (int i = 0; i < histogram.getLevels(); ++i) {
-                seriesR.getData().add(new XYChart.Data<>(Integer.toString(i), histogram.gethR()[i]));
-                seriesG.getData().add(new XYChart.Data<>(Integer.toString(i), histogram.gethG()[i]));
-                seriesB.getData().add(new XYChart.Data<>(Integer.toString(i), histogram.gethB()[i]));
+                dataR[i].setYValue(histogram.gethR()[i]);
+                dataG[i].setYValue(histogram.gethG()[i]);
+                dataB[i].setYValue(histogram.gethB()[i]);
+            }
+        } else {
+            for (int i = 0; i < histogram.getLevels(); ++i) {
+                dataR[i].setYValue(0);
+                dataG[i].setYValue(0);
+                dataB[i].setYValue(0);
             }
         }
     }

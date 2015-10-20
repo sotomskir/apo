@@ -3,28 +3,28 @@ package pl.sotomski.apoz.charts;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import pl.sotomski.apoz.utils.Histogram;
 
 /**
  * Created by sotomski on 19/10/15.
  */
 public class MonoHistogramChart extends BarChart<String, Number> {
-    private Series<String, Number> series;
+    private XYChart.Data<String, Number> data[] = new XYChart.Data[256];
 
     public MonoHistogramChart() {
         super(new CategoryAxis(), new NumberAxis());
-        series = new Series<>();
-        this.getData().add(series);
+        for (int i=0;i<256;++i) data[i] = new XYChart.Data<>(Integer.toString(i), 0);
+        Series<String, Number> series = new Series<>();
+        series.getData().addAll(data);
 //        series.getNode().getStyleClass().add("series-mono");
+        this.getData().add(series);
         applyStyle();
     }
 
     public void update(Histogram histogram) {
-        series.getData().clear();
 //        xAxis.setUpperBound(levels-1);
-        for (int i=0;i<histogram.getLevels();++i) {
-            series.getData().add(new Data<>(Integer.toString(i), histogram.gethM()[i]));
-        }
+        for (int i=0;i<histogram.getLevels();++i) data[i].setYValue(histogram.gethM()[i]);
     }
 
     private void applyStyle() {

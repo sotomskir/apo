@@ -9,22 +9,23 @@ import pl.sotomski.apoz.utils.Histogram;
  * Created by sotomski on 19/10/15.
  */
 public class CumulativeHistogramChart extends LineChart<Number, Number> {
-    private XYChart.Series<Number, Number> series;
+    private XYChart.Data<Number, Number> data[] = new XYChart.Data[256];
 
     public CumulativeHistogramChart() {
         super(new NumberAxis(), new NumberAxis());
-        series = new XYChart.Series<>();
+        for (int i=0;i<256;++i) data[i] = new XYChart.Data<>(i, 0);
+        Series<Number, Number> series = new Series<>();
+        series.getData().addAll(data);
         this.getData().add(series);
 //        series.getNode().getStyleClass().add("series-mono");
         applyStyle();
     }
 
     public void update(Histogram histogram) {
-        series.getData().clear();
 //        xAxis.setUpperBound(levels-1);
         for (int i = 0; i < histogram.getLevels(); ++i) {
             int[][] c = histogram.getCumulative();
-            series.getData().add(new Data<>(i, c[0][i]+c[1][i]+c[2][i]));
+            data[i].setYValue(c[0][i]+c[1][i]+c[2][i]);
         }
     }
 
