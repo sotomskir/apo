@@ -27,7 +27,7 @@ public class HistogramEqTool extends VBox {
         methods[1] = bundle.getString("HEmethod2");
         methods[2] = bundle.getString("HEmethod3");
         methods[3] = bundle.getString("HEmethod4");
-        methods[4] = bundle.getString("HEmethod5");
+//        methods[4] = bundle.getString("HEmethod5");
         this.choiceBox = new ChoiceBox<>();
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);

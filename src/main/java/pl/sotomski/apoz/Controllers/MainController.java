@@ -24,12 +24,14 @@ import javafx.stage.Window;
 import pl.sotomski.apoz.Main;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.ConvertToGrayCommand;
+import pl.sotomski.apoz.commands.NegativeCommand;
 import pl.sotomski.apoz.nodes.HistogramPane;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.nodes.ImageTab;
 import pl.sotomski.apoz.nodes.ImageWindow;
 import pl.sotomski.apoz.tools.HistogramEqTool;
 import pl.sotomski.apoz.tools.ToolController;
+import pl.sotomski.apoz.tools.TresholdTool;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.ImageUtils;
 import pl.sotomski.apoz.utils.UTF8Control;
@@ -348,5 +350,15 @@ public class MainController implements Initializable, ToolController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void handleNegativeConversion(ActionEvent actionEvent) {
+        CommandManager manager = activePaneProperty.getValue().getCommandManager();
+        manager.executeCommand(new NegativeCommand(activePaneProperty.getValue()));
+    }
+
+    public void handleTresholding(ActionEvent actionEvent) {
+        toolbox.getChildren().clear();
+        toolbox.getChildren().add(TresholdTool.getInstance(this));
     }
 }
