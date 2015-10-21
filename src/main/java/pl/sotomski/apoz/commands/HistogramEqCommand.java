@@ -2,12 +2,10 @@ package pl.sotomski.apoz.commands;
 
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.Histogram;
-import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.awt.image.WritableRaster;
 import java.util.Random;
 
 /**
@@ -18,7 +16,7 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
 
     public HistogramEqCommand(ImagePane imagePane, int method) throws Exception {
         super(imagePane);
-        if (method < 1 || method > 4) throw new IllegalArgumentException("Bad method. Eligible methods: 1, 2, 3, 4");
+        if (method < 1 || method > 5) throw new IllegalArgumentException("Bad method. Eligible methods: 1, 2, 3, 4, 5");
         this.method = method;
     }
 
@@ -38,6 +36,10 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
         }
         else if (method == 4) {
             method4(imagePane.getImage());
+            imagePane.refresh();
+        }
+        else if (method == 5) {
+            method5(imagePane.getImage());
             imagePane.refresh();
         }
     }
@@ -118,6 +120,50 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
         return bufferedImage;
     }
 
+    private BufferedImage method5(BufferedImage bufferedImage) {
+        final double t = 0.05;
+        Histogram histogram = new Histogram(bufferedImage);
+        int h[][] = histogram.getRGB();
+        int r[] = new int[3], hint[] = new int[3];
+        int left[][] = new int[3][histogram.getLevels()];
+        int right[][] = new int[3][histogram.getLevels()];
+        int newValue[][] = new int[3][histogram.getLevels()];
+
+        for (int z = 0; z<histogram.getLevels(); ++z) {
+            for (int ch = 0;ch<3;++ch) {
+                left[ch][z] = r[ch];
+                hint[ch] += h[ch][z];
+                while (hint[ch] > histogram.getHRGBAvg()[ch]) {
+                    hint[ch] -= histogram.getHRGBAvg()[ch];
+                    ++r[ch];
+                }
+                right[ch][z] = r[ch];
+                newValue[ch][z] = right[ch][z] - left[ch][z];
+            }
+        }
+
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
+        Random random = new Random();
+
+        final byte[] a = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
+        for (int p = 0; p < width*height*histogram.getChannels(); p+=histogram.getChannels() ) {
+
+            for (int ch = 0;ch<histogram.getChannels();++ch) {
+                int chInv = histogram.getChannels()-1-ch;
+                int i = a[p+chInv] & 0xFF;
+                int avg = getAverage(a, width, height, histogram.getChannels(), p);
+                double dif = ((double)(avg>a[p]?avg-a[p]:a[p]-avg)) / (double)a[p];
+                if (left[ch][i] == right[ch][i]) a[p+chInv] = (byte) (left[ch][i] & 0xFF);
+//                else if (dif>t) a[p+chInv] = (byte) ((randomInRange(0, newValue[ch][i], random) + left[ch][i]) & 0xFF);
+                else a[p+chInv] = (byte) ((randomInRange(0, newValue[ch][i], random) + left[ch][i]) & 0xFF);
+//                else a[p+chInv] = (byte) (newValue[ch][i] /2);
+            }
+        }
+
+        return bufferedImage;
+    }
+
     private BufferedImage method3(BufferedImage bufferedImage) {
         Histogram histogram = new Histogram(bufferedImage);
         int h[][] = histogram.getRGB();
@@ -159,30 +205,22 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
         return bufferedImage;
     }
 
-    private BufferedImage method4(BufferedImage bufferedImage) {
+    private BufferedImage method4(BufferedImage bi) {
 //        http://www.generation5.org/content/2004/histogramEqualization.asp
-        Histogram histogram = new Histogram(bufferedImage);
-        double alpha = (double)histogram.getLevels() / (bufferedImage.getWidth()*bufferedImage.getHeight());
+        Histogram histogram = new Histogram(bi);
+        double alpha = (double)histogram.getLevels() / (bi.getWidth()*bi.getHeight());
         int[][] cumulativeFrequency = histogram.getCumulativeRGB();
-        WritableRaster raster = bufferedImage.getRaster();
-        int rgb2;
-        int[] rgb = new int[3];
 
-        for (int x=0;x<bufferedImage.getWidth();++x) {
-            for (int y=0;y<bufferedImage.getHeight();++y) {
-                rgb2 = bufferedImage.getRGB(x, y);
-                rgb[0] = ImageUtils.getR(rgb2);
-                rgb[1] = ImageUtils.getG(rgb2);
-                rgb[2] = ImageUtils.getB(rgb2);
-                rgb[0] = (int) (cumulativeFrequency[0][rgb[0]] * alpha);
-                rgb[1] = (int) (cumulativeFrequency[1][rgb[1]] * alpha);
-                rgb[2] = (int) (cumulativeFrequency[2][rgb[2]] * alpha);
-                for (int i=0;i<3;++i) if (rgb[i]>255) rgb[i]=255;
-                raster.setPixel(x, y, rgb);
+        final byte[] a = ((DataBufferByte) bi.getRaster().getDataBuffer()).getData();
+        for (int p = bi.getWidth()*bi.getHeight()*histogram.getChannels()-histogram.getChannels(); p>=0; p-=histogram.getChannels() ) {
+            for (int ch = 0;ch<histogram.getChannels();++ch) {
+                int chInv = histogram.getChannels() - 1 - ch;
+                int i = a[p + chInv] & 0xFF;
+                a[p+chInv] = (byte) ((cumulativeFrequency[ch][i] * alpha)-1);
             }
         }
 
-        return bufferedImage;
+        return bi;
     }
 
     private Color getAverage(BufferedImage bufferedImage, int px, int py) {

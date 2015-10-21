@@ -10,6 +10,8 @@ import pl.sotomski.apoz.utils.Histogram;
 public class LineProfileChart extends LineChart {
     public LineProfileChart() {
         super(new NumberAxis(), new NumberAxis());
+        this.setMaxHeight(200.0);
+
     }
 
     public void update(Histogram histogram) {

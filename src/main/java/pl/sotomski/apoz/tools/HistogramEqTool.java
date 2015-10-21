@@ -22,11 +22,12 @@ public class HistogramEqTool extends VBox {
 
     protected HistogramEqTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
-        methods = new String[4];
+        methods = new String[5];
         methods[0] = bundle.getString("HEmethod1");
         methods[1] = bundle.getString("HEmethod2");
         methods[2] = bundle.getString("HEmethod3");
         methods[3] = bundle.getString("HEmethod4");
+        methods[4] = bundle.getString("HEmethod5");
         this.choiceBox = new ChoiceBox<>();
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);
@@ -70,6 +71,11 @@ public class HistogramEqTool extends VBox {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
             manager.executeCommand(new HistogramEqCommand(imagePane, 4));
+            imagePane.setImage(imagePane.getImage());
+        } else       if(methods[4].equals(method)) {
+            ImagePane imagePane = toolController.getActivePaneProperty();
+            CommandManager manager = imagePane.getCommandManager();
+            manager.executeCommand(new HistogramEqCommand(imagePane, 5));
             imagePane.setImage(imagePane.getImage());
         }
     }
