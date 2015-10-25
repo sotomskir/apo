@@ -36,6 +36,8 @@
                                 <MenuItem onAction="#handleNegativeConversion" text="%NegativeConversion" />
                                 <MenuItem onAction="#handleHistogramEqualisation" text="%HistogramEqualisation" />
                                 <MenuItem onAction="#handleTresholding" text="%Tresholding" />
+                                <MenuItem onAction="#handleIntervalTreshloding" text="%IntervalTresholding" />
+                                <MenuItem onAction="#handlePosterize" text="%Posterize" />
                             </items>
                         </Menu>
                         <Menu text="%Help">

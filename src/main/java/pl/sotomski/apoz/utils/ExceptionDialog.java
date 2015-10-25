@@ -13,7 +13,7 @@ import java.io.StringWriter;
  * Created by sotomski on 27/09/15.
  */
 public class ExceptionDialog {
-    public ExceptionDialog(Exception ex, String header) {
+    public ExceptionDialog(Throwable ex, String header) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
         alert.setHeaderText(header);
@@ -47,4 +47,5 @@ public class ExceptionDialog {
 
         alert.showAndWait();
     }
+
 }

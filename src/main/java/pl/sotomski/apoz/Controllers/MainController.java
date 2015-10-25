@@ -29,9 +29,7 @@ import pl.sotomski.apoz.nodes.HistogramPane;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.nodes.ImageTab;
 import pl.sotomski.apoz.nodes.ImageWindow;
-import pl.sotomski.apoz.tools.HistogramEqTool;
-import pl.sotomski.apoz.tools.ToolController;
-import pl.sotomski.apoz.tools.TresholdTool;
+import pl.sotomski.apoz.tools.*;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.ImageUtils;
 import pl.sotomski.apoz.utils.UTF8Control;
@@ -356,9 +354,20 @@ public class MainController implements Initializable, ToolController {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
         manager.executeCommand(new NegativeCommand(activePaneProperty.getValue()));
     }
+    private void addToToolbox(Pane tool) {
+        toolbox.getChildren().clear();
+        toolbox.getChildren().add(tool);
+    }
 
     public void handleTresholding(ActionEvent actionEvent) {
-        toolbox.getChildren().clear();
-        toolbox.getChildren().add(TresholdTool.getInstance(this));
+        addToToolbox(TresholdTool.getInstance(this));
+    }
+
+    public void handlePosterize(ActionEvent actionEvent) {
+        addToToolbox(PosterizeTool.getInstance(this));
+    }
+
+    public void handleIntervalTreshloding(ActionEvent actionEvent) {
+        addToToolbox(IntervalTresholdTool.getInstance(this));
     }
 }

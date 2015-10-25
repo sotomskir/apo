@@ -38,11 +38,19 @@ public class Main extends Application {
         } catch (Exception e) {
             e.printStackTrace();
             new ExceptionDialog(e, "Exception occured");
+        } catch (Throwable t) {
+            t.printStackTrace();
+            new ExceptionDialog(t, "Exception occured");
         }
 
     }
 
     public static void main(String[] args) {
-        launch(args);
+        try {
+            launch(args);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            new ExceptionDialog(t, "Exception occured");
+        }
     }
 }

@@ -15,29 +15,35 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ResourceBundle;
 
-public class TresholdTool extends VBox {
+public class IntervalTresholdTool extends VBox {
 
     private static VBox instance;
     private ToolController toolController;
     private Slider slider;
-    private CheckBox checkBox;
     private Label sliderValue;
+    private ChartControl chartControl;
 
-    protected TresholdTool(ToolController controller) {
+    protected IntervalTresholdTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);
-        Label label = new Label(bundle.getString("Tresholding"));
-        slider = new Slider(0, 255, 128);
+        Label label = new Label(bundle.getString("IntervalTresholding"));
+        chartControl = new ChartControl(3);
+        slider = new Slider(2, 255, 3);
         slider.setShowTickMarks(true);
         slider.setShowTickLabels(true);
-        slider.setMajorTickUnit(25.0f);
-        slider.setBlockIncrement(1.0f);
+        slider.setMajorTickUnit(25);
+        slider.setMinorTickCount(25);
+        slider.setSnapToTicks(true);
         slider.setOrientation(Orientation.HORIZONTAL);
-        sliderValue = new Label("128");
-        checkBox = new CheckBox(bundle.getString("Reverse"));
-        checkBox.selectedProperty().addListener(e -> updateImageView());
-        slider.valueProperty().addListener(e -> updateImageView());
+        sliderValue = new Label("3");
+        slider.valueProperty().addListener(e -> chartControl.createDefaultIntervals((int) slider.getValue()));
+        chartControl.createDefaultIntervals((int) slider.getValue());
+        CheckBox checkBox = new CheckBox(bundle.getString("Reverse"));
+        checkBox.selectedProperty().addListener(observable1 -> {
+            chartControl.invert();
+            updateImageView();
+        });
         Button buttonApply = new Button(bundle.getString("Apply"));
         Button buttonCancel = new Button(bundle.getString("Cancel"));
         buttonApply.setOnAction((actionEvent) -> {
@@ -48,52 +54,40 @@ public class TresholdTool extends VBox {
             }
         });
         buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
-        getChildren().addAll(separator, label, slider, sliderValue, checkBox, buttonApply, buttonCancel);
+        getChildren().addAll(separator, label, chartControl, checkBox, slider, sliderValue, buttonApply, buttonCancel);
+        chartControl.changedProperty().addListener(observable -> updateImageView());
         updateImageView();
     }
+
 
     private void updateImageView() {
         sliderValue.setText(String.valueOf(((int) slider.getValue())));
         ImagePane ap = toolController.getActivePaneProperty();
-        ap.getImageView().setImage(liveTreshold(ap.getImage(), (int) slider.getValue(), checkBox.isSelected()));
+        ap.getImageView().setImage(liveThreshold());
     }
 
     public static VBox getInstance(ToolController controller) {
-        if(instance == null) instance = new TresholdTool(controller);
+        if(instance == null) instance = new IntervalTresholdTool(controller);
         return instance;
     }
 
     public void handleApply(ActionEvent actionEvent) throws Exception {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
-        manager.executeCommand(new TresholdCommand(imagePane, getLUT()));
+        manager.executeCommand(new TresholdCommand(imagePane, chartControl.getLUT()));
     }
 
-    public static Image liveTreshold(BufferedImage bi, int treshold, boolean reverse) {
-        BufferedImage grayBI;
-        if(bi.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(bi);
-        else grayBI = ImageUtils.deepCopy(bi);
+    public Image liveThreshold() {
+        BufferedImage grayBI, image = toolController.getBufferedImage();
+        if(image.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(image);
+        else grayBI = ImageUtils.deepCopy(image);
         int width = grayBI.getWidth();
         int height = grayBI.getHeight();
         BufferedImage binaryImage = new BufferedImage(grayBI.getWidth(), grayBI.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
         final byte[] a = ((DataBufferByte) grayBI.getRaster().getDataBuffer()).getData();
         final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
-        int max, min;
-        if (reverse) {
-            max = 0;
-            min = 255;
-        } else {
-            max = 255;
-            min = 0;
-        }
-        for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) ((a[p] & 0xFF) > treshold?max:min);
+        for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (chartControl.getLUT()[a[p] & 0xFF]);
         return SwingFXUtils.toFXImage(binaryImage, null);
     }
 
-    public int[] getLUT() {
-        int[] LUT = new int[255];
-        if (checkBox.isSelected()) for (int i=0; i<(int)slider.getValue(); ++i) LUT[i]=1;
-        else for (int i=(int)slider.getValue(); i<256; ++i) LUT[i]=1;
-        return LUT;
-    }
 }
