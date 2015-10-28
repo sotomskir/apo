@@ -4,8 +4,8 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Cursor;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Pane;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
@@ -16,57 +16,56 @@ import java.util.List;
 /**
  * Created by sotomski on 25/10/15.
  */
-public class ChartControl extends Pane {
+public class ChartControl extends LineChart {
 
-    private List<IntervalLine> intervalLines;
-    private List<LevelLine> levelLines;
-    private int[] LUT = new int[256];
-    private IntegerProperty changed;
+    protected List<IntervalLine> intervalLines;
+    protected List<LevelLine> levelLines;
+    protected int[] LUT = new int[256];
+    protected IntegerProperty changed;
+    protected boolean keepLevels;
 
     public ChartControl() {
-        super();
+        super(new NumberAxis(0, 255, 25), new NumberAxis(0, 255, 25));
         setMaxWidth(Double.MAX_VALUE);
         changed = new SimpleIntegerProperty();
         intervalLines = new ArrayList<>();
         levelLines    = new ArrayList<>();
+        keepLevels = false;
     }
 
-    public ChartControl(int intervals) {
+    public ChartControl(double maxWidth, double maxHeight) {
         this();
-        createDefaultIntervals(intervals);
-        widthProperty().addListener(observable -> resize());
-    }
-
-    private void resize() {
-        System.out.println(getWidth()+" r");
-        for (int i = 0; i<intervalLines.size(); ++i) {
-            intervalLines.get(i).setStartX( getWidth() / (intervalLines.size()-1) * i);
-            intervalLines.get(i).setEndX(   getWidth() / (intervalLines.size()-1) * i);
-        }
-        intervalLines.get(intervalLines.size()-1).setStartX(getWidth()-2);
-        intervalLines.get(intervalLines.size()-1).setEndX(getWidth()-2);
-        updateLUT();
+        setMaxHeight(maxHeight);
+        setMaxWidth(maxWidth);
     }
 
     public void invert() {
         for (IntervalLine line : intervalLines) {
-            double startY = line.getStartY();
-            double endY   = line.getEndY();
-            line.setStartY(endY);
-            line.setEndY(startY);
+            if (keepLevels) {
+                double startY = yValue(line.getStartY());
+                line.setStartY(startY>0 ? yDisplay(0) : yDisplay(255));
+            } else {
+                double startY = line.getStartY();
+                double endY = line.getEndY();
+                line.setStartY(endY);
+                line.setEndY(startY);
+            }
         }
         updateLUT();
     }
 
     public void createDefaultIntervals(int intervals) {
-        System.out.println(getWidth());
-        this.getChildren().clear();
+        System.out.println("createDefaultIntervals "+getWidth());
+        this.getPlotChildren().removeAll(intervalLines);
+        this.getPlotChildren().removeAll(levelLines);
         intervalLines.clear();
         levelLines.clear();
         for (int i = 0; i<intervals; ++i) {
-            intervalLines.add(new IntervalLine(getWidth() / intervals * i));
+            IntervalLine l = new IntervalLine(255.0 / intervals * i);
+            intervalLines.add(l);
+            System.out.println(l);
         }
-        intervalLines.add(new IntervalLine(getWidth()-2));
+        intervalLines.add(new IntervalLine(255));
         for (int i = 0; i<intervals; ++i) {
             IntervalLine left  = intervalLines.get(i);
             IntervalLine right = intervalLines.get(i+1);
@@ -76,25 +75,23 @@ public class ChartControl extends Pane {
             DoubleProperty endY   = (i % 2 == 0) ? right.startYProperty() : right.endYProperty();
             levelLines.add(new LevelLine(startX, startY, endX, endY));
         }
-        this.getChildren().addAll(intervalLines);
-        this.getChildren().addAll(levelLines);
+        this.getPlotChildren().addAll(intervalLines);
+        this.getPlotChildren().addAll(levelLines);
         for (int i = 1; i < intervalLines.size()-1; ++i) intervalLines.get(i).enableDrag();
         updateLUT();
     }
 
     class IntervalLine extends Line {
-        Tooltip tooltip;
 
         IntervalLine(double x) {
-            setStartX(x);
-            setStartY(100);
-            setEndX(x);
-            setEndY(0);
+            setStartX(xDisplay(x));
+            setStartY(yDisplay(0));
+            setEndX(xDisplay(x));
+            setEndY(yDisplay(255));
             setStrokeWidth(2);
             setStroke(Color.GRAY.deriveColor(0, 1, 1, 0.5));
             setStrokeLineCap(StrokeLineCap.BUTT);
             getStrokeDashArray().setAll(10.0, 5.0);
-            Tooltip.install(this, new Tooltip("X:" + getStartX()));
         }
 
         // make a node movable by dragging it around with the mouse.
@@ -128,7 +125,23 @@ public class ChartControl extends Pane {
                     getScene().setCursor(Cursor.DEFAULT);
                 }
             });
+        }
 
+        public void bindYtoX() {
+            System.out.println(yDisplay(xValue(getEndX())));
+            endYProperty().bind(endXProperty().multiply(yDisplay(xValue(getEndX()))).divide(getEndX()));
+        }
+
+        public void unBindYfromX() {
+            endYProperty().unbind();
+            endYProperty().setValue(yValue(getEndY())>0 ? yDisplay(255) : yDisplay(0));
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            return sb.append("Start: (\t").append(getStartX()).append(",\t").append(getStartY()).append("); End:(\t")
+                    .append(getEndX()).append(",\t").append(getEndY()).append(");").toString();
         }
 
         // records relative x and y co-ordinates.
@@ -145,25 +158,57 @@ public class ChartControl extends Pane {
             setStrokeWidth(1);
             setStroke(Color.BLACK);
         }
-
     }
 
-    private void updateLUT() {
+
+    protected void updateLUT() {
+        System.out.println("updateLUT");
+        for (int i=0; i<LUT.length; ++i) LUT[i]=i;
         for (LevelLine levelLine : levelLines) {
+            int scaledStartX = ((Double)getXAxis().getValueForDisplay(levelLine.getStartX())).intValue();
+            int scaledEndX = ((Double)getXAxis().getValueForDisplay(levelLine.getEndX())).intValue();
             //TODO przedzial 0:1 zamiast 0:255
-            int value = levelLine.getEndY()>0 ? 0 : 255;
-            int scaledStartX = (int) (levelLine.getStartX() * 255 / getWidth());
-            int scaledEndX = (int) (levelLine.getEndX() * 255 / getWidth());
-            for (int x = scaledStartX ; x<scaledEndX; ++x) LUT[x] = value;
+            int value = yValue(levelLine.getEndY()) > 0 ? 255 : 0;
+            if (keepLevels) value = (int) yValue(levelLine.getEndY());
+            if (!keepLevels || yValue(levelLine.getStartY()) == yValue(levelLine.getEndY()))
+                for (int x = scaledStartX; x < scaledEndX; ++x) LUT[x] = value;
         }
-        changed.setValue(changed.get()+1);
+        changed.setValue(changed.get() + 1);
+        System.out.println("updateLUT2");
     }
 
     public IntegerProperty changedProperty() {
         return changed;
     }
 
+    public void setKeepLevels(boolean keepLevels) {
+        this.keepLevels = keepLevels;
+        if (keepLevels) {
+            System.out.println("setKeepLevels");
+            for (IntervalLine l : intervalLines) l.bindYtoX();
+            System.out.println("setKeepLevels2");
+        }
+        else for (IntervalLine l : intervalLines) l.unBindYfromX();
+        updateLUT();
+    }
+
     public int[] getLUT() {
         return LUT;
+    }
+
+    private double xValue(double x) {
+        return (double) getXAxis().getValueForDisplay(x);
+    }
+
+    private double yValue(double y) {
+        return (double) getYAxis().getValueForDisplay(y);
+    }
+
+    private double xDisplay(double x) {
+        return getXAxis().getDisplayPosition(x);
+    }
+
+    private double yDisplay(double y) {
+        return getYAxis().getDisplayPosition(y);
     }
 }

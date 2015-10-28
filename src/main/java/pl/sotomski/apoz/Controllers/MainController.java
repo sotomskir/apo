@@ -368,6 +368,10 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleIntervalTreshloding(ActionEvent actionEvent) {
-        addToToolbox(IntervalTresholdTool.getInstance(this));
+        addToToolbox(intervalThresholdTool.getInstance(this));
+    }
+
+    public void handleSampleTool(ActionEvent actionEvent) {
+        addToToolbox(SampleTool.getInstance(this));
     }
 }

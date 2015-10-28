@@ -2,163 +2,136 @@
 
 <?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
-<?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.sotomski.apoz.controllers.MainController">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/null" fx:controller="pl.sotomski.apoz.controllers.MainController">
     <top>
         <VBox>
-            <children>
-                <MenuBar fx:id="menuBar" onKeyPressed="#handleKeyInput">
-                    <menus>
-                        <Menu text="%File">
-                            <items>
-                                <MenuItem onAction="#handleOpen" text="%Open" />
-                                <MenuItem onAction="#handleRevert" text="%Revert" />
-                                <MenuItem onAction="#handleDuplicate" text="%Duplicate" />
-                                <MenuItem onAction="#handleSave" text="%Save" />
-                                <MenuItem onAction="#handleSaveAs" text="%SaveAs" />
-                                <SeparatorMenuItem />
-                                <MenuItem onAction="#handlePreferences" text="%Preferences" />
-                                <SeparatorMenuItem />
-                                <MenuItem onAction="#handleExit" text="%Quit" />
-                            </items>
-                        </Menu>
-                        <Menu text="%Edit">
-                            <items>
-                                <MenuItem onAction="#handleUndo" text="%Undo" />
-                                <MenuItem onAction="#handleRedo" text="%Redo" />
-                            </items>
-                        </Menu>
-                        <Menu text="%Tools">
-                            <items>
-                                <MenuItem onAction="#handleConvertToGrayscale" text="%ConvertToGrayscale" />
-                                <MenuItem onAction="#handleNegativeConversion" text="%NegativeConversion" />
-                                <MenuItem onAction="#handleHistogramEqualisation" text="%HistogramEqualisation" />
-                                <MenuItem onAction="#handleTresholding" text="%Tresholding" />
-                                <MenuItem onAction="#handleIntervalTreshloding" text="%IntervalTresholding" />
-                                <MenuItem onAction="#handlePosterize" text="%Posterize" />
-                            </items>
-                        </Menu>
-                        <Menu text="%Help">
-                            <items>
-                                <MenuItem disable="true" text="%Search" />
-                                <MenuItem text="Online Manual" visible="false" />
-                                <SeparatorMenuItem />
-                                <MenuItem onAction="#handleAboutAction" text="%About" />
-                            </items>
-                        </Menu>
-                    </menus>
-                </MenuBar>
-                <ToolBar prefHeight="40.0" prefWidth="240.0">
-                    <items>
-                        <Button contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#handleOpen">
-                            <tooltip>
-                                <Tooltip text="%Open" />
-                            </tooltip>
-                            <graphic>
-                                <ImageView fitWidth="24" preserveRatio="true">
-                                    <image>
-                                        <Image url="@icons/Folder.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                        </Button>
+            <MenuBar fx:id="menuBar" onKeyPressed="#handleKeyInput">
+                <Menu text="%File">
+                    <MenuItem onAction="#handleOpen" text="%Open"/>
+                    <MenuItem onAction="#handleRevert" text="%Revert"/>
+                    <MenuItem onAction="#handleDuplicate" text="%Duplicate"/>
+                    <MenuItem onAction="#handleSave" text="%Save"/>
+                    <MenuItem onAction="#handleSaveAs" text="%SaveAs"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem onAction="#handlePreferences" text="%Preferences"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem onAction="#handleExit" text="%Quit"/>
+                </Menu>
+                <Menu text="%Edit">
+                    <MenuItem onAction="#handleUndo" text="%Undo"/>
+                    <MenuItem onAction="#handleRedo" text="%Redo"/>
+                </Menu>
+                <Menu text="%Tools">
+                    <MenuItem onAction="#handleConvertToGrayscale" text="%ConvertToGrayscale"/>
+                    <MenuItem onAction="#handleNegativeConversion" text="%NegativeConversion"/>
+                    <MenuItem onAction="#handleHistogramEqualisation" text="%HistogramEqualisation"/>
+                    <MenuItem onAction="#handleTresholding" text="%Tresholding"/>
+                    <MenuItem onAction="#handleIntervalTreshloding" text="%IntervalTresholding"/>
+                    <MenuItem onAction="#handlePosterize" text="%Posterize"/>
+                    <MenuItem onAction="#handleSampleTool" text="Sample Tool"/>
+                </Menu>
+                <Menu text="%Help">
+                    <MenuItem disable="true" text="%Search"/>
+                    <MenuItem text="Online Manual" visible="false"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem onAction="#handleAboutAction" text="%About"/>
+                </Menu>
+            </MenuBar>
+            <ToolBar prefHeight="40.0" prefWidth="240.0">
+                <Button contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false"
+                        onAction="#handleOpen">
+                    <tooltip>
+                        <Tooltip text="%Open"/>
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitWidth="24" preserveRatio="true">
+                            <Image url="@icons/Folder.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-                        <Button mnemonicParsing="false" onAction="#handleRevert" prefHeight="24.0" prefWidth="24.0">
-                            <tooltip>
-                                <Tooltip text="%Revert" />
-                            </tooltip>
-                            <graphic>
-                                <ImageView fitWidth="24" preserveRatio="true">
-                                    <image>
-                                        <Image url="@icons/Open.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                        </Button>
+                <Button mnemonicParsing="false" onAction="#handleRevert" prefHeight="24.0" prefWidth="24.0">
+                    <tooltip>
+                        <Tooltip text="%Revert"/>
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitWidth="24" preserveRatio="true">
+                            <Image url="@icons/Open.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-                        <Button mnemonicParsing="false" onAction="#handleSave">
-                            <tooltip>
-                                <Tooltip text="%Save" />
-                            </tooltip>
-                            <graphic>
-                                <ImageView fitWidth="24" preserveRatio="true">
-                                    <image>
-                                        <Image url="@icons/Save.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                        </Button>
+                <Button mnemonicParsing="false" onAction="#handleSave">
+                    <tooltip>
+                        <Tooltip text="%Save"/>
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitWidth="24" preserveRatio="true">
+                            <Image url="@icons/Save.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-                        <Button fx:id="undoButton" disable="true" mnemonicParsing="false" onAction="#handleUndo">
-                            <tooltip>
-                                <Tooltip text="%Undo" />
-                            </tooltip>
-                            <graphic>
-                                <ImageView fitWidth="24" preserveRatio="true">
-                                    <image>
-                                        <Image url="@icons/Undo.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                        </Button>
+                <Button fx:id="undoButton" disable="true" mnemonicParsing="false" onAction="#handleUndo">
+                    <tooltip>
+                        <Tooltip text="%Undo"/>
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitWidth="24" preserveRatio="true">
+                            <Image url="@icons/Undo.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-                        <Button fx:id="redoButton" disable="true" mnemonicParsing="false" onAction="#handleRedo">
-                            <tooltip>
-                                <Tooltip text="%Redo" />
-                            </tooltip>
-                            <graphic>
-                                <ImageView fitWidth="24" preserveRatio="true">
-                                    <image>
-                                        <Image url="@icons/Redo.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                        </Button>
+                <Button fx:id="redoButton" disable="true" mnemonicParsing="false" onAction="#handleRedo">
+                    <tooltip>
+                        <Tooltip text="%Redo"/>
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitWidth="24" preserveRatio="true">
+                            <Image url="@icons/Redo.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-                        <Button mnemonicParsing="false" onAction="#handleDuplicate">
-                            <tooltip>
-                                <Tooltip text="%Duplicate" />
-                            </tooltip>
-                            <graphic>
-                                <ImageView fitWidth="24" preserveRatio="true">
-                                    <image>
-                                        <Image url="@icons/Add.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                        </Button>
+                <Button mnemonicParsing="false" onAction="#handleDuplicate">
+                    <tooltip>
+                        <Tooltip text="%Duplicate"/>
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitWidth="24" preserveRatio="true">
+                            <Image url="@icons/Add.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-                        <Button mnemonicParsing="false" onAction="#handleScreenShot">
-                            <tooltip>
-                                <Tooltip text="%ScreenShot" />
-                            </tooltip>
-                            <graphic>
-                                <ImageView fitWidth="24" preserveRatio="true">
-                                    <image>
-                                        <Image url="@icons/Picture.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                        </Button>
+                <Button mnemonicParsing="false" onAction="#handleScreenShot">
+                    <tooltip>
+                        <Tooltip text="%ScreenShot"/>
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitWidth="24" preserveRatio="true">
+                            <Image url="@icons/Picture.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-                        <Button mnemonicParsing="false" onAction="#handleUnpinTab">
-                            <tooltip>
-                                <Tooltip text="%Detach" />
-                            </tooltip>
-                            <graphic>
-                                <ImageView fitWidth="24" preserveRatio="true">
-                                    <image>
-                                        <Image url="@icons/Stock_Index_Up.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                        </Button>
+                <Button mnemonicParsing="false" onAction="#handleUnpinTab">
+                    <tooltip>
+                        <Tooltip text="%Detach"/>
+                    </tooltip>
+                    <graphic>
+                        <ImageView fitWidth="24" preserveRatio="true">
+                            <Image url="@icons/Stock_Index_Up.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-                    </items>
-                </ToolBar>
-            </children>
+            </ToolBar>
         </VBox>
     </top>
     <center>
@@ -173,54 +146,51 @@
     </center>
     <right>
         <VBox styleClass="center" BorderPane.alignment="CENTER">
-            <Pane fx:id="histogramPaneContainer" />
+            <Pane fx:id="histogramPaneContainer"/>
             <HBox>
                 <VBox>
-                    <Label fx:id="labelDepth" text="%Depth" />
-                    <Label fx:id="labelR" text="R: -" />
-                    <Label fx:id="labelG" text="G: -" />
-                    <Label fx:id="labelB" text="B: -" />
+                    <Label fx:id="labelDepth" text="%Depth"/>
+                    <Label fx:id="labelR" text="R: -"/>
+                    <Label fx:id="labelG" text="G: -"/>
+                    <Label fx:id="labelB" text="B: -"/>
                 </VBox>
-                <Separator orientation="VERTICAL" />
+                <Separator orientation="VERTICAL"/>
                 <VBox>
 
-                    <Label fx:id="labelWidth" text="%Width" />
-                    <Label fx:id="labelHeight" text="%Heigth" />
-                    <Label fx:id="labelX" text="x: -" />
-                    <Label fx:id="labelY" text="y: -" />
+                    <Label fx:id="labelWidth" text="%Width"/>
+                    <Label fx:id="labelHeight" text="%Heigth"/>
+                    <Label fx:id="labelX" text="x: -"/>
+                    <Label fx:id="labelY" text="y: -"/>
                 </VBox>
             </HBox>
-            <VBox fx:id="toolbox" BorderPane.alignment="CENTER" />
+            <!--<ScrollPane >-->
+                <VBox fx:id="toolbox" BorderPane.alignment="CENTER"/>
+            <!--</ScrollPane>-->
         </VBox>
     </right>
     <bottom>
         <ToolBar>
-            <Label fx:id="zoomLabel" prefWidth="55" text="100%" />
+            <Label fx:id="zoomLabel" prefWidth="55" text="100%"/>
             <Button onMouseClicked="#handleZoomOut">
                 <tooltip>
-                    <Tooltip text="%ZoomOut" />
+                    <Tooltip text="%ZoomOut"/>
                 </tooltip>
                 <graphic>
                     <ImageView fitWidth="24" preserveRatio="true">
-                        <image>
-                            <Image url="@icons/Zoom_Out.png" />
-                        </image>
+                        <Image url="@icons/Zoom_Out.png"/>
                     </ImageView>
                 </graphic>
             </Button>
             <Button onMouseClicked="#handleZoomIn">
                 <tooltip>
-                    <Tooltip text="%ZoomIn" />
+                    <Tooltip text="%ZoomIn"/>
                 </tooltip>
                 <graphic>
                     <ImageView fitWidth="24" preserveRatio="true">
-                        <image>
-                            <Image url="@icons/Zoom_In.png" />
-                        </image>
+                        <Image url="@icons/Zoom_In.png"/>
                     </ImageView>
                 </graphic>
             </Button>
-            <Label fx:id="fileNameLabel" />
         </ToolBar>
     </bottom>
 </BorderPane>

@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ResourceBundle;
 
-public class IntervalTresholdTool extends VBox {
+public class intervalThresholdTool extends VBox {
 
     private static VBox instance;
     private ToolController toolController;
@@ -23,12 +23,12 @@ public class IntervalTresholdTool extends VBox {
     private Label sliderValue;
     private ChartControl chartControl;
 
-    protected IntervalTresholdTool(ToolController controller) {
+    protected intervalThresholdTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("IntervalTresholding"));
-        chartControl = new ChartControl(3);
+        chartControl = new ChartControl();
         slider = new Slider(2, 255, 3);
         slider.setShowTickMarks(true);
         slider.setShowTickLabels(true);
@@ -44,6 +44,8 @@ public class IntervalTresholdTool extends VBox {
             chartControl.invert();
             updateImageView();
         });
+        CheckBox checkBoxKeepLevels = new CheckBox(bundle.getString("KeepLevels"));
+        checkBoxKeepLevels.selectedProperty().addListener(observable1 -> chartControl.setKeepLevels(checkBoxKeepLevels.isSelected()));
         Button buttonApply = new Button(bundle.getString("Apply"));
         Button buttonCancel = new Button(bundle.getString("Cancel"));
         buttonApply.setOnAction((actionEvent) -> {
@@ -54,8 +56,9 @@ public class IntervalTresholdTool extends VBox {
             }
         });
         buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
-        getChildren().addAll(separator, label, chartControl, checkBox, slider, sliderValue, buttonApply, buttonCancel);
+        getChildren().addAll(separator, label, chartControl, checkBox, checkBoxKeepLevels, slider, sliderValue, buttonApply, buttonCancel);
         chartControl.changedProperty().addListener(observable -> updateImageView());
+        chartControl.createDefaultIntervals(3);
         updateImageView();
     }
 
@@ -67,7 +70,7 @@ public class IntervalTresholdTool extends VBox {
     }
 
     public static VBox getInstance(ToolController controller) {
-        if(instance == null) instance = new IntervalTresholdTool(controller);
+        if(instance == null) instance = new intervalThresholdTool(controller);
         return instance;
     }
 
