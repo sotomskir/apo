@@ -22,7 +22,7 @@ public class HistogramEqTool extends VBox {
 
     protected HistogramEqTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
-        methods = new String[5];
+        methods = new String[4];
         methods[0] = bundle.getString("HEmethod1");
         methods[1] = bundle.getString("HEmethod2");
         methods[2] = bundle.getString("HEmethod3");
