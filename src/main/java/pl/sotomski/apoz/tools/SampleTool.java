@@ -2,6 +2,9 @@ package pl.sotomski.apoz.tools;
 
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
+import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
@@ -9,7 +12,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
-import pl.sotomski.apoz.nodes.CurvedFittedAreaChart;
+import pl.sotomski.apoz.charts.CurvedFittedAreaChart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +35,32 @@ public class SampleTool extends VBox {
         Label label = new Label("Sample Tool");
         ChoiceBox<String> choiceBox = new ChoiceBox<>();
         choiceBox.getItems().addAll("method 1", "method 2", "method 3");
-        CurvedFittedAreaChart chart = new CurvedFittedAreaChart(new NumberAxis(0, 100, 10), new NumberAxis(0, 100, 10));
-        XYChart.Series series = new XYChart.Series();
-        List<XYChart.Data> data = new ArrayList<>();
-        data.add(new XYChart.Data(10, 10));
-        data.add(new XYChart.Data(30, 40));
-        data.add(new XYChart.Data(50, 20));
-        data.add(new XYChart.Data(70, 90));
-        data.add(new XYChart.Data(90, 50));
-        series.getData().addAll(data);
+        NumberAxis xAxis = new NumberAxis(0, 100, 10);
+        NumberAxis yAxis =  new NumberAxis(0, 100, 10);
+        CurvedFittedAreaChart chart = new CurvedFittedAreaChart(xAxis, yAxis);
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        List<XYChart.Data<Number, Number>> datas = new ArrayList<>();
+        datas.add(new XYChart.Data<>(10, 10));
+        datas.add(new XYChart.Data<>(30, 40));
+        datas.add(new XYChart.Data<>(50, 20));
+        datas.add(new XYChart.Data<>(70, 90));
+        datas.add(new XYChart.Data<>(90, 50));
+        series.getData().addAll(datas);
         chart.getData().addAll(series);
+        for (XYChart.Data data : series.getData()) {
+            Node node = data.getNode() ;
+            node.setCursor(Cursor.HAND);
+            node.setOnMouseDragged(e -> {
+                Point2D pointInScene = new Point2D(e.getSceneX(), e.getSceneY());
+                double xAxisLoc = xAxis.sceneToLocal(pointInScene).getX();
+                double yAxisLoc = yAxis.sceneToLocal(pointInScene).getY();
+                Number x = xAxis.getValueForDisplay(xAxisLoc);
+                Number y = yAxis.getValueForDisplay(yAxisLoc);
+                data.setXValue(x);
+                data.setYValue(y);
+            });
+
+        }
         Button button = new Button("Apply");
         getChildren().addAll(separator, label, choiceBox, chart, button);
     }

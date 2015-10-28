@@ -1,5 +1,6 @@
 package pl.sotomski.apoz.tools;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -18,14 +19,18 @@ import java.util.List;
  */
 public class ChartControl extends LineChart {
 
+    protected List<Data<Number, Number>> data;
     protected List<IntervalLine> intervalLines;
     protected List<LevelLine> levelLines;
     protected int[] LUT = new int[256];
     protected IntegerProperty changed;
     protected boolean keepLevels;
+    protected Series<Number, Number> series;
 
     public ChartControl() {
         super(new NumberAxis(0, 255, 25), new NumberAxis(0, 255, 25));
+        data = new ArrayList<>();
+        series = new Series<>();
         setMaxWidth(Double.MAX_VALUE);
         changed = new SimpleIntegerProperty();
         intervalLines = new ArrayList<>();
@@ -114,26 +119,34 @@ public class ChartControl extends LineChart {
                     updateLUT();
                 }
             });
+
             setOnMouseEntered(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.E_RESIZE);
 
                 }
             });
+
             setOnMouseExited(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.DEFAULT);
                 }
             });
+
+        }
+
+        private InvalidationListener bindXYListener() {
+            return l -> setEndY(yDisplay(xValue(getEndX())));
         }
 
         public void bindYtoX() {
             System.out.println(yDisplay(xValue(getEndX())));
-            endYProperty().bind(endXProperty().multiply(yDisplay(xValue(getEndX()))).divide(getEndX()));
+            endXProperty().addListener(bindXYListener());
+            setEndY(yDisplay(xValue(getEndX())));
         }
 
         public void unBindYfromX() {
-            endYProperty().unbind();
+            endYProperty().removeListener(bindXYListener());
             endYProperty().setValue(yValue(getEndY())>0 ? yDisplay(255) : yDisplay(0));
         }
 

@@ -24,11 +24,17 @@ public class intervalThresholdTool extends VBox {
     private ChartControl chartControl;
 
     protected intervalThresholdTool(ToolController controller) {
-        ResourceBundle bundle = controller.getBundle();
         this.toolController = controller;
+        ResourceBundle bundle = controller.getBundle();
+
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("IntervalTresholding"));
+        CheckBox checkBoxKeepLevels = new CheckBox(bundle.getString("KeepLevels"));
+        CheckBox checkBox = new CheckBox(bundle.getString("Reverse"));
+        Button buttonApply = new Button(bundle.getString("Apply"));
+        Button buttonCancel = new Button(bundle.getString("Cancel"));
         chartControl = new ChartControl();
+
         slider = new Slider(2, 255, 3);
         slider.setShowTickMarks(true);
         slider.setShowTickLabels(true);
@@ -37,17 +43,18 @@ public class intervalThresholdTool extends VBox {
         slider.setSnapToTicks(true);
         slider.setOrientation(Orientation.HORIZONTAL);
         sliderValue = new Label("3");
-        slider.valueProperty().addListener(e -> chartControl.createDefaultIntervals((int) slider.getValue()));
+        slider.valueProperty().addListener(e -> {
+            checkBox.selectedProperty().setValue(false);
+            checkBoxKeepLevels.selectedProperty().setValue(false);
+            chartControl.createDefaultIntervals((int) slider.getValue());
+        });
+
         chartControl.createDefaultIntervals((int) slider.getValue());
-        CheckBox checkBox = new CheckBox(bundle.getString("Reverse"));
         checkBox.selectedProperty().addListener(observable1 -> {
             chartControl.invert();
             updateImageView();
         });
-        CheckBox checkBoxKeepLevels = new CheckBox(bundle.getString("KeepLevels"));
         checkBoxKeepLevels.selectedProperty().addListener(observable1 -> chartControl.setKeepLevels(checkBoxKeepLevels.isSelected()));
-        Button buttonApply = new Button(bundle.getString("Apply"));
-        Button buttonCancel = new Button(bundle.getString("Cancel"));
         buttonApply.setOnAction((actionEvent) -> {
             try {
                 handleApply(actionEvent);
