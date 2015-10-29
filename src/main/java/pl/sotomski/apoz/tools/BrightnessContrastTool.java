@@ -7,7 +7,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
-import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
@@ -47,16 +46,12 @@ public class BrightnessContrastTool extends VBox {
 
         contrastSlider.valueProperty().addListener(e -> {
             contrastValueLabel.setText(String.valueOf(((int) contrastSlider.getValue())));
-            ImagePane ap = toolController.getActivePaneProperty();
-            updateLUT();
-            ap.getImageView().setImage(liveApply());
+            updateImageView();
         });
 
         brightnessSlider.valueProperty().addListener(e -> {
             brightnessValueLabel.setText(String.valueOf(((int) brightnessSlider.getValue())));
-            ImagePane ap = toolController.getActivePaneProperty();
-            updateLUT();
-            ap.getImageView().setImage(liveApply());
+            updateImageView();
         });
 
         buttonApply.setOnAction((actionEvent) -> {
@@ -69,6 +64,14 @@ public class BrightnessContrastTool extends VBox {
 
         buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
         getChildren().addAll(separator, brightnessLabel, brightnessSlider,brightnessValueLabel, contrastLabel, contrastSlider, contrastValueLabel, buttonApply, buttonCancel);
+    }
+
+    private void updateImageView() {
+        ImagePane ap = toolController.getActivePaneProperty();
+        updateLUT();
+        BufferedImage image = calculateImage();
+        ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
+        ap.getHistogramPane().update(image);
     }
 
     private void updateLUT() {
@@ -104,7 +107,7 @@ public class BrightnessContrastTool extends VBox {
         manager.executeCommand(new LUTCommand(imagePane, LUT));
     }
 
-    public Image liveApply() {
+    public BufferedImage calculateImage() {
         BufferedImage grayBI, image = this.toolController.getBufferedImage();
         if(image.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(image);
         else grayBI = ImageUtils.deepCopy(image);
@@ -114,7 +117,7 @@ public class BrightnessContrastTool extends VBox {
         final byte[] a = ((DataBufferByte) grayBI.getRaster().getDataBuffer()).getData();
         final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
         for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (LUT[a[p] & 0xFF]);
-        return SwingFXUtils.toFXImage(binaryImage, null);
+        return binaryImage;
     }
 
 }

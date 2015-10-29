@@ -3,9 +3,10 @@ package pl.sotomski.apoz.tools;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.nodes.ImagePane;
@@ -14,19 +15,15 @@ import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.util.ResourceBundle;
 
-public class LevelsReductionTool extends VBox {
+public class LevelsReductionTool extends Tool {
 
-    private static VBox instance;
-    private ToolController toolController;
     private Slider slider;
     private Label sliderValue;
     private LevelsReductionControl chartControl;
 
     protected LevelsReductionTool(ToolController controller) {
-        this.toolController = controller;
-        ResourceBundle bundle = controller.getBundle();
+        super(controller);
 
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("LevelsReduction"));
@@ -56,19 +53,20 @@ public class LevelsReductionTool extends VBox {
         });
         buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
         getChildren().addAll(separator, label, chartControl, slider, sliderValue, buttonApply, buttonCancel);
-        chartControl.changedProperty().addListener(observable -> updateImageView());
+        chartControl.changedProperty().addListener(observable -> updateImageViewAndHistogram());
         chartControl.createDefaultIntervals(3);
-        updateImageView();
+        updateImageViewAndHistogram();
     }
 
 
-    private void updateImageView() {
-        sliderValue.setText(String.valueOf(((int) slider.getValue())));
+    private void updateImageViewAndHistogram() {
         ImagePane ap = toolController.getActivePaneProperty();
-        ap.getImageView().setImage(liveThreshold());
+        BufferedImage image = calculateImage();
+        ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
+        ap.getHistogramPane().update(image);
     }
 
-    public static VBox getInstance(ToolController controller) {
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new LevelsReductionTool(controller);
         return instance;
     }
@@ -79,7 +77,7 @@ public class LevelsReductionTool extends VBox {
         manager.executeCommand(new LUTCommand(imagePane, chartControl.getLUT()));
     }
 
-    public Image liveThreshold() {
+    public BufferedImage calculateImage() {
         BufferedImage grayBI, image = toolController.getBufferedImage();
         if(image.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(image);
         else grayBI = ImageUtils.deepCopy(image);
@@ -89,7 +87,7 @@ public class LevelsReductionTool extends VBox {
         final byte[] a = ((DataBufferByte) grayBI.getRaster().getDataBuffer()).getData();
         final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
         for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (chartControl.getLUT()[a[p] & 0xFF]);
-        return SwingFXUtils.toFXImage(binaryImage, null);
+        return binaryImage;
     }
 
 }

@@ -4,7 +4,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
@@ -55,7 +54,10 @@ public class ThresholdTool extends VBox {
     private void updateImageView() {
         sliderValue.setText(String.valueOf(((int) slider.getValue())));
         ImagePane ap = toolController.getActivePaneProperty();
-        ap.getImageView().setImage(liveApply(ap.getImage(), (int) slider.getValue(), checkBox.isSelected()));
+        BufferedImage image = calculateImage(ap.getImage(), (int) slider.getValue(), checkBox.isSelected());
+        ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
+        ap.getHistogramPane().update(image);
+        ap.getHistogramPane().update(image);
     }
 
     public static VBox getInstance(ToolController controller) {
@@ -69,7 +71,7 @@ public class ThresholdTool extends VBox {
         manager.executeCommand(new LUTCommand(imagePane, getLUT()));
     }
 
-    public static Image liveApply(BufferedImage bi, int threshold, boolean reverse) {
+    public static BufferedImage calculateImage(BufferedImage bi, int threshold, boolean reverse) {
         BufferedImage grayBI;
         if(bi.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(bi);
         else grayBI = ImageUtils.deepCopy(bi);
@@ -87,7 +89,7 @@ public class ThresholdTool extends VBox {
             min = 0;
         }
         for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) ((a[p] & 0xFF) > threshold?max:min);
-        return SwingFXUtils.toFXImage(binaryImage, null);
+        return binaryImage;
     }
 
     public int[] getLUT() {

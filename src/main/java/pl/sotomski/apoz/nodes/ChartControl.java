@@ -193,7 +193,7 @@ public class ChartControl extends LineChart {
                 getScene().setCursor(Cursor.MOVE);
             });
 
-            setOnMouseReleased(mouseEvent -> getScene().setCursor(Cursor.H_RESIZE));
+            setOnMouseReleased(mouseEvent -> getScene().setCursor(Cursor.V_RESIZE));
 
             setOnMouseDragged(mouseEvent -> {
                 double newY = mouseEvent.getY() + dragDelta.y;
@@ -206,7 +206,7 @@ public class ChartControl extends LineChart {
 
             setOnMouseEntered(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
-                    getScene().setCursor(Cursor.H_RESIZE);
+                    getScene().setCursor(Cursor.V_RESIZE);
 
                 }
             });
@@ -223,12 +223,11 @@ public class ChartControl extends LineChart {
         private class Delta { double x, y; }
     }
 
-
     protected void updateLUT() {
         for(LevelLine l : levelLines) {
-            double slope = (l.getEndY() - l.getStartY()) / (l.getEndX() - l.getStartX());
+            double slope = (yValue(l.getEndY()) - yValue(l.getStartY())) / (xValue(l.getEndX()) - xValue(l.getStartX()));
             for (int x = (int) xValue(l.getStartX()); x<=xValue(l.getEndX())+1; ++x) {
-                LUT[x] = (int) (slope * (x - xValue(l.getStartX())) + yValue(l.getStartY()));
+                LUT[x] = (int) (slope * x);
             }
         }
         changed.setValue(changed.get() + 1);

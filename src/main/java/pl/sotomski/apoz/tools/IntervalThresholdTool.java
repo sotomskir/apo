@@ -4,7 +4,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
@@ -29,7 +28,7 @@ public class IntervalThresholdTool extends VBox {
         ResourceBundle bundle = controller.getBundle();
 
         Separator separator = new Separator(Orientation.HORIZONTAL);
-        Label label = new Label(bundle.getString("IntervalTresholding"));
+        Label label = new Label(bundle.getString("IntervalThresholding"));
         CheckBox checkBoxKeepLevels = new CheckBox(bundle.getString("KeepLevels"));
         CheckBox checkBox = new CheckBox(bundle.getString("Reverse"));
         Button buttonApply = new Button(bundle.getString("Apply"));
@@ -74,7 +73,9 @@ public class IntervalThresholdTool extends VBox {
     private void updateImageView() {
         sliderValue.setText(String.valueOf(((int) slider.getValue())));
         ImagePane ap = toolController.getActivePaneProperty();
-        ap.getImageView().setImage(liveThreshold());
+        BufferedImage image = calculateImage();
+        ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
+        ap.getHistogramPane().update(image);
     }
 
     public static VBox getInstance(ToolController controller) {
@@ -88,7 +89,7 @@ public class IntervalThresholdTool extends VBox {
         manager.executeCommand(new LUTCommand(imagePane, chartControl.getLUT()));
     }
 
-    public Image liveThreshold() {
+    public BufferedImage calculateImage() {
         BufferedImage grayBI, image = toolController.getBufferedImage();
         if(image.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(image);
         else grayBI = ImageUtils.deepCopy(image);
@@ -98,7 +99,7 @@ public class IntervalThresholdTool extends VBox {
         final byte[] a = ((DataBufferByte) grayBI.getRaster().getDataBuffer()).getData();
         final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
         for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (chartControl.getLUT()[a[p] & 0xFF]);
-        return SwingFXUtils.toFXImage(binaryImage, null);
+        return binaryImage;
     }
 
 }
