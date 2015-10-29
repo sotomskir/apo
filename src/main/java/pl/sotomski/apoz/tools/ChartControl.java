@@ -78,7 +78,12 @@ public class ChartControl extends LineChart {
             DoubleProperty endX   = right.startXProperty();
             DoubleProperty startY = (i % 2 == 0) ? left.startYProperty()  : left.endYProperty();
             DoubleProperty endY   = (i % 2 == 0) ? right.startYProperty() : right.endYProperty();
-            levelLines.add(new LevelLine(startX, startY, endX, endY));
+            LevelLine levelLine = new LevelLine(startX, startY, endX, endY);
+            levelLine.startXProperty().bind(startX);
+            levelLine.startYProperty().bind(startY);
+            levelLine.endXProperty().bind(endX);
+            levelLine.endYProperty().bind(endY);
+            levelLines.add(levelLine);
         }
         this.getPlotChildren().addAll(intervalLines);
         this.getPlotChildren().addAll(levelLines);
@@ -97,6 +102,12 @@ public class ChartControl extends LineChart {
             setStroke(Color.GRAY.deriveColor(0, 1, 1, 0.5));
             setStrokeLineCap(StrokeLineCap.BUTT);
             getStrokeDashArray().setAll(10.0, 5.0);
+        }
+
+        public IntervalLine(double startX, double startY, double endY) {
+            this(startX);
+            setStartY(yDisplay(startY));
+            setEndY(yDisplay(endY));
         }
 
         // make a node movable by dragging it around with the mouse.
@@ -164,30 +175,63 @@ public class ChartControl extends LineChart {
 
     class LevelLine extends Line {
         LevelLine(DoubleProperty startX, DoubleProperty startY, DoubleProperty endX, DoubleProperty endY) {
-            startXProperty().bind(startX);
-            startYProperty().bind(startY);
-            endXProperty().bind(endX);
-            endYProperty().bind(endY);
             setStrokeWidth(1);
             setStroke(Color.BLACK);
+            setStartX(startX.getValue());
+            setStartY(startY.getValue());
+            setEndX(endX.getValue());
+            setEndY(endY.getValue());
         }
+
+        // make a node movable by dragging it around with the mouse.
+        public void enableDrag() {
+            final Delta dragDelta = new Delta();
+            setOnMousePressed(mouseEvent -> {
+                // record a delta distance for the drag and drop operation.
+                dragDelta.x = getStartX() - mouseEvent.getX();
+                dragDelta.y = getStartY() - mouseEvent.getY();
+                getScene().setCursor(Cursor.MOVE);
+            });
+
+            setOnMouseReleased(mouseEvent -> getScene().setCursor(Cursor.H_RESIZE));
+
+            setOnMouseDragged(mouseEvent -> {
+                double newY = mouseEvent.getY() + dragDelta.y;
+                if (newY > 0 && newY < getScene().getHeight()) {
+                    setStartY(newY);
+                    setEndY(newY);
+                    updateLUT();
+                }
+            });
+
+            setOnMouseEntered(mouseEvent -> {
+                if (!mouseEvent.isPrimaryButtonDown()) {
+                    getScene().setCursor(Cursor.H_RESIZE);
+
+                }
+            });
+
+            setOnMouseExited(mouseEvent -> {
+                if (!mouseEvent.isPrimaryButtonDown()) {
+                    getScene().setCursor(Cursor.DEFAULT);
+                }
+            });
+
+        }
+
+        // records relative x and y co-ordinates.
+        private class Delta { double x, y; }
     }
 
 
     protected void updateLUT() {
-        System.out.println("updateLUT");
-        for (int i=0; i<LUT.length; ++i) LUT[i]=i;
-        for (LevelLine levelLine : levelLines) {
-            int scaledStartX = ((Double)getXAxis().getValueForDisplay(levelLine.getStartX())).intValue();
-            int scaledEndX = ((Double)getXAxis().getValueForDisplay(levelLine.getEndX())).intValue();
-            //TODO przedzial 0:1 zamiast 0:255
-            int value = yValue(levelLine.getEndY()) > 0 ? 255 : 0;
-            if (keepLevels) value = (int) yValue(levelLine.getEndY());
-            if (!keepLevels || yValue(levelLine.getStartY()) == yValue(levelLine.getEndY()))
-                for (int x = scaledStartX; x < scaledEndX; ++x) LUT[x] = value;
+        for(LevelLine l : levelLines) {
+            double slope = (l.getEndY() - l.getStartY()) / (l.getEndX() - l.getStartX());
+            for (int x = (int) xValue(l.getStartX()); x<=xValue(l.getEndX())+1; ++x) {
+                LUT[x] = (int) (slope * (x - xValue(l.getStartX())) + yValue(l.getStartY()));
+            }
         }
         changed.setValue(changed.get() + 1);
-        System.out.println("updateLUT2");
     }
 
     public IntegerProperty changedProperty() {
@@ -209,19 +253,19 @@ public class ChartControl extends LineChart {
         return LUT;
     }
 
-    private double xValue(double x) {
+    protected double xValue(double x) {
         return (double) getXAxis().getValueForDisplay(x);
     }
 
-    private double yValue(double y) {
+    protected double yValue(double y) {
         return (double) getYAxis().getValueForDisplay(y);
     }
 
-    private double xDisplay(double x) {
+    protected double xDisplay(double x) {
         return getXAxis().getDisplayPosition(x);
     }
 
-    private double yDisplay(double y) {
+    protected double yDisplay(double y) {
         return getYAxis().getDisplayPosition(y);
     }
 }

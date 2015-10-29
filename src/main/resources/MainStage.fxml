@@ -33,6 +33,7 @@
                     <MenuItem onAction="#handleIntervalTreshloding" text="%IntervalTresholding"/>
                     <MenuItem onAction="#handlePosterize" text="%Posterize"/>
                     <MenuItem onAction="#handleSampleTool" text="Sample Tool"/>
+                    <MenuItem onAction="#handleLevelsReduction" text="%LevelsReduction"/>
                 </Menu>
                 <Menu text="%Help">
                     <MenuItem disable="true" text="%Search"/>
