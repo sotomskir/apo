@@ -7,7 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
-import pl.sotomski.apoz.commands.TresholdCommand;
+import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.ImageUtils;
 
@@ -66,7 +66,7 @@ public class TresholdTool extends VBox {
     public void handleApply(ActionEvent actionEvent) throws Exception {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
-        manager.executeCommand(new TresholdCommand(imagePane, getLUT()));
+        manager.executeCommand(new LUTCommand(imagePane, getLUT()));
     }
 
     public static Image liveTreshold(BufferedImage bi, int treshold, boolean reverse) {

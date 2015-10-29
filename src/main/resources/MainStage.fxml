@@ -34,6 +34,7 @@
                     <MenuItem onAction="#handlePosterize" text="%Posterize"/>
                     <MenuItem onAction="#handleSampleTool" text="Sample Tool"/>
                     <MenuItem onAction="#handleLevelsReduction" text="%LevelsReduction"/>
+                    <MenuItem onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
                 </Menu>
                 <Menu text="%Help">
                     <MenuItem disable="true" text="%Search"/>
