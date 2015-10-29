@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
+import pl.sotomski.apoz.nodes.ChartControl;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.ImageUtils;
 
@@ -15,7 +16,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ResourceBundle;
 
-public class intervalThresholdTool extends VBox {
+public class IntervalThresholdTool extends VBox {
 
     private static VBox instance;
     private ToolController toolController;
@@ -23,7 +24,7 @@ public class intervalThresholdTool extends VBox {
     private Label sliderValue;
     private ChartControl chartControl;
 
-    protected intervalThresholdTool(ToolController controller) {
+    protected IntervalThresholdTool(ToolController controller) {
         this.toolController = controller;
         ResourceBundle bundle = controller.getBundle();
 
@@ -77,7 +78,7 @@ public class intervalThresholdTool extends VBox {
     }
 
     public static VBox getInstance(ToolController controller) {
-        if(instance == null) instance = new intervalThresholdTool(controller);
+        if(instance == null) instance = new IntervalThresholdTool(controller);
         return instance;
     }
 

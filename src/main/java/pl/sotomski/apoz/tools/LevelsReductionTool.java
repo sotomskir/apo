@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.nodes.ImagePane;
+import pl.sotomski.apoz.nodes.LevelsReductionControl;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
@@ -29,8 +30,6 @@ public class LevelsReductionTool extends VBox {
 
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("LevelsReduction"));
-//        CheckBox checkBoxKeepLevels = new CheckBox(bundle.getString("KeepLevels"));
-//        CheckBox checkBox = new CheckBox(bundle.getString("Reverse"));
         Button buttonApply = new Button(bundle.getString("Apply"));
         Button buttonCancel = new Button(bundle.getString("Cancel"));
         chartControl = new LevelsReductionControl();
@@ -44,17 +43,10 @@ public class LevelsReductionTool extends VBox {
         slider.setOrientation(Orientation.HORIZONTAL);
         sliderValue = new Label("3");
         slider.valueProperty().addListener(e -> {
-//            checkBox.selectedProperty().setValue(false);
-//            checkBoxKeepLevels.selectedProperty().setValue(false);
             chartControl.createDefaultIntervals((int) slider.getValue());
         });
 
         chartControl.createDefaultIntervals((int) slider.getValue());
-//        checkBox.selectedProperty().addListener(observable1 -> {
-//            chartControl.invert();
-//            updateImageView();
-//        });
-//        checkBoxKeepLevels.selectedProperty().addListener(observable1 -> chartControl.setKeepLevels(checkBoxKeepLevels.isSelected()));
         buttonApply.setOnAction((actionEvent) -> {
             try {
                 handleApply(actionEvent);

@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ResourceBundle;
 
-public class TresholdTool extends VBox {
+public class ThresholdTool extends VBox {
 
     private static VBox instance;
     private ToolController toolController;
@@ -23,11 +23,11 @@ public class TresholdTool extends VBox {
     private CheckBox checkBox;
     private Label sliderValue;
 
-    protected TresholdTool(ToolController controller) {
+    protected ThresholdTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);
-        Label label = new Label(bundle.getString("Tresholding"));
+        Label label = new Label(bundle.getString("Thresholding"));
         slider = new Slider(0, 255, 128);
         slider.setShowTickMarks(true);
         slider.setShowTickLabels(true);
@@ -55,11 +55,11 @@ public class TresholdTool extends VBox {
     private void updateImageView() {
         sliderValue.setText(String.valueOf(((int) slider.getValue())));
         ImagePane ap = toolController.getActivePaneProperty();
-        ap.getImageView().setImage(liveTreshold(ap.getImage(), (int) slider.getValue(), checkBox.isSelected()));
+        ap.getImageView().setImage(liveApply(ap.getImage(), (int) slider.getValue(), checkBox.isSelected()));
     }
 
     public static VBox getInstance(ToolController controller) {
-        if(instance == null) instance = new TresholdTool(controller);
+        if(instance == null) instance = new ThresholdTool(controller);
         return instance;
     }
 
@@ -69,7 +69,7 @@ public class TresholdTool extends VBox {
         manager.executeCommand(new LUTCommand(imagePane, getLUT()));
     }
 
-    public static Image liveTreshold(BufferedImage bi, int treshold, boolean reverse) {
+    public static Image liveApply(BufferedImage bi, int threshold, boolean reverse) {
         BufferedImage grayBI;
         if(bi.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(bi);
         else grayBI = ImageUtils.deepCopy(bi);
@@ -86,7 +86,7 @@ public class TresholdTool extends VBox {
             max = 255;
             min = 0;
         }
-        for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) ((a[p] & 0xFF) > treshold?max:min);
+        for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) ((a[p] & 0xFF) > threshold?max:min);
         return SwingFXUtils.toFXImage(binaryImage, null);
     }
 

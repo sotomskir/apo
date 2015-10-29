@@ -1,4 +1,4 @@
-package pl.sotomski.apoz.tools;
+package pl.sotomski.apoz.nodes;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
@@ -241,9 +241,7 @@ public class ChartControl extends LineChart {
     public void setKeepLevels(boolean keepLevels) {
         this.keepLevels = keepLevels;
         if (keepLevels) {
-            System.out.println("setKeepLevels");
             for (IntervalLine l : intervalLines) l.bindYtoX();
-            System.out.println("setKeepLevels2");
         }
         else for (IntervalLine l : intervalLines) l.unBindYfromX();
         updateLUT();

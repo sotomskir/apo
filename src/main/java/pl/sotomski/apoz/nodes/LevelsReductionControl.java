@@ -1,6 +1,7 @@
-package pl.sotomski.apoz.tools;
+package pl.sotomski.apoz.nodes;
 
 import javafx.beans.property.DoubleProperty;
+import pl.sotomski.apoz.nodes.ChartControl;
 
 /**
  * Created by sotomski on 28/10/15.
@@ -18,6 +19,7 @@ public class LevelsReductionControl extends ChartControl {
         intervalLines.clear();
         levelLines.clear();
         double intervalLength = 255.0 /intervals;
+
         for (int i = 0; i<=intervals; ++i) {
             double startX = intervalLength * i;
             double startY = startX - intervalLength;
@@ -26,7 +28,7 @@ public class LevelsReductionControl extends ChartControl {
             intervalLines.add(l);
             System.out.println(l);
         }
-//        intervalLines.add(new IntervalLine(255));
+
         for (int i = 0; i<intervals; ++i) {
             IntervalLine left  = intervalLines.get(i);
             IntervalLine right = intervalLines.get(i+1);
@@ -42,6 +44,7 @@ public class LevelsReductionControl extends ChartControl {
             levelLines.add(levelLine);
 
         }
+
         this.getPlotChildren().addAll(intervalLines);
         this.getPlotChildren().addAll(levelLines);
         for (int i = 1; i < intervalLines.size()-1; ++i) intervalLines.get(i).enableDrag();

@@ -20,7 +20,7 @@ import java.util.ResourceBundle;
 
 public class BrightnessContrastTool extends VBox {
 
-    private static VBox instance;
+    private static BrightnessContrastTool instance;
     private ToolController toolController;
     private Slider contrastSlider;
     private Slider brightnessSlider;
@@ -78,10 +78,7 @@ public class BrightnessContrastTool extends VBox {
             LUT[i] = (int) (LUT[i]+brightnessSlider.getValue());
             if (LUT[i] > 255) LUT[i] = 255;
             if (LUT[i] < 0) LUT[i] = 0;
-
-//            System.out.print(LUT[i]+":");
         }
-//        System.out.println();
     }
 
     private void sliderStyle(Slider slider) {
@@ -94,6 +91,10 @@ public class BrightnessContrastTool extends VBox {
 
     public static VBox getInstance(ToolController controller) {
         if(instance == null) instance = new BrightnessContrastTool(controller);
+        else {
+            instance.contrastSlider.setValue(0);
+            instance.brightnessSlider.setValue(0);
+        }
         return instance;
     }
 
