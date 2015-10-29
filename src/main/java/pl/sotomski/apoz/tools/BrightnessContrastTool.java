@@ -72,13 +72,16 @@ public class BrightnessContrastTool extends VBox {
     }
 
     private void updateLUT() {
-        for (int i=0; i<255; ++i) {
+        for (int i=0; i<256; ++i) {
             double slope = 1 + 0.01 * contrastSlider.getValue();
             LUT[i] = (int) (slope * (i - 128) + 128);
             LUT[i] = (int) (LUT[i]+brightnessSlider.getValue());
             if (LUT[i] > 255) LUT[i] = 255;
             if (LUT[i] < 0) LUT[i] = 0;
+
+//            System.out.print(LUT[i]+":");
         }
+//        System.out.println();
     }
 
     private void sliderStyle(Slider slider) {
