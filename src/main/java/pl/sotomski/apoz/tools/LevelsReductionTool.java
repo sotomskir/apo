@@ -3,10 +3,8 @@ package pl.sotomski.apoz.tools;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.nodes.ImagePane;
@@ -18,8 +16,7 @@ import java.awt.image.DataBufferByte;
 
 public class LevelsReductionTool extends Tool {
 
-    private Slider slider;
-    private Label sliderValue;
+    private Spinner<Integer> spinner;
     private LevelsReductionControl chartControl;
 
     protected LevelsReductionTool(ToolController controller) {
@@ -30,20 +27,13 @@ public class LevelsReductionTool extends Tool {
         Button buttonApply = new Button(bundle.getString("Apply"));
         Button buttonCancel = new Button(bundle.getString("Cancel"));
         chartControl = new LevelsReductionControl();
-
-        slider = new Slider(2, 255, 3);
-        slider.setShowTickMarks(true);
-        slider.setShowTickLabels(true);
-        slider.setMajorTickUnit(25);
-        slider.setMinorTickCount(25);
-        slider.setSnapToTicks(true);
-        slider.setOrientation(Orientation.HORIZONTAL);
-        sliderValue = new Label("3");
-        slider.valueProperty().addListener(e -> {
-            chartControl.createDefaultIntervals((int) slider.getValue());
+        spinner = new Spinner<>(2, 255, 2);
+        spinner.setEditable(true);
+        spinner.valueProperty().addListener(e -> {
+            chartControl.createDefaultIntervals(spinner.getValue());
         });
 
-        chartControl.createDefaultIntervals((int) slider.getValue());
+        chartControl.createDefaultIntervals(spinner.getValue());
         buttonApply.setOnAction((actionEvent) -> {
             try {
                 handleApply(actionEvent);
@@ -52,7 +42,8 @@ public class LevelsReductionTool extends Tool {
             }
         });
         buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
-        getChildren().addAll(separator, label, chartControl, slider, sliderValue, buttonApply, buttonCancel);
+        HBox hBox = new HBox(spinner, buttonCancel, buttonApply);
+        getChildren().addAll(separator, label, chartControl, hBox);
         chartControl.changedProperty().addListener(observable -> updateImageViewAndHistogram());
         chartControl.createDefaultIntervals(3);
         updateImageViewAndHistogram();

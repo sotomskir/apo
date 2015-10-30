@@ -110,6 +110,16 @@ public class ChartControl extends LineChart {
             setEndY(yDisplay(endY));
         }
 
+        private IntervalLine getLeft() {
+            int index = intervalLines.indexOf(this);
+            return index == 0 ? null : intervalLines.get(index-1);
+        }
+
+        private IntervalLine getRigth() {
+            int index = intervalLines.indexOf(this);
+            return index == intervalLines.size()-1 ? null : intervalLines.get(index+1);
+        }
+
         // make a node movable by dragging it around with the mouse.
         public void enableDrag() {
             final Delta dragDelta = new Delta();
@@ -124,7 +134,9 @@ public class ChartControl extends LineChart {
 
             setOnMouseDragged(mouseEvent -> {
                 double newX = mouseEvent.getX() + dragDelta.x;
-                if (newX > 0 && newX < getScene().getWidth()) {
+                double min = getLeft().getEndX();
+                double max = getRigth().getEndX();
+                if (newX > min && newX < max) {
                     setStartX(newX);
                     setEndX(newX);
                     updateLUT();
@@ -223,11 +235,13 @@ public class ChartControl extends LineChart {
         private class Delta { double x, y; }
     }
 
+
     protected void updateLUT() {
         for(LevelLine l : levelLines) {
             double slope = (yValue(l.getEndY()) - yValue(l.getStartY())) / (xValue(l.getEndX()) - xValue(l.getStartX()));
             for (int x = (int) xValue(l.getStartX()); x<=xValue(l.getEndX())+1; ++x) {
-                LUT[x] = (int) (slope * x);
+                LUT[x] = (int) (slope * (x - xValue(l.getStartX())) + yValue(l.getStartY()));
+                LUT[x] = LUT[x]>255 ? 255 : LUT[x]<0 ? 0 : LUT[x];
             }
         }
         changed.setValue(changed.get() + 1);
