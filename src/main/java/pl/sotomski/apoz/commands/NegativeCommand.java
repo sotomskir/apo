@@ -23,7 +23,7 @@ public class NegativeCommand extends UndoableCommand implements Command {
         int height = bi.getHeight();
         final byte[] a = ((DataBufferByte) bi.getRaster().getDataBuffer()).getData();
         for (int p = width*height*histogram.getChannels()-histogram.getChannels(); p>=0; p-- ) {
-            a[p] = (byte) (histogram.getLevels() - (a[p] & 0xFF));
+            a[p] = (byte) (histogram.getLevels()-1 - (a[p] & 0xFF));
         }
         imagePane.refresh();
     }
