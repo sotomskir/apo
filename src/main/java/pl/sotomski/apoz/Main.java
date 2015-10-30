@@ -19,6 +19,10 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         Parent root = null;
         try {
+            Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
+                new ExceptionDialog(throwable, throwable.getMessage());
+                throwable.printStackTrace();
+            });
             Preferences prefs = Preferences.userNodeForPackage(Main.class);
             String lang = prefs.get(PrefsController.LANGUAGE, Locale.getDefault().getLanguage());
             System.out.println("lang: "+lang);
@@ -38,19 +42,17 @@ public class Main extends Application {
         } catch (Exception e) {
             e.printStackTrace();
             new ExceptionDialog(e, "Exception occured");
-        } catch (Throwable t) {
-            t.printStackTrace();
-            new ExceptionDialog(t, "Exception occured");
         }
 
     }
 
-    public static void main(String[] args) {
-        try {
-            launch(args);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            new ExceptionDialog(t, "Exception occured");
-        }
-    }
+//    public static void main(String[] args) {
+//        try {
+//            Thread.setDefaultUncaughtExceptionHandler(Thread.UncaughtExceptionHandler);
+//            launch(args);
+//        } catch (Throwable t) {
+//            t.printStackTrace();
+//            new ExceptionDialog(t, "Exception occured");
+//        }
+//    }
 }

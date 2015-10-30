@@ -1,5 +1,6 @@
-package pl.sotomski.apoz.tools;
+package pl.sotomski.apoz.nodes;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -18,14 +19,18 @@ import java.util.List;
  */
 public class ChartControl extends LineChart {
 
+    protected List<Data<Number, Number>> data;
     protected List<IntervalLine> intervalLines;
     protected List<LevelLine> levelLines;
     protected int[] LUT = new int[256];
     protected IntegerProperty changed;
     protected boolean keepLevels;
+    protected Series<Number, Number> series;
 
     public ChartControl() {
         super(new NumberAxis(0, 255, 25), new NumberAxis(0, 255, 25));
+        data = new ArrayList<>();
+        series = new Series<>();
         setMaxWidth(Double.MAX_VALUE);
         changed = new SimpleIntegerProperty();
         intervalLines = new ArrayList<>();
@@ -73,7 +78,12 @@ public class ChartControl extends LineChart {
             DoubleProperty endX   = right.startXProperty();
             DoubleProperty startY = (i % 2 == 0) ? left.startYProperty()  : left.endYProperty();
             DoubleProperty endY   = (i % 2 == 0) ? right.startYProperty() : right.endYProperty();
-            levelLines.add(new LevelLine(startX, startY, endX, endY));
+            LevelLine levelLine = new LevelLine(startX, startY, endX, endY);
+            levelLine.startXProperty().bind(startX);
+            levelLine.startYProperty().bind(startY);
+            levelLine.endXProperty().bind(endX);
+            levelLine.endYProperty().bind(endY);
+            levelLines.add(levelLine);
         }
         this.getPlotChildren().addAll(intervalLines);
         this.getPlotChildren().addAll(levelLines);
@@ -94,6 +104,22 @@ public class ChartControl extends LineChart {
             getStrokeDashArray().setAll(10.0, 5.0);
         }
 
+        public IntervalLine(double startX, double startY, double endY) {
+            this(startX);
+            setStartY(yDisplay(startY));
+            setEndY(yDisplay(endY));
+        }
+
+        private IntervalLine getLeft() {
+            int index = intervalLines.indexOf(this);
+            return index == 0 ? null : intervalLines.get(index-1);
+        }
+
+        private IntervalLine getRigth() {
+            int index = intervalLines.indexOf(this);
+            return index == intervalLines.size()-1 ? null : intervalLines.get(index+1);
+        }
+
         // make a node movable by dragging it around with the mouse.
         public void enableDrag() {
             final Delta dragDelta = new Delta();
@@ -108,32 +134,42 @@ public class ChartControl extends LineChart {
 
             setOnMouseDragged(mouseEvent -> {
                 double newX = mouseEvent.getX() + dragDelta.x;
-                if (newX > 0 && newX < getScene().getWidth()) {
+                double min = getLeft().getEndX();
+                double max = getRigth().getEndX();
+                if (newX > min && newX < max) {
                     setStartX(newX);
                     setEndX(newX);
                     updateLUT();
                 }
             });
+
             setOnMouseEntered(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.E_RESIZE);
 
                 }
             });
+
             setOnMouseExited(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.DEFAULT);
                 }
             });
+
+        }
+
+        private InvalidationListener bindXYListener() {
+            return l -> setEndY(yDisplay(xValue(getEndX())));
         }
 
         public void bindYtoX() {
             System.out.println(yDisplay(xValue(getEndX())));
-            endYProperty().bind(endXProperty().multiply(yDisplay(xValue(getEndX()))).divide(getEndX()));
+            endXProperty().addListener(bindXYListener());
+            setEndY(yDisplay(xValue(getEndX())));
         }
 
         public void unBindYfromX() {
-            endYProperty().unbind();
+            endYProperty().removeListener(bindXYListener());
             endYProperty().setValue(yValue(getEndY())>0 ? yDisplay(255) : yDisplay(0));
         }
 
@@ -151,30 +187,64 @@ public class ChartControl extends LineChart {
 
     class LevelLine extends Line {
         LevelLine(DoubleProperty startX, DoubleProperty startY, DoubleProperty endX, DoubleProperty endY) {
-            startXProperty().bind(startX);
-            startYProperty().bind(startY);
-            endXProperty().bind(endX);
-            endYProperty().bind(endY);
             setStrokeWidth(1);
             setStroke(Color.BLACK);
+            setStartX(startX.getValue());
+            setStartY(startY.getValue());
+            setEndX(endX.getValue());
+            setEndY(endY.getValue());
         }
+
+        // make a node movable by dragging it around with the mouse.
+        public void enableDrag() {
+            final Delta dragDelta = new Delta();
+            setOnMousePressed(mouseEvent -> {
+                // record a delta distance for the drag and drop operation.
+                dragDelta.x = getStartX() - mouseEvent.getX();
+                dragDelta.y = getStartY() - mouseEvent.getY();
+                getScene().setCursor(Cursor.MOVE);
+            });
+
+            setOnMouseReleased(mouseEvent -> getScene().setCursor(Cursor.V_RESIZE));
+
+            setOnMouseDragged(mouseEvent -> {
+                double newY = mouseEvent.getY() + dragDelta.y;
+                if (newY > 0 && newY < getScene().getHeight()) {
+                    setStartY(newY);
+                    setEndY(newY);
+                    updateLUT();
+                }
+            });
+
+            setOnMouseEntered(mouseEvent -> {
+                if (!mouseEvent.isPrimaryButtonDown()) {
+                    getScene().setCursor(Cursor.V_RESIZE);
+
+                }
+            });
+
+            setOnMouseExited(mouseEvent -> {
+                if (!mouseEvent.isPrimaryButtonDown()) {
+                    getScene().setCursor(Cursor.DEFAULT);
+                }
+            });
+
+        }
+
+        // records relative x and y co-ordinates.
+        private class Delta { double x, y; }
     }
 
 
     protected void updateLUT() {
-        System.out.println("updateLUT");
-        for (int i=0; i<LUT.length; ++i) LUT[i]=i;
-        for (LevelLine levelLine : levelLines) {
-            int scaledStartX = ((Double)getXAxis().getValueForDisplay(levelLine.getStartX())).intValue();
-            int scaledEndX = ((Double)getXAxis().getValueForDisplay(levelLine.getEndX())).intValue();
-            //TODO przedzial 0:1 zamiast 0:255
-            int value = yValue(levelLine.getEndY()) > 0 ? 255 : 0;
-            if (keepLevels) value = (int) yValue(levelLine.getEndY());
-            if (!keepLevels || yValue(levelLine.getStartY()) == yValue(levelLine.getEndY()))
-                for (int x = scaledStartX; x < scaledEndX; ++x) LUT[x] = value;
+        for(LevelLine l : levelLines) {
+            double slope = (yValue(l.getEndY()) - yValue(l.getStartY())) / (xValue(l.getEndX()) - xValue(l.getStartX()));
+            for (int x = (int) xValue(l.getStartX()); x<=xValue(l.getEndX())+1; ++x) {
+                LUT[x] = (int) (slope * (x - xValue(l.getStartX())) + yValue(l.getStartY()));
+                LUT[x] = LUT[x]>255 ? 255 : LUT[x]<0 ? 0 : LUT[x];
+            }
         }
         changed.setValue(changed.get() + 1);
-        System.out.println("updateLUT2");
     }
 
     public IntegerProperty changedProperty() {
@@ -184,9 +254,7 @@ public class ChartControl extends LineChart {
     public void setKeepLevels(boolean keepLevels) {
         this.keepLevels = keepLevels;
         if (keepLevels) {
-            System.out.println("setKeepLevels");
             for (IntervalLine l : intervalLines) l.bindYtoX();
-            System.out.println("setKeepLevels2");
         }
         else for (IntervalLine l : intervalLines) l.unBindYfromX();
         updateLUT();
@@ -196,19 +264,19 @@ public class ChartControl extends LineChart {
         return LUT;
     }
 
-    private double xValue(double x) {
+    protected double xValue(double x) {
         return (double) getXAxis().getValueForDisplay(x);
     }
 
-    private double yValue(double y) {
+    protected double yValue(double y) {
         return (double) getYAxis().getValueForDisplay(y);
     }
 
-    private double xDisplay(double x) {
+    protected double xDisplay(double x) {
         return getXAxis().getDisplayPosition(x);
     }
 
-    private double yDisplay(double y) {
+    protected double yDisplay(double y) {
         return getYAxis().getDisplayPosition(y);
     }
 }

@@ -9,10 +9,10 @@ import java.awt.image.DataBufferByte;
 /**
  * Created by sotomski on 21/10/15.
  */
-public class TresholdCommand extends UndoableCommand implements Command {
+public class LUTCommand extends UndoableCommand implements Command {
     private int[] LUT;
 
-    public TresholdCommand(ImagePane imagePane, int[] LUT) {
+    public LUTCommand(ImagePane imagePane, int[] LUT) {
         super(imagePane);
         this.LUT = LUT;
     }

@@ -26,12 +26,13 @@
                     <MenuItem onAction="#handleRedo" text="%Redo"/>
                 </Menu>
                 <Menu text="%Tools">
-                    <MenuItem onAction="#handleConvertToGrayscale" text="%ConvertToGrayscale"/>
+                    <MenuItem onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale"/>
                     <MenuItem onAction="#handleNegativeConversion" text="%NegativeConversion"/>
                     <MenuItem onAction="#handleHistogramEqualisation" text="%HistogramEqualisation"/>
-                    <MenuItem onAction="#handleTresholding" text="%Tresholding"/>
-                    <MenuItem onAction="#handleIntervalTreshloding" text="%IntervalTresholding"/>
-                    <MenuItem onAction="#handlePosterize" text="%Posterize"/>
+                    <MenuItem onAction="#handleThresholding" text="%Thresholding"/>
+                    <MenuItem onAction="#handleIntervalThreshloding" text="%IntervalThresholding"/>
+                    <MenuItem onAction="#handleLevelsReduction" text="%LevelsReduction"/>
+                    <MenuItem onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
                     <MenuItem onAction="#handleSampleTool" text="Sample Tool"/>
                 </Menu>
                 <Menu text="%Help">

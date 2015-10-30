@@ -44,6 +44,7 @@ import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class MainController implements Initializable, ToolController {
+
     private ResourceBundle bundle;
     private HistogramPane histogramPane;
     private ObjectProperty<ImagePane> activePaneProperty;
@@ -57,8 +58,12 @@ public class MainController implements Initializable, ToolController {
     @FXML private Button undoButton;
     @FXML private Button redoButton;
 
-    @Override
-    public void initialize(java.net.URL arg0, ResourceBundle resources) {
+    /***************************************************************************
+     *                                                                         *
+     *                               METHODS                                   *
+     *                                                                         *
+     **************************************************************************/
+    @Override public void initialize(java.net.URL arg0, ResourceBundle resources) {
         prefs = Preferences.userNodeForPackage(Main.class);
 
         bundle = resources;
@@ -98,10 +103,6 @@ public class MainController implements Initializable, ToolController {
 
     }
 
-    public ResourceBundle getBundle() {
-        return bundle;
-    }
-
     private void updateLabels(ImagePane pane) {
         labelDepth.setText(bundle.getString("Depth") + ": " + (pane.getImage().getColorModel().getNumComponents()>1?"RGB":"Gray"));
         labelWidth.setText(bundle.getString("Width") + ": " + pane.getImage().getWidth());
@@ -119,24 +120,40 @@ public class MainController implements Initializable, ToolController {
         redoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getRedoAvailable());
     }
 
-    @Override
-    public void setBufferedImage(BufferedImage image) {
-        this.activePaneProperty.getValue().setImage(image);
+    /**
+     * Perform functionality associated with "About" menu selection or CTRL-A.
+     */
+    private void provideAboutFunctionality() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("APOZ");
+        alert.setHeaderText(bundle.getString("About"));
+        alert.setContentText(bundle.getString("Author"));
+        alert.showAndWait();
     }
 
-    @Override
-    public ImagePane getActivePaneProperty() {
-        return activePaneProperty.getValue();
+    private void attachTab(ImageTab imageTab) {
+        tabPane.getTabs().add(imageTab);
+        imageTab.getPane().getImageView().addEventHandler(MouseEvent.MOUSE_MOVED, this::handleMouseMoved);
+        tabPane.getSelectionModel().select(imageTab);
     }
+
+    private void addToToolbox(Pane tool) {
+        toolbox.getChildren().clear();
+        toolbox.getChildren().add(tool);
+    }
+
+    /***************************************************************************
+     *                                                                         *
+     *                  Controller Method Event Handlers                       *
+     *                                                                         *
+     **************************************************************************/
 
     /**
      * Handle action related to "About" menu item.
      *
      * @param event Event on "About" menu item.
      */
-    @FXML
-    private void handleAboutAction(final ActionEvent event)
-    {
+    @FXML private void handleAboutAction(final ActionEvent event) {
         provideAboutFunctionality();
     }
 
@@ -145,11 +162,8 @@ public class MainController implements Initializable, ToolController {
      *
      * @param event Input event.
      */
-    @FXML
-    private void handleKeyInput(final InputEvent event)
-    {
-        if (event instanceof KeyEvent)
-        {
+    @FXML private void handleKeyInput(final InputEvent event) {
+        if (event instanceof KeyEvent) {
             final KeyEvent keyEvent = (KeyEvent) event;
             if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.A) {
                 provideAboutFunctionality();
@@ -170,31 +184,9 @@ public class MainController implements Initializable, ToolController {
             }
         }
     }
-
-
-    /**
-     * Perform functionality associated with "About" menu selection or CTRL-A.
-     */
-    private void provideAboutFunctionality()
-    {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("APOZ");
-        alert.setHeaderText(bundle.getString("About"));
-        alert.setContentText(bundle.getString("Author"));
-        alert.showAndWait();
-    }
-
-
     public void handleExit(ActionEvent actionEvent) {
         System.exit(0);
     }
-
-    private void attachTab(ImageTab imageTab) {
-        tabPane.getTabs().add(imageTab);
-        imageTab.getPane().getImageView().addEventHandler(MouseEvent.MOUSE_MOVED, this::handleMouseMoved);
-        tabPane.getSelectionModel().select(imageTab);
-    }
-
     public void handleOpen(ActionEvent actionEvent) {
         File file = FileMenuUtils.openDialog(rootLayout);
         ImagePane pane = new ImagePane(histogramPane, file);
@@ -227,17 +219,6 @@ public class MainController implements Initializable, ToolController {
         toolbox.getChildren().clear();
         toolbox.getChildren().add(HistogramEqTool.getInstance(this));
     }
-
-    @Override
-    public HistogramPane getHistogramChart() {
-        return activePaneProperty.getValue().getHistogramPane();
-    }
-
-    @Override
-    public BufferedImage getBufferedImage() {
-        return activePaneProperty.getValue().getImage();
-    }
-
     public void handleMouseMoved(MouseEvent event) {
         int x = (int)event.getX();
         int y = (int)event.getY();
@@ -257,7 +238,7 @@ public class MainController implements Initializable, ToolController {
         }
     }
 
-    public void handleConvertToGrayscale(ActionEvent actionEvent) {
+    public void handleConvertToGreyscale(ActionEvent actionEvent) {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
         manager.executeCommand(new ConvertToGrayCommand(activePaneProperty.getValue()));
     }
@@ -298,7 +279,6 @@ public class MainController implements Initializable, ToolController {
             e.printStackTrace();
         }
     }
-
     public void handleUnpinTab(ActionEvent actionEvent) {
         ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
         selectedTab.getPane().setTabbed(false);
@@ -319,7 +299,6 @@ public class MainController implements Initializable, ToolController {
             }
         });
     }
-
     public void handleUndo(ActionEvent actionEvent) {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
         manager.undo();
@@ -330,7 +309,6 @@ public class MainController implements Initializable, ToolController {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
         manager.redo();
     }
-
     public void handlePreferences(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -349,29 +327,46 @@ public class MainController implements Initializable, ToolController {
             e.printStackTrace();
         }
     }
-
     public void handleNegativeConversion(ActionEvent actionEvent) {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
         manager.executeCommand(new NegativeCommand(activePaneProperty.getValue()));
     }
-    private void addToToolbox(Pane tool) {
-        toolbox.getChildren().clear();
-        toolbox.getChildren().add(tool);
+    public void handleThresholding(ActionEvent actionEvent) {
+        addToToolbox(ThresholdTool.getInstance(this));
     }
 
-    public void handleTresholding(ActionEvent actionEvent) {
-        addToToolbox(TresholdTool.getInstance(this));
-    }
-
-    public void handlePosterize(ActionEvent actionEvent) {
-        addToToolbox(PosterizeTool.getInstance(this));
-    }
-
-    public void handleIntervalTreshloding(ActionEvent actionEvent) {
-        addToToolbox(intervalThresholdTool.getInstance(this));
+    public void handleIntervalThreshloding(ActionEvent actionEvent) {
+        addToToolbox(IntervalThresholdTool.getInstance(this));
     }
 
     public void handleSampleTool(ActionEvent actionEvent) {
         addToToolbox(SampleTool.getInstance(this));
     }
+
+    public void handleLevelsReduction(ActionEvent actionEvent) {
+        addToToolbox(LevelsReductionTool.getInstance(this));
+    }
+
+    public void handleBrightnessContrast(ActionEvent actionEvent) {
+        addToToolbox(BrightnessContrastTool.getInstance(this));
+    }
+
+
+    /***************************************************************************
+     *                                                                         *
+     *                               GETTERS                                   *
+     *                                                                         *
+     **************************************************************************/
+
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+
+    @Override public BufferedImage getBufferedImage() {
+        return activePaneProperty.getValue().getImage();
+    }
+    @Override public ImagePane getActivePaneProperty() {
+        return activePaneProperty.getValue();
+    }
+
 }

@@ -4,10 +4,10 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
-import pl.sotomski.apoz.commands.TresholdCommand;
+import pl.sotomski.apoz.commands.LUTCommand;
+import pl.sotomski.apoz.nodes.ChartControl;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.ImageUtils;
 
@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ResourceBundle;
 
-public class intervalThresholdTool extends VBox {
+public class IntervalThresholdTool extends VBox {
 
     private static VBox instance;
     private ToolController toolController;
@@ -23,12 +23,18 @@ public class intervalThresholdTool extends VBox {
     private Label sliderValue;
     private ChartControl chartControl;
 
-    protected intervalThresholdTool(ToolController controller) {
-        ResourceBundle bundle = controller.getBundle();
+    protected IntervalThresholdTool(ToolController controller) {
         this.toolController = controller;
+        ResourceBundle bundle = controller.getBundle();
+
         Separator separator = new Separator(Orientation.HORIZONTAL);
-        Label label = new Label(bundle.getString("IntervalTresholding"));
+        Label label = new Label(bundle.getString("IntervalThresholding"));
+        CheckBox checkBoxKeepLevels = new CheckBox(bundle.getString("KeepLevels"));
+        CheckBox checkBox = new CheckBox(bundle.getString("Reverse"));
+        Button buttonApply = new Button(bundle.getString("Apply"));
+        Button buttonCancel = new Button(bundle.getString("Cancel"));
         chartControl = new ChartControl();
+
         slider = new Slider(2, 255, 3);
         slider.setShowTickMarks(true);
         slider.setShowTickLabels(true);
@@ -37,17 +43,18 @@ public class intervalThresholdTool extends VBox {
         slider.setSnapToTicks(true);
         slider.setOrientation(Orientation.HORIZONTAL);
         sliderValue = new Label("3");
-        slider.valueProperty().addListener(e -> chartControl.createDefaultIntervals((int) slider.getValue()));
+        slider.valueProperty().addListener(e -> {
+            checkBox.selectedProperty().setValue(false);
+            checkBoxKeepLevels.selectedProperty().setValue(false);
+            chartControl.createDefaultIntervals((int) slider.getValue());
+        });
+
         chartControl.createDefaultIntervals((int) slider.getValue());
-        CheckBox checkBox = new CheckBox(bundle.getString("Reverse"));
         checkBox.selectedProperty().addListener(observable1 -> {
             chartControl.invert();
             updateImageView();
         });
-        CheckBox checkBoxKeepLevels = new CheckBox(bundle.getString("KeepLevels"));
         checkBoxKeepLevels.selectedProperty().addListener(observable1 -> chartControl.setKeepLevels(checkBoxKeepLevels.isSelected()));
-        Button buttonApply = new Button(bundle.getString("Apply"));
-        Button buttonCancel = new Button(bundle.getString("Cancel"));
         buttonApply.setOnAction((actionEvent) -> {
             try {
                 handleApply(actionEvent);
@@ -66,21 +73,23 @@ public class intervalThresholdTool extends VBox {
     private void updateImageView() {
         sliderValue.setText(String.valueOf(((int) slider.getValue())));
         ImagePane ap = toolController.getActivePaneProperty();
-        ap.getImageView().setImage(liveThreshold());
+        BufferedImage image = calculateImage();
+        ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
+        ap.getHistogramPane().update(image);
     }
 
     public static VBox getInstance(ToolController controller) {
-        if(instance == null) instance = new intervalThresholdTool(controller);
+        if(instance == null) instance = new IntervalThresholdTool(controller);
         return instance;
     }
 
     public void handleApply(ActionEvent actionEvent) throws Exception {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
-        manager.executeCommand(new TresholdCommand(imagePane, chartControl.getLUT()));
+        manager.executeCommand(new LUTCommand(imagePane, chartControl.getLUT()));
     }
 
-    public Image liveThreshold() {
+    public BufferedImage calculateImage() {
         BufferedImage grayBI, image = toolController.getBufferedImage();
         if(image.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(image);
         else grayBI = ImageUtils.deepCopy(image);
@@ -90,7 +99,7 @@ public class intervalThresholdTool extends VBox {
         final byte[] a = ((DataBufferByte) grayBI.getRaster().getDataBuffer()).getData();
         final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
         for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (chartControl.getLUT()[a[p] & 0xFF]);
-        return SwingFXUtils.toFXImage(binaryImage, null);
+        return binaryImage;
     }
 
 }

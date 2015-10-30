@@ -1,4 +1,4 @@
-package pl.sotomski.apoz.nodes;
+package pl.sotomski.apoz.charts;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -18,6 +18,7 @@ public class CurvedFittedAreaChart extends AreaChart<Number,Number> {
 
     public CurvedFittedAreaChart(NumberAxis xAxis, NumberAxis yAxis) {
         super(xAxis, yAxis);
+        this.setAnimated(false);
     }
 
     /** @inheritDoc */
