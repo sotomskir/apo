@@ -239,7 +239,7 @@ public class ChartControl extends LineChart {
     protected void updateLUT() {
         for(LevelLine l : levelLines) {
             double slope = (yValue(l.getEndY()) - yValue(l.getStartY())) / (xValue(l.getEndX()) - xValue(l.getStartX()));
-            for (int x = (int) xValue(l.getStartX()); x<=xValue(l.getEndX())+1; ++x) {
+            for (int x = (int) xValue(l.getStartX()); x<=xValue(l.getEndX()); ++x) {
                 LUT[x] = (int) (slope * (x - xValue(l.getStartX())) + yValue(l.getStartY()));
                 LUT[x] = LUT[x]>255 ? 255 : LUT[x]<0 ? 0 : LUT[x];
             }
