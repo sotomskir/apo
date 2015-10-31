@@ -103,7 +103,7 @@ public class CurvedFittedAreaChart extends AreaChart<Number,Number> {
                     2 * firstControlPoints[0].getX() - dataPoints[0].getX(),
                     2 * firstControlPoints[0].getY() - dataPoints[0].getY()
             );
-            return new Pair<Point2D[], Point2D[]>(firstControlPoints, secondControlPoints);
+            return new Pair<>(firstControlPoints, secondControlPoints);
         }
 
         // Calculate first Bezier control points
@@ -143,7 +143,7 @@ public class CurvedFittedAreaChart extends AreaChart<Number,Number> {
                         (dataPoints[n].getY() + y[n - 1]) / 2);
             }
         }
-        return new Pair<Point2D[], Point2D[]>(firstControlPoints, secondControlPoints);
+        return new Pair<>(firstControlPoints, secondControlPoints);
     }
 
     /**

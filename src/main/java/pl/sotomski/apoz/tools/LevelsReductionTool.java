@@ -80,5 +80,4 @@ public class LevelsReductionTool extends Tool {
         for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (chartControl.getLUT()[a[p] & 0xFF]);
         return binaryImage;
     }
-
 }

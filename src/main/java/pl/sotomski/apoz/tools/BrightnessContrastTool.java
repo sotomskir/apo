@@ -25,7 +25,7 @@ public class BrightnessContrastTool extends VBox {
     private Slider brightnessSlider;
     private int[] LUT;
 
-    protected BrightnessContrastTool(ToolController controller) {
+    private BrightnessContrastTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
         this.toolController = controller;
 
@@ -101,13 +101,13 @@ public class BrightnessContrastTool extends VBox {
         return instance;
     }
 
-    public void handleApply(ActionEvent actionEvent) throws Exception {
+    private void handleApply(ActionEvent actionEvent) throws Exception {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         manager.executeCommand(new LUTCommand(imagePane, LUT));
     }
 
-    public BufferedImage calculateImage() {
+    private BufferedImage calculateImage() {
         BufferedImage grayBI, image = this.toolController.getBufferedImage();
         if(image.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(image);
         else grayBI = ImageUtils.deepCopy(image);

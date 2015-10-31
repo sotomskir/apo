@@ -20,8 +20,8 @@ public class Main extends Application {
         Parent root = null;
         try {
             Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) -> {
-                new ExceptionDialog(throwable, throwable.getMessage());
                 throwable.printStackTrace();
+                new ExceptionDialog(throwable, throwable.getMessage());
             });
             Preferences prefs = Preferences.userNodeForPackage(Main.class);
             String lang = prefs.get(PrefsController.LANGUAGE, Locale.getDefault().getLanguage());

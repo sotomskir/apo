@@ -30,7 +30,6 @@ public class Histogram {
         cumulativeMono =  new int[levels];
         double hSum = 0, hRGBSum[] = new double[3];
         final byte[] a = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-        int r,g,b;
         if (channels==3) {
             for (int p = 0; p < width*height*3; p+=3 ) {
                 ++rgb[0][a[p+2] & 0xFF];

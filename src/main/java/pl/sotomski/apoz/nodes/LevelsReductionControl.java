@@ -13,24 +13,23 @@ public class LevelsReductionControl extends ChartControl {
     @Override
     public void createDefaultIntervals(int intervals) {
         System.out.println("createDefaultIntervals "+getWidth());
-        this.getPlotChildren().removeAll(intervalLines);
+//        this.getPlotChildren().removeAll(intervalData);
         this.getPlotChildren().removeAll(levelLines);
-        intervalLines.clear();
+        intervalData.clear();
         levelLines.clear();
         double intervalLength = 255.0 /intervals;
 
         for (int i = 0; i<=intervals; ++i) {
             double startX = intervalLength * i;
             double startY = startX - intervalLength;
-            double endY = startX;
-            IntervalLine l = new IntervalLine(startX, startY, endY);
-            intervalLines.add(l);
-            System.out.println(l);
+            IntervalData d = new IntervalData(startX, startY, startX);
+//            IntervalData d = new IntervalData(startX);
+            intervalData.add(d);
         }
 
         for (int i = 0; i<intervals; ++i) {
-            IntervalLine left  = intervalLines.get(i);
-            IntervalLine right = intervalLines.get(i+1);
+            IntervalLine left  = intervalData.get(i).getLine();
+            IntervalLine right = intervalData.get(i+1).getLine();
             DoubleProperty startX = left.startXProperty();
             DoubleProperty endX   = right.startXProperty();
             DoubleProperty startY = left.endYProperty();
@@ -44,9 +43,9 @@ public class LevelsReductionControl extends ChartControl {
 
         }
 
-        this.getPlotChildren().addAll(intervalLines);
+//        this.getPlotChildren().addAll(intervalData);
         this.getPlotChildren().addAll(levelLines);
-        for (int i = 1; i < intervalLines.size()-1; ++i) intervalLines.get(i).enableDrag();
+        for (int i = 1; i < intervalData.size()-1; ++i) intervalData.get(i).getLine().enableDrag();
         for (int i = 1; i < levelLines.size(); ++i) levelLines.get(i).enableDrag();
         updateLUT();
     }
