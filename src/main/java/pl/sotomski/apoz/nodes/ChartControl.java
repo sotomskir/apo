@@ -28,6 +28,7 @@ public class ChartControl extends LineChart {
     protected int[] LUT = new int[256];
     protected IntegerProperty changed;
     protected boolean keepLevels;
+    protected boolean inverted = false;
     protected Series<Number, Number> series;
 
     public ChartControl() {
@@ -65,8 +66,8 @@ public class ChartControl extends LineChart {
                 data.setEndY(startY);
             }
         }
+        inverted = !inverted;
         layoutPlotChildren();
-        updateLUT();
     }
 
     /** @inheritDoc */
@@ -81,6 +82,7 @@ public class ChartControl extends LineChart {
             line.setEndY(yDisplay(d.getEndY()));
             System.out.println(d);
         }
+        updateLUT();
     }
 
     /** creates default equal intervals
@@ -153,7 +155,7 @@ public class ChartControl extends LineChart {
 
         @Override
         public String toString() {
-            return "Data:\t(\t"+x.getValue()+",\t"+startY.getValue()+",\t"+endY.getValue()+")\nLine:\t(\t"+line.getStartX()+",\t"+line.getStartY()+",\t"+line.getEndY()+")";
+            return "Data:\t(\t"+x.getValue()+",\t"+startY.getValue()+",\t"+endY.getValue()+")";//\nLine:\t(\t"+line.getStartX()+",\t"+line.getStartY()+",\t"+line.getEndY()+")";
         }
 
         public IntervalLine getLine() {
@@ -199,7 +201,13 @@ public class ChartControl extends LineChart {
         }
         public void unBindYfromX() {
             endYProperty().removeListener(bindXYListener());
-            endYProperty().setValue(getEndY() > 0 ? 255 : 0);
+            if (inverted) endYProperty().setValue(getEndY() < 255 ? 0 : 255);
+            else endYProperty().setValue(getEndY() > 0 ? 255 : 0);
+            // special case for first and last line
+            if (x.getValue() == 0 || x.getValue() == 255) {
+                endYProperty().setValue(inverted ? 0 : 255);
+                startYProperty().setValue(inverted ? 255 : 0);
+            }
         }
 
         private InvalidationListener bindXYListener() {
@@ -393,7 +401,6 @@ public class ChartControl extends LineChart {
             for (IntervalData l : intervalDatas) l.bindYtoX();
         }
         else for (IntervalData l : intervalDatas) l.unBindYfromX();
-        updateLUT();
         layoutPlotChildren();
     }
 
