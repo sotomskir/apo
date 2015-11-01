@@ -4,6 +4,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
@@ -19,38 +20,31 @@ public class IntervalThresholdTool extends VBox {
 
     private static VBox instance;
     private ToolController toolController;
-    private Slider slider;
-    private Label sliderValue;
+    private Spinner<Integer> spinner;
     private ChartControl chartControl;
 
     protected IntervalThresholdTool(ToolController controller) {
         this.toolController = controller;
         ResourceBundle bundle = controller.getBundle();
 
+        // create controls
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("IntervalThresholding"));
         CheckBox checkBoxKeepLevels = new CheckBox(bundle.getString("KeepLevels"));
-        CheckBox checkBox = new CheckBox(bundle.getString("Reverse"));
-        Button buttonApply = new Button(bundle.getString("Apply"));
-        Button buttonCancel = new Button(bundle.getString("Cancel"));
+        CheckBox checkBoxInvert = new CheckBox(bundle.getString("Reverse"));
         chartControl = new ChartControl();
+        spinner = new Spinner<>(2, 255, 3);
+        Button buttonCancel = new Button(bundle.getString("Cancel"));
+        Button buttonApply = new Button(bundle.getString("Apply"));
+        HBox hBox = new HBox(spinner, buttonCancel, buttonApply);
 
-        slider = new Slider(2, 255, 3);
-        slider.setShowTickMarks(true);
-        slider.setShowTickLabels(true);
-        slider.setMajorTickUnit(25);
-        slider.setMinorTickCount(25);
-        slider.setSnapToTicks(true);
-        slider.setOrientation(Orientation.HORIZONTAL);
-        sliderValue = new Label("3");
-        slider.valueProperty().addListener(e -> {
-            checkBox.selectedProperty().setValue(false);
+        // add listeners
+        spinner.valueProperty().addListener(e -> {
+            checkBoxInvert.selectedProperty().setValue(false);
             checkBoxKeepLevels.selectedProperty().setValue(false);
-            chartControl.createDefaultIntervals((int) slider.getValue());
+            chartControl.createDefaultIntervals(spinner.getValue());
         });
-
-        chartControl.createDefaultIntervals((int) slider.getValue());
-        checkBox.selectedProperty().addListener(observable1 -> {
+        checkBoxInvert.selectedProperty().addListener(observable1 -> {
             chartControl.invert();
             updateImageView();
         });
@@ -63,15 +57,16 @@ public class IntervalThresholdTool extends VBox {
             }
         });
         buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
-        getChildren().addAll(separator, label, chartControl, checkBox, checkBoxKeepLevels, slider, sliderValue, buttonApply, buttonCancel);
         chartControl.changedProperty().addListener(observable -> updateImageView());
-        chartControl.createDefaultIntervals(3);
+
+        // add controls to view and init
+        getChildren().addAll(separator, label, chartControl, checkBoxInvert, checkBoxKeepLevels, hBox);
+        chartControl.createDefaultIntervals(spinner.getValue());
         updateImageView();
     }
 
 
     private void updateImageView() {
-        sliderValue.setText(String.valueOf(((int) slider.getValue())));
         ImagePane ap = toolController.getActivePaneProperty();
         BufferedImage image = calculateImage();
         ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));

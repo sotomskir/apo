@@ -35,16 +35,16 @@ public class SampleTool extends VBox {
         Label label = new Label("Sample Tool");
         ChoiceBox<String> choiceBox = new ChoiceBox<>();
         choiceBox.getItems().addAll("method 1", "method 2", "method 3");
-        NumberAxis xAxis = new NumberAxis(0, 100, 10);
-        NumberAxis yAxis =  new NumberAxis(0, 100, 10);
+        NumberAxis xAxis = new NumberAxis(0, 255, 10);
+        NumberAxis yAxis =  new NumberAxis(0, 255, 10);
         CurvedFittedAreaChart chart = new CurvedFittedAreaChart(xAxis, yAxis);
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         List<XYChart.Data<Number, Number>> datas = new ArrayList<>();
-        datas.add(new XYChart.Data<>(10, 10));
-        datas.add(new XYChart.Data<>(30, 40));
-        datas.add(new XYChart.Data<>(50, 20));
-        datas.add(new XYChart.Data<>(70, 90));
-        datas.add(new XYChart.Data<>(90, 50));
+        datas.add(new XYChart.Data<>(0, 0));
+        datas.add(new XYChart.Data<>(64, 64));
+        datas.add(new XYChart.Data<>(128, 128));
+        datas.add(new XYChart.Data<>(192, 192));
+        datas.add(new XYChart.Data<>(255, 255));
         series.getData().addAll(datas);
         chart.getData().addAll(series);
         for (XYChart.Data data : series.getData()) {
