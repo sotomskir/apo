@@ -46,5 +46,6 @@ public class CumulativeHistogramChart extends LineChart<Number, Number> {
         yAxis.setTickLabelsVisible(false);
         xAxis.setTickLabelsVisible(false);
         this.setMaxHeight(200.0);
+        getStyleClass().add("thick-chart");
     }
 }

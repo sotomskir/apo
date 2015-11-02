@@ -40,7 +40,6 @@ public class LevelsReductionControl extends ChartControl {
             double startX = intervalLength * i;
             double startY = startX - intervalLength;
             IntervalData d = new IntervalData(startX, startY, startX);
-//            IntervalData d = new IntervalData(startX);
             this.getPlotChildren().add(d.getLine());
             intervalDatas.add(d);
         }
@@ -54,10 +53,6 @@ public class LevelsReductionControl extends ChartControl {
             DoubleProperty leftEndY = left.getLine().endYProperty();
             DoubleProperty rightStartY   = right.getLine().startYProperty();
             LevelLine levelLine = new LevelLine(leftStartX.getValue(), (leftEndY.getValue()), (rightStartX.getValue()), (rightStartY.getValue()));
-//            leftEndY.setValue(yValue(levelLine.getStartY()));
-//            rightStartY.setValue(yValue(levelLine.getEndY()));
-//            levelLine.setStartX(leftStartX.getValue());
-//            levelLine.setEndX(rightStartX.getValue());
             levelLine.startYProperty().addListener(observable1 -> {
                 left.setEndY(yValue(levelLine.getStartY()));
                 layoutPlotChildren();
@@ -71,11 +66,9 @@ public class LevelsReductionControl extends ChartControl {
             levelLines.add(levelLine);
         }
 
-//        this.getPlotChildren().addAll(intervalDatas);
         this.getPlotChildren().addAll(levelLines);
         for (int i = 1; i < intervalDatas.size()-1; ++i) intervalDatas.get(i).getLine().enableDrag();
         for (int i = 1; i < levelLines.size(); ++i) levelLines.get(i).enableDrag();
-//            layoutPlotChildren();
         updateLUT();
     }
 

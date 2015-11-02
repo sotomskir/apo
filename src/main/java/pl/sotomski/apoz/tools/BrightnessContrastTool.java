@@ -23,6 +23,7 @@ public class BrightnessContrastTool extends VBox {
     private ToolController toolController;
     private Slider contrastSlider;
     private Slider brightnessSlider;
+    private Slider gammaSlider;
     private int[] LUT;
 
     private BrightnessContrastTool(ToolController controller) {
@@ -31,18 +32,22 @@ public class BrightnessContrastTool extends VBox {
 
         contrastSlider = new Slider(-100, 100, 0);
         brightnessSlider = new Slider(-100, 100, 0);
+        gammaSlider = new Slider(0.3, 6, 1);
         LUT = new int[256];
 
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label brightnessLabel = new Label(bundle.getString("Brightness"));
         Label contrastLabel = new Label(bundle.getString("Contrast"));
+        Label gammaLabel = new Label(bundle.getString("Gamma"));
         Label brightnessValueLabel = new Label("0");
         Label contrastValueLabel = new Label("0");
+        Label gammaValueLabel = new Label("0");
         Button buttonApply = new Button(bundle.getString("Apply"));
         Button buttonCancel = new Button(bundle.getString("Cancel"));
 
         sliderStyle(contrastSlider);
         sliderStyle(brightnessSlider);
+//        sliderStyle(gammaSlider);
 
         contrastSlider.valueProperty().addListener(e -> {
             contrastValueLabel.setText(String.valueOf(((int) contrastSlider.getValue())));
@@ -51,6 +56,11 @@ public class BrightnessContrastTool extends VBox {
 
         brightnessSlider.valueProperty().addListener(e -> {
             brightnessValueLabel.setText(String.valueOf(((int) brightnessSlider.getValue())));
+            updateImageView();
+        });
+
+        gammaSlider.valueProperty().addListener(e -> {
+            gammaValueLabel.setText(String.valueOf((gammaSlider.getValue())));
             updateImageView();
         });
 
@@ -63,7 +73,10 @@ public class BrightnessContrastTool extends VBox {
         });
 
         buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
-        getChildren().addAll(separator, brightnessLabel, brightnessSlider,brightnessValueLabel, contrastLabel, contrastSlider, contrastValueLabel, buttonApply, buttonCancel);
+//        getChildren().addAll(separator, brightnessLabel, brightnessSlider,brightnessValueLabel, contrastLabel,
+//                contrastSlider, contrastValueLabel, gammaLabel, gammaSlider, gammaValueLabel, buttonApply, buttonCancel);
+        getChildren().addAll(separator, brightnessLabel, brightnessSlider,brightnessValueLabel, contrastLabel,
+                contrastSlider, contrastValueLabel, buttonApply, buttonCancel);
     }
 
     private void updateImageView() {
@@ -79,6 +92,7 @@ public class BrightnessContrastTool extends VBox {
             double slope = 1 + 0.01 * contrastSlider.getValue();
             LUT[i] = (int) (slope * (i - 128) + 128);
             LUT[i] = (int) (LUT[i]+brightnessSlider.getValue());
+            LUT[i] = (int) Math.pow(LUT[i], gammaSlider.getValue());
             if (LUT[i] > 255) LUT[i] = 255;
             if (LUT[i] < 0) LUT[i] = 0;
         }

@@ -16,8 +16,8 @@ import pl.sotomski.apoz.charts.CurvedFittedAreaChart;
 
 import java.util.ArrayList;
 import java.util.List;
-
-
+//http://jsxgraph.uni-bayreuth.de/wp/examples/
+//http://jsxgraph.uni-bayreuth.de/wiki/index.php/Cubic_spline_interpolation
 public class SampleTool extends VBox {
     private static SampleTool instance;
     private final ToolController toolControler;
