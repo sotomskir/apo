@@ -45,7 +45,7 @@ public class ExceptionDialog {
 // Set expandable Exception into the dialog pane.
         alert.getDialogPane().setExpandableContent(expContent);
 
-        alert.showAndWait();
+        alert.show();
     }
 
 }

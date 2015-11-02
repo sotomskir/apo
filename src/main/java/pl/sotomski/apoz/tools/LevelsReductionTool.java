@@ -22,6 +22,7 @@ public class LevelsReductionTool extends Tool {
     protected LevelsReductionTool(ToolController controller) {
         super(controller);
 
+        // create controls
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("LevelsReduction"));
         Button buttonApply = new Button(bundle.getString("Apply"));
@@ -29,11 +30,13 @@ public class LevelsReductionTool extends Tool {
         chartControl = new LevelsReductionControl();
         spinner = new Spinner<>(2, 255, 2);
         spinner.setEditable(true);
+        HBox hBox = new HBox(spinner, buttonCancel, buttonApply);
+
+        // create listeners
         spinner.valueProperty().addListener(e -> {
             chartControl.createDefaultIntervals(spinner.getValue());
         });
 
-        chartControl.createDefaultIntervals(spinner.getValue());
         buttonApply.setOnAction((actionEvent) -> {
             try {
                 handleApply(actionEvent);
@@ -42,10 +45,11 @@ public class LevelsReductionTool extends Tool {
             }
         });
         buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
-        HBox hBox = new HBox(spinner, buttonCancel, buttonApply);
-        getChildren().addAll(separator, label, chartControl, hBox);
         chartControl.changedProperty().addListener(observable -> updateImageViewAndHistogram());
-        chartControl.createDefaultIntervals(3);
+
+        //
+        getChildren().addAll(separator, label, chartControl, hBox);
+        chartControl.createDefaultIntervals(spinner.getValue());
         updateImageViewAndHistogram();
     }
 

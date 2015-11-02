@@ -114,7 +114,7 @@ public class ChartControl extends LineChart {
             DoubleProperty endX   = right.startXProperty();
             DoubleProperty startY = (i % 2 == 0) ? left.startYProperty()  : left.endYProperty();
             DoubleProperty endY   = (i % 2 == 0) ? right.startYProperty() : right.endYProperty();
-            LevelLine levelLine = new LevelLine(startX, startY, endX, endY);
+            LevelLine levelLine = new LevelLine(startX.doubleValue(), startY.doubleValue(), endX.doubleValue(), endY.doubleValue());
             levelLine.startXProperty().bind(startX);
             levelLine.startYProperty().bind(startY);
             levelLine.endXProperty().bind(endX);
@@ -285,7 +285,7 @@ public class ChartControl extends LineChart {
 
             setOnMouseDragged(mouseEvent -> {
                 double newX = mouseEvent.getX() + dragDelta.x;
-                double min =  getLeft().getEndX();
+                double min = getLeft().getEndX();
                 double max = getRight().getEndX();
                 if (newX > min && newX < max) {
                     setStartX(newX);
@@ -293,14 +293,16 @@ public class ChartControl extends LineChart {
                     this.data.setX(xValue(newX));
                     updateLUT();
                     layoutPlotChildren();
+                    menu.setX(mouseEvent.getSceneX() + 25);
+                    menu.setY(mouseEvent.getSceneY() + 25);
                 }
             });
 
             setOnMouseEntered(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.E_RESIZE);
-                    menuItem.setText("X:" + data.getX() + " sY:" + data.getStartY() + " eY:" + data.getEndY());
-                    menu.show(getScene().getWindow(), mouseEvent.getX() + 25, mouseEvent.getY() + 25);
+                    menuItem.setText("X:" + data.getX().intValue());
+                    menu.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
                 }
             });
 
@@ -329,13 +331,19 @@ public class ChartControl extends LineChart {
     }
 
     class LevelLine extends Line {
-        LevelLine(DoubleProperty startX, DoubleProperty startY, DoubleProperty endX, DoubleProperty endY) {
+        private ContextMenu menu;
+        private MenuItem menuItem;
+
+        LevelLine(double startX, double startY, double endX, double endY) {
+            this.menu = new ContextMenu();
+            this.menuItem = new MenuItem();
+            menu.getItems().add(menuItem);
             setStrokeWidth(1);
             setStroke(Color.BLACK);
-            setStartX(startX.getValue());
-            setStartY(startY.getValue());
-            setEndX(endX.getValue());
-            setEndY(endY.getValue());
+            setStartX(startX);
+            setStartY(startY);
+            setEndX(endX);
+            setEndY(endY);
         }
 
         // make a node movable by dragging it around with the mouse.
@@ -348,28 +356,32 @@ public class ChartControl extends LineChart {
                 getScene().setCursor(Cursor.MOVE);
             });
 
-            setOnMouseReleased(mouseEvent -> getScene().setCursor(Cursor.V_RESIZE));
+            setOnMouseReleased(mouseEvent -> {
+                getScene().setCursor(Cursor.V_RESIZE);
+                updateLUT();
+                layoutPlotChildren();
+            });
 
             setOnMouseDragged(mouseEvent -> {
                 double newY = mouseEvent.getY() + dragDelta.y;
                 if (newY > 0 && newY < getScene().getHeight()) {
                     setStartY(newY);
                     setEndY(newY);
-                    updateLUT();
-                    layoutPlotChildren();
                 }
             });
 
             setOnMouseEntered(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.V_RESIZE);
-
+                    menuItem.setText("Y:" + yValue(this.startYProperty().intValue()));
+                    menu.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
                 }
             });
 
             setOnMouseExited(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.DEFAULT);
+                    menu.hide();
                 }
             });
 
@@ -383,7 +395,7 @@ public class ChartControl extends LineChart {
     protected void updateLUT() {
         for(LevelLine l : levelLines) {
             double slope = (yValue(l.getEndY()) - yValue(l.getStartY())) / (xValue(l.getEndX()) - xValue(l.getStartX()));
-            for (int x = (int) xValue(l.getStartX()); x<=xValue(l.getEndX()); ++x) {
+            for (int x = (int) xValue(l.getStartX()); x<xValue(l.getEndX()); ++x) {
                 LUT[x] = (int) (slope * (x - xValue(l.getStartX())) + yValue(l.getStartY()));
                 LUT[x] = LUT[x]>255 ? 255 : LUT[x]<0 ? 0 : LUT[x];
             }
