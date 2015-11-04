@@ -5,7 +5,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -33,7 +32,7 @@ public class CurvesControl extends LineChart {
     protected IntegerProperty changed;
 
     public CurvesControl() {
-        super(new NumberAxis(0, 255, 10), new NumberAxis(0, 255, 10));
+        super(new NumberAxis(0, 255, 50), new NumberAxis(0, 255, 50));
         changed = new SimpleIntegerProperty();
         path = new Path();
         mousingPath = new Path();
@@ -41,7 +40,7 @@ public class CurvesControl extends LineChart {
         mousingPath.setStroke(Color.rgb(255, 255, 255, 0.01));
         Bindings.bindContent(mousingPath.getElements(), path.getElements());
         mousingPath.setOnMouseClicked(event -> {
-            Anchor anchor = new Anchor(xValue(event.getSceneX()), yValue(event.getSceneY()));
+            Anchor anchor = new Anchor(xValue(event.getX()), yValue(event.getY()));
             System.out.println("Anchor: "+anchor.x+", "+anchor.y);
             anchor.enableDrag(true, true);
             anchors.add(anchor);
@@ -74,7 +73,7 @@ public class CurvesControl extends LineChart {
         getPlotChildren().removeAll(mousingPath);
         getPlotChildren().removeAll(anchors);
 
-        anchors.sort((o1, o2) -> o1.getCenterX() < o2.getCenterX() ? -1 : o1.getCenterX() == o2.getCenterX() ? 0 : 1);
+        anchors.sort((o1, o2) -> o1.x < o2.x ? -1 : o1.x == o2.x ? 0 : 1);
         for (int i=0; i<anchors.size(); ++i) {
             x[i] = anchors.get(i).x / PLOT_SIZE;
             y[i] = anchors.get(i).y / PLOT_SIZE;
@@ -94,7 +93,7 @@ public class CurvesControl extends LineChart {
             final double frac = (i + 1.0) / N_SEGS;
             final double x = xDisplay(frac * PLOT_SIZE);
             final double y = yDisplay(pathInterpolator.interpolate(0, PLOT_SIZE, frac));
-            System.out.println(i+"\t(\t"+x+",\t"+y+"\t)");
+//            System.out.println(i+"\t(\t"+x+",\t"+y+"\t)");
             path.getElements().add(new LineTo(x, y));
         }
         anchors.forEach(anchor -> {
@@ -168,8 +167,9 @@ public class CurvesControl extends LineChart {
                 layoutPlotChildren();
             });
             setOnMouseEntered(mouseEvent -> {
-                if (!mouseEvent.isPrimaryButtonDown()) getScene().setCursor(Cursor.MOVE);
-
+//                if (!mouseEvent.isPrimaryButtonDown())
+                    getScene().setCursor(Cursor.MOVE);
+                System.out.println("Entered");
             });
             setOnMouseExited(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) getScene().setCursor(Cursor.DEFAULT);
