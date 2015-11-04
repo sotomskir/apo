@@ -41,15 +41,20 @@ public class Test extends Application {
         public void enableDrag(boolean horizontal, boolean vertical) {
             final Delta dragDelta = new Delta();
             setOnMousePressed(mouseEvent -> {
+                System.out.println("Pressed");
                 // record a delta distance for the drag and drop operation.
                 dragDelta.x = getCenterX() - mouseEvent.getX();
                 dragDelta.y = getCenterY() - mouseEvent.getY();
                 getScene().setCursor(Cursor.MOVE);
             });
 
-            setOnMouseReleased(mouseEvent -> getScene().setCursor(Cursor.MOVE));
+            setOnMouseReleased(mouseEvent -> {
+                System.out.println("Released");
+                getScene().setCursor(Cursor.MOVE);
+            });
 
             setOnMouseDragged(mouseEvent -> {
+                System.out.println("Dragged");
                 double newX = mouseEvent.getX() + dragDelta.x;
 //                double min = getScene().getX();
 //                double max = getScene().getX()+getScene().getWidth();
@@ -71,12 +76,15 @@ public class Test extends Application {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.MOVE);
                 }
+                System.out.println("Entered");
             });
 
             setOnMouseExited(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.DEFAULT);
                 }
+                System.out.println("Exited");
+
             });
         }
         // records relative x and y co-ordinates.
