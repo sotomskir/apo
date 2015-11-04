@@ -9,10 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
+import javafx.scene.shape.*;
 import pl.sotomski.apoz.utils.BestFitSplineInterpolator;
 
 import java.util.ArrayList;
@@ -29,12 +26,15 @@ public class CurvesControl extends LineChart {
     private List<Anchor> anchors;
     double[] x;
     double[] y;
+    private int[] LUT;
     protected IntegerProperty changed;
 
     public CurvesControl() {
-        super(new NumberAxis(0, 255, 50), new NumberAxis(0, 255, 50));
+        super(new NumberAxis(0, 255, 64), new NumberAxis(0, 255, 64));
         changed = new SimpleIntegerProperty();
         path = new Path();
+        LUT = new int[256];
+        for (int i=0; i<LUT.length; ++i) LUT[i] = i;
         mousingPath = new Path();
         mousingPath.setStrokeWidth(12);
         mousingPath.setStroke(Color.rgb(255, 255, 255, 0.01));
@@ -44,6 +44,7 @@ public class CurvesControl extends LineChart {
             System.out.println("Anchor: "+anchor.x+", "+anchor.y);
             anchor.enableDrag(true, true);
             anchors.add(anchor);
+            getPlotChildren().add(anchor);
             x = new double[x.length + 1];
             y = new double[y.length + 1];
             layoutPlotChildren();
@@ -54,6 +55,7 @@ public class CurvesControl extends LineChart {
         anchors.add(new Anchor(0, 0));
         anchors.add(new Anchor(128, 128));
         anchors.add(new Anchor(255, 255));
+        getPlotChildren().addAll(anchors);
         x = new double[anchors.size()];
         y = new double[anchors.size()];
         anchors.forEach(anchor -> {
@@ -71,7 +73,6 @@ public class CurvesControl extends LineChart {
         super.layoutPlotChildren();
         getPlotChildren().removeAll(path);
         getPlotChildren().removeAll(mousingPath);
-        getPlotChildren().removeAll(anchors);
 
         anchors.sort((o1, o2) -> o1.x < o2.x ? -1 : o1.x == o2.x ? 0 : 1);
         for (int i=0; i<anchors.size(); ++i) {
@@ -82,18 +83,20 @@ public class CurvesControl extends LineChart {
         Interpolator pathInterpolator = new BestFitSplineInterpolator(x, y);
         getPlotChildren().addAll(path);
         getPlotChildren().addAll(mousingPath);
-        getPlotChildren().addAll(anchors);
         final double y0 = pathInterpolator.interpolate(0, PLOT_SIZE, 0);
         path.getElements().clear();
         path.getElements().addAll(
                 new MoveTo(xDisplay(0), yDisplay(y0))
         );
 
+        LUT[0] = (int) anchors.get(0).y;
+        System.out.println("LUT[0]="+LUT[0]);
         for (int i = 0; i < N_SEGS; i++) {
             final double frac = (i + 1.0) / N_SEGS;
             final double x = xDisplay(frac * PLOT_SIZE);
             final double y = yDisplay(pathInterpolator.interpolate(0, PLOT_SIZE, frac));
-//            System.out.println(i+"\t(\t"+x+",\t"+y+"\t)");
+//            System.out.println(i+"\t(\t"+Math.round(xValue(x))+",\t"+Math.round(yValue(y))+"\t)");
+            LUT[((int) Math.round(xValue(x)))] = (int) (Math.round(yValue(y)) > 255 ? 255 : Math.round(yValue(y)) < 0 ? 0 : Math.round(yValue(y)));
             path.getElements().add(new LineTo(x, y));
         }
         anchors.forEach(anchor -> {
@@ -101,6 +104,7 @@ public class CurvesControl extends LineChart {
             anchor.setCenterY(yDisplay(anchor.y));
         });
         anchors.forEach(Node::toFront);
+        changedProperty().setValue(getChanged()+1);
     }
 
     private double xDisplay(double x) {
@@ -128,8 +132,9 @@ public class CurvesControl extends LineChart {
     }
 
     public int[] getLUT() {
-        return new int[0];
+        return LUT;
     }
+
 
     class Anchor extends Circle {
         double x, y;
@@ -153,22 +158,22 @@ public class CurvesControl extends LineChart {
             });
             setOnMouseReleased(mouseEvent -> {
                 System.out.println("Released");
-                getScene().setCursor(Cursor.MOVE);
+                getScene().setCursor(Cursor.DEFAULT);
             });
             setOnMouseDragged(mouseEvent -> {
                 System.out.println("Dragged");
                 double newX = mouseEvent.getX() + dragDelta.x;
-//                double min = getScene().getX();
-//                double max = getScene().getX()+getScene().getWidth();
+                double min = getScene().getX();
+                double max = getScene().getX() + getScene().getWidth();
 //                if (newX > min && newX < max) {
                 if (horizontal) x = xValue(newX);
 //                }
                 double newY = mouseEvent.getY() + dragDelta.y;
-//                min = getScene().getY();
-//                max = getScene().getY()+getScene().getHeight();
-//                if (newY > min && newY < max) {
-                if (vertical) y = yValue(newY);
-//                }
+                min = yDisplay(255);
+                max = yDisplay(0);
+                if (newY > min && newY < max) {
+                    if (vertical) y = yValue(newY);
+                }
                 layoutPlotChildren();
             });
             setOnMouseEntered(mouseEvent -> {

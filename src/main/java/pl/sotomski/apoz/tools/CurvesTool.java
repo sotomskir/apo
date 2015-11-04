@@ -55,9 +55,9 @@ public class CurvesTool extends Tool {
 
     private void updateImageViewAndHistogram() {
         ImagePane ap = toolController.getActivePaneProperty();
-//        BufferedImage image = calculateImage();
-//        ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
-//        ap.getHistogramPane().update(image);
+        BufferedImage image = calculateImage();
+        ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
+        ap.getHistogramPane().update(image);
     }
 
     public static Tool getInstance(ToolController controller) {
