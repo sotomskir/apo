@@ -1,4 +1,4 @@
-package pl.sotomski.apoz;
+package pl.sotomski.apoz.utils;
 
 import javafx.animation.Interpolator;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;

@@ -1,9 +1,11 @@
 package pl.sotomski.apoz;
 
 import javafx.animation.Interpolator;
-import javafx.animation.PathTransition;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -11,73 +13,148 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.stage.Stage;
-import javafx.util.Duration;
+import pl.sotomski.apoz.utils.BestFitSplineInterpolator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Test extends Application {
 
-    private static final Duration CYCLE_TIME = Duration.seconds(7);
+    private static final int PLOT_SIZE = 800;
+    private static final int N_SEGS    = 255;
+    Path path;
+    List<Anchor> anchors;
+    Group group;
+    double[] x;
+    double[] y;
+    private Path mousingPath;
 
-    private static final int PLOT_SIZE = 500;
-    private static final int N_SEGS    = PLOT_SIZE / 10;
+    class Anchor extends Circle {
+        double x, y;
+        Anchor(double x, double y) {
+            super(x, y, 4);
+            this.x = x;
+            this.y = y;
+            this.setStroke(Color.BLACK);
+            this.setFill(Color.rgb(222,222,222));
+        }
+        public void enableDrag(boolean horizontal, boolean vertical) {
+            final Delta dragDelta = new Delta();
+            setOnMousePressed(mouseEvent -> {
+                System.out.println("Pressed");
+                // record a delta distance for the drag and drop operation.
+                dragDelta.x = getCenterX() - mouseEvent.getX();
+                dragDelta.y = getCenterY() - mouseEvent.getY();
+                getScene().setCursor(Cursor.MOVE);
+            });
+
+            setOnMouseReleased(mouseEvent -> {
+                System.out.println("Released");
+                getScene().setCursor(Cursor.MOVE);
+            });
+
+            setOnMouseDragged(mouseEvent -> {
+                System.out.println("Dragged");
+                double newX = mouseEvent.getX() + dragDelta.x;
+//                double min = getScene().getX();
+//                double max = getScene().getX()+getScene().getWidth();
+//                if (newX > min && newX < max) {
+                if (horizontal) setCenterX(newX);
+//                }
+                double newY = mouseEvent.getY() + dragDelta.y;
+//                min = getScene().getY();
+//                max = getScene().getY()+getScene().getHeight();
+//                if (newY > min && newY < max) {
+                if (vertical) setCenterY(newY);
+//                }
+
+                plotSpline();
+
+            });
+
+            setOnMouseEntered(mouseEvent -> {
+                if (!mouseEvent.isPrimaryButtonDown()) {
+                    getScene().setCursor(Cursor.MOVE);
+                }
+                System.out.println("Entered");
+            });
+
+            setOnMouseExited(mouseEvent -> {
+                if (!mouseEvent.isPrimaryButtonDown()) {
+                    getScene().setCursor(Cursor.DEFAULT);
+                }
+                System.out.println("Exited");
+
+            });
+        }
+        // records relative x and y co-ordinates.
+        class Delta { double x, y; }
+    }
 
     public void start(Stage stage) {
-        Path path = new Path();
-        path.setStroke(Color.DARKGREEN);
+        path = new Path();
+        mousingPath = new Path();
+        mousingPath.setStrokeWidth(12);
+        mousingPath.setStroke(Color.rgb(255, 255, 255, 0.01));
+        Bindings.bindContent(mousingPath.getElements(), path.getElements());
+        mousingPath.setOnMouseClicked(event -> {
+            Anchor anchor = new Anchor(event.getSceneX(), event.getSceneY());
+            anchor.enableDrag(true, true);
+            anchors.add(anchor);
+            group.getChildren().add(anchor);
+            x = new double[x.length + 1];
+            y = new double[y.length + 1];
+            plotSpline();
+        });
+        path.setSmooth(true);
+        path.setStroke(Color.DARKGRAY);
+        anchors = new ArrayList<>();
+        anchors.add(new Anchor(0, 800));
+        anchors.add(new Anchor(400, 400));
+        anchors.add(new Anchor(800, 0));
+        x = new double[anchors.size()];
+        y = new double[anchors.size()];
+        anchors.forEach(anchor -> {
+            if (anchors.indexOf(anchor) == 0 || anchors.indexOf(anchor) == anchors.size()-1) {
+                anchor.enableDrag(false, true);
+            } else {
+                anchor.enableDrag(true, true);
+            }
+        });
 
-        final Interpolator pathInterpolator = new BestFitSplineInterpolator(
-                new double[] { 0.0, 0.25, 0.5, 0.75, 1.0 },
-                new double[] { 0.0, 0.5,  0.3, 0.8,  0.0 }
-        );
-
-        // interpolated spline function plot.
-        plotSpline(path, pathInterpolator, true);
-
-        // animated dot moving along the plot according to a distance over time function.
-        final Interpolator timeVsDistanceInterpolator = new BestFitSplineInterpolator(
-                new double[] { 0.0, 0.25, 0.5, 0.75, 1.0 },
-                new double[] { 0.0, 0.1,  0.4, 0.85, 1.0 }
-        );
-
-        Circle dot = new Circle(5, Color.GREENYELLOW);
-        PathTransition transition = new PathTransition(CYCLE_TIME, path, dot);
-        transition.setInterpolator(timeVsDistanceInterpolator);
-        transition.setAutoReverse(true);
-        transition.setCycleCount(PathTransition.INDEFINITE);
-        transition.play();
-
-        // show a light grey path representing the distance over time.
-        Path timeVsDistancePath = new Path();
-        timeVsDistancePath.setStroke(Color.DIMGRAY.darker());
-        timeVsDistancePath.getStrokeDashArray().setAll(15d, 10d, 5d, 10d);
-        plotSpline(timeVsDistancePath, timeVsDistanceInterpolator, true);
-
+        group = new Group();
+        group.getChildren().addAll(anchors);
+        plotSpline();
         stage.setScene(
-                new Scene(
-                        new Group(
-                                timeVsDistancePath,
-                                path,
-                                dot
-                        ),
-                        Color.rgb(35,39,50)
-                )
+                new Scene(group, Color.rgb(222, 222, 222))
         );
         stage.show();
     }
 
-    // plots an interpolated curve in segments along a path
-    // if invert is true then y=0 will be in the bottom left, otherwise it is in the top right
-    private void plotSpline(Path path, Interpolator pathInterpolator, boolean invert) {
+    private void plotSpline() {
+        group.getChildren().removeAll(path);
+        group.getChildren().removeAll(mousingPath);
+        anchors.sort((o1, o2) -> o1.getCenterX() < o2.getCenterX() ? -1 : o1.getCenterX() == o2.getCenterX() ? 0 : 1);
+        for (int i=0; i< anchors.size(); ++i) {
+            x[i] = anchors.get(i).getCenterX() / PLOT_SIZE;
+            y[i] = anchors.get(i).getCenterY() / PLOT_SIZE;
+        }
+        Interpolator pathInterpolator = new BestFitSplineInterpolator(x, y);
+        group.getChildren().addAll(path);
+        group.getChildren().addAll(mousingPath);
         final double y0 = pathInterpolator.interpolate(0, PLOT_SIZE, 0);
+        path.getElements().clear();
         path.getElements().addAll(
-                new MoveTo(0, invert ? PLOT_SIZE - y0 : y0)
+                new MoveTo(0, y0)
         );
 
         for (int i = 0; i < N_SEGS; i++) {
             final double frac = (i + 1.0) / N_SEGS;
             final double x = frac * PLOT_SIZE;
             final double y = pathInterpolator.interpolate(0, PLOT_SIZE, frac);
-            path.getElements().add(new LineTo(x, invert ? PLOT_SIZE - y : y));
+            path.getElements().add(new LineTo(x, y));
         }
+        anchors.forEach(Node::toFront);
     }
 
     public static void main(String[] args) { launch(args); }

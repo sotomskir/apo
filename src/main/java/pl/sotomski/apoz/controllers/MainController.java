@@ -104,7 +104,7 @@ public class MainController implements Initializable, ToolController {
     }
 
     private void updateLabels(ImagePane pane) {
-        labelDepth.setText(bundle.getString("Depth") + ": " + (pane.getImage().getColorModel().getNumComponents()>1?"RGB":"Gray"));
+        labelDepth.setText(bundle.getString("Depth") + ": " + (pane.getImage().getColorModel().getNumComponents() > 1 ? "RGB" : "Gray"));
         labelWidth.setText(bundle.getString("Width") + ": " + pane.getImage().getWidth());
         labelHeight.setText(bundle.getString("Heigth") + ": " + pane.getImage().getHeight());
     }
@@ -351,6 +351,9 @@ public class MainController implements Initializable, ToolController {
         addToToolbox(BrightnessContrastTool.getInstance(this));
     }
 
+    public void handleCurves(ActionEvent actionEvent) {
+        addToToolbox(CurvesTool.getInstance(this));
+    }
 
     /***************************************************************************
      *                                                                         *

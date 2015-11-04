@@ -13,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.charts.CurvedFittedAreaChart;
+import pl.sotomski.apoz.controllers.ToolController;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,6 +10,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
+import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.ImageUtils;
 

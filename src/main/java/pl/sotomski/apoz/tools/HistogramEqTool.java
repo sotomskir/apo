@@ -7,6 +7,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
+import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.HistogramEqCommand;
