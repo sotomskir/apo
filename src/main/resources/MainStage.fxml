@@ -33,6 +33,7 @@
                     <MenuItem onAction="#handleIntervalThreshloding" text="%IntervalThresholding"/>
                     <MenuItem onAction="#handleLevelsReduction" text="%LevelsReduction"/>
                     <MenuItem onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
+                    <MenuItem onAction="#handleCurves" text="%Curves"/>
                     <MenuItem onAction="#handleSampleTool" text="Sample Tool"/>
                 </Menu>
                 <Menu text="%Help">

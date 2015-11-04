@@ -1,6 +1,7 @@
 package pl.sotomski.apoz.tools;
 
 import javafx.scene.layout.VBox;
+import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
@@ -12,7 +13,6 @@ import java.util.ResourceBundle;
 public abstract class Tool extends VBox {
 
     protected ToolController toolController;
-    protected static Tool instance;
     protected ResourceBundle bundle;
     protected BufferedImage originalImage;
 

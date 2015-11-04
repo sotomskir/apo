@@ -1,4 +1,4 @@
-package pl.sotomski.apoz.tools;
+package pl.sotomski.apoz.controllers;
 
 import pl.sotomski.apoz.nodes.ImagePane;
 

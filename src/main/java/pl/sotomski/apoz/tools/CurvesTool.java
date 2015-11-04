@@ -3,41 +3,39 @@ package pl.sotomski.apoz.tools;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.controllers.ToolController;
-import pl.sotomski.apoz.nodes.ImagePane;
+import pl.sotomski.apoz.controls.CurvesControl;
 import pl.sotomski.apoz.controls.LevelsReductionControl;
+import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 
-public class LevelsReductionTool extends Tool {
+public class CurvesTool extends Tool {
 
-    private static LevelsReductionTool instance;
-    private Spinner<Integer> spinner;
-    private LevelsReductionControl chartControl;
+    private static CurvesTool instance;
+    private CurvesControl curvesControl;
 
-    protected LevelsReductionTool(ToolController controller) {
+    protected CurvesTool(ToolController controller) {
         super(controller);
 
         // create controls
         Separator separator = new Separator(Orientation.HORIZONTAL);
-        Label label = new Label(bundle.getString("LevelsReduction"));
+        Label label = new Label(bundle.getString("Curves"));
         Button buttonApply = new Button(bundle.getString("Apply"));
         Button buttonCancel = new Button(bundle.getString("Cancel"));
-        chartControl = new LevelsReductionControl();
-        spinner = new Spinner<>(2, 255, 2);
-        spinner.setEditable(true);
-        HBox hBox = new HBox(spinner, buttonCancel, buttonApply);
+        curvesControl = new CurvesControl();
+        HBox hBox = new HBox(buttonCancel, buttonApply);
 
         // create listeners
-        spinner.valueProperty().addListener(e -> {
-            chartControl.createDefaultIntervals(spinner.getValue());
-        });
 
         buttonApply.setOnAction((actionEvent) -> {
             try {
@@ -47,31 +45,30 @@ public class LevelsReductionTool extends Tool {
             }
         });
         buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
-        chartControl.changedProperty().addListener(observable -> updateImageViewAndHistogram());
+        curvesControl.changedProperty().addListener(observable -> updateImageViewAndHistogram());
 
         //
-        getChildren().addAll(separator, label, chartControl, hBox);
-        chartControl.createDefaultIntervals(spinner.getValue());
+        getChildren().addAll(separator, label, curvesControl, hBox);
         updateImageViewAndHistogram();
     }
 
 
     private void updateImageViewAndHistogram() {
         ImagePane ap = toolController.getActivePaneProperty();
-        BufferedImage image = calculateImage();
-        ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
-        ap.getHistogramPane().update(image);
+//        BufferedImage image = calculateImage();
+//        ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
+//        ap.getHistogramPane().update(image);
     }
 
     public static Tool getInstance(ToolController controller) {
-        if(instance == null) instance = new LevelsReductionTool(controller);
+        if(instance == null) instance = new CurvesTool(controller);
         return instance;
     }
 
     public void handleApply(ActionEvent actionEvent) throws Exception {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
-        manager.executeCommand(new LUTCommand(imagePane, chartControl.getLUT()));
+        manager.executeCommand(new LUTCommand(imagePane, curvesControl.getLUT()));
     }
 
     public BufferedImage calculateImage() {
@@ -83,7 +80,7 @@ public class LevelsReductionTool extends Tool {
         BufferedImage binaryImage = new BufferedImage(grayBI.getWidth(), grayBI.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
         final byte[] a = ((DataBufferByte) grayBI.getRaster().getDataBuffer()).getData();
         final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
-        for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (chartControl.getLUT()[a[p] & 0xFF]);
+        for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (curvesControl.getLUT()[a[p] & 0xFF]);
         return binaryImage;
     }
 }

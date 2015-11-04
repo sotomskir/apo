@@ -92,7 +92,20 @@
                     </archive>
                 </configuration>
             </plugin>
-
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+                <archive>
+                    <manifest>
+                        <!-- Jar file entry point -->
+                        <mainClass>pl.sotomski.apoz.Main</mainClass>
+                    </manifest>
+                </archive>
+            </configuration>
+        </plugin>
         </plugins>
     </build>
 
