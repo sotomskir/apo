@@ -1,6 +1,3 @@
-before_script:
-  - mvn clean
-
 compile:
   script:
     - mvn clean compile assembly:single
