@@ -67,7 +67,7 @@
                     </graphic>
                 </Button>
 
-                <Button mnemonicParsing="false" onAction="#handleSave">
+                <Button mnemonicParsing="false" onAction="#handleSaveAs">
                     <tooltip>
                         <Tooltip text="%Save"/>
                     </tooltip>
