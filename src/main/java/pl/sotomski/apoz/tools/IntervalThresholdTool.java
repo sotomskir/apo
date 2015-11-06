@@ -57,7 +57,7 @@ public class IntervalThresholdTool extends VBox {
         });
         checkBoxStretch.selectedProperty().addListener(observable1 -> {
             if (checkBoxStretch.isSelected()) checkBoxKeepLevels.selectedProperty().setValue(false);
-            chartControl.toogleStrech(checkBoxStretch.isSelected());
+            chartControl.toggleStretch(checkBoxStretch.isSelected());
             updateImageView();
         });
         buttonApply.setOnAction((actionEvent) -> {
