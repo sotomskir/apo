@@ -32,6 +32,7 @@ public class IntervalThresholdTool extends VBox {
         Label label = new Label(bundle.getString("IntervalThresholding"));
         CheckBox checkBoxKeepLevels = new CheckBox(bundle.getString("KeepLevels"));
         CheckBox checkBoxInvert = new CheckBox(bundle.getString("Reverse"));
+        CheckBox checkBoxStretch = new CheckBox(bundle.getString("Stretch"));
         chartControl = new ChartControl();
         spinner = new Spinner<>(2, 255, 3);
         Button buttonCancel = new Button(bundle.getString("Cancel"));
@@ -42,6 +43,7 @@ public class IntervalThresholdTool extends VBox {
         spinner.valueProperty().addListener(e -> {
             checkBoxInvert.selectedProperty().setValue(false);
             checkBoxKeepLevels.selectedProperty().setValue(false);
+            checkBoxStretch.selectedProperty().setValue(false);
             chartControl.createDefaultIntervals(spinner.getValue());
         });
         checkBoxInvert.selectedProperty().addListener(observable1 -> {
@@ -49,7 +51,13 @@ public class IntervalThresholdTool extends VBox {
             updateImageView();
         });
         checkBoxKeepLevels.selectedProperty().addListener(observable1 -> {
+            if (checkBoxKeepLevels.isSelected()) checkBoxStretch.selectedProperty().setValue(false);
             chartControl.setKeepLevels(checkBoxKeepLevels.isSelected());
+            updateImageView();
+        });
+        checkBoxStretch.selectedProperty().addListener(observable1 -> {
+            if (checkBoxStretch.isSelected()) checkBoxKeepLevels.selectedProperty().setValue(false);
+            chartControl.toogleStrech(checkBoxStretch.isSelected());
             updateImageView();
         });
         buttonApply.setOnAction((actionEvent) -> {
@@ -63,7 +71,7 @@ public class IntervalThresholdTool extends VBox {
         chartControl.changedProperty().addListener(observable -> updateImageView());
 
         // add controls to view and init
-        getChildren().addAll(separator, label, chartControl, checkBoxInvert, checkBoxKeepLevels, hBox);
+        getChildren().addAll(separator, label, chartControl, checkBoxInvert, checkBoxKeepLevels, checkBoxStretch, hBox);
         chartControl.createDefaultIntervals(spinner.getValue());
         updateImageView();
     }
