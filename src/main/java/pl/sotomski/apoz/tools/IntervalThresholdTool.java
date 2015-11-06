@@ -14,7 +14,6 @@ import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.util.ResourceBundle;
 
 public class IntervalThresholdTool extends VBox {
@@ -72,7 +71,7 @@ public class IntervalThresholdTool extends VBox {
 
     private void updateImageView() {
         ImagePane ap = toolController.getActivePaneProperty();
-        BufferedImage image = calculateImage();
+        BufferedImage image = ImageUtils.applyLUT(toolController.getBufferedImage(), chartControl.getLUT());
         ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
         ap.getHistogramPane().update(image);
     }
@@ -88,17 +87,5 @@ public class IntervalThresholdTool extends VBox {
         manager.executeCommand(new LUTCommand(imagePane, chartControl.getLUT()));
     }
 
-    public BufferedImage calculateImage() {
-        BufferedImage grayBI, image = toolController.getBufferedImage();
-        if(image.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(image);
-        else grayBI = ImageUtils.deepCopy(image);
-        int width = grayBI.getWidth();
-        int height = grayBI.getHeight();
-        BufferedImage binaryImage = new BufferedImage(grayBI.getWidth(), grayBI.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        final byte[] a = ((DataBufferByte) grayBI.getRaster().getDataBuffer()).getData();
-        final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
-        for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (chartControl.getLUT()[a[p] & 0xFF]);
-        return binaryImage;
-    }
 
 }

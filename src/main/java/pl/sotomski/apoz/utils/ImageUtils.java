@@ -51,5 +51,18 @@ public class ImageUtils {
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
 
+    public static BufferedImage applyLUT(BufferedImage image, int[] lut) {
+        BufferedImage grayBI;
+        if(image.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(image);
+        else grayBI = ImageUtils.deepCopy(image);
+        int width = grayBI.getWidth();
+        int height = grayBI.getHeight();
+        BufferedImage binaryImage = new BufferedImage(grayBI.getWidth(), grayBI.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+        final byte[] a = ((DataBufferByte) grayBI.getRaster().getDataBuffer()).getData();
+        final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
+        for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (lut[a[p] & 0xFF]);
+        return binaryImage;
+    }
+
 
 }
