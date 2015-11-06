@@ -1,0 +1,1 @@
+[![build status](https://gitlab.sotomski.pl/ci/projects/1/status.png?ref=master)](https://gitlab.sotomski.pl/ci/projects/1?ref=master)

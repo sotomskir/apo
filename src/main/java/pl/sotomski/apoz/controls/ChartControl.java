@@ -30,6 +30,7 @@ public class ChartControl extends LineChart {
     protected boolean keepLevels;
     protected boolean inverted = false;
     protected Series<Number, Number> series;
+    private boolean streched;
 
     public ChartControl() {
         super(new NumberAxis(0, 255, 25), new NumberAxis(0, 255, 25));
@@ -56,9 +57,25 @@ public class ChartControl extends LineChart {
         for (IntervalData data : intervalDatas) {
             if (keepLevels) {
                 double startY = data.getStartY();
-                System.out.println("before"+data);
                 data.setStartY(startY > 1 ? 0 : 255);
-                System.out.println("after"+data);
+            } else if (streched) {
+                double startY = data.getStartY();
+                double endY = data.getEndY();
+                if (startY == 0 && endY == 0) {
+                    data.setStartY(255);
+                    data.setEndY(0);
+                } else if (startY == 255 && endY == 255) {
+                    data.setStartY(0);
+                    data.setEndY(255);
+                } else {
+                    if (inverted) {
+                        data.setStartY(0);
+                        data.setEndY(0);
+                    } else {
+                        data.setStartY(255);
+                        data.setEndY(255);
+                    }
+                }
             } else {
                 double startY = data.getStartY();
                 double endY = data.getEndY();
@@ -126,6 +143,24 @@ public class ChartControl extends LineChart {
         // enable drag
         for (int i = 1; i < intervalDatas.size()-1; ++i) intervalDatas.get(i).getLine().enableDrag();
         updateLUT();
+    }
+
+    public void toogleStrech(boolean strech) {
+        for (int i = 0; i < intervalDatas.size(); ++i) {
+            if (strech) {
+                if (inverted ? i%2 == 0 : i%2 != 0) {
+                    intervalDatas.get(i).setStartY(inverted ? 255 : 0);
+                    intervalDatas.get(i).setEndY(inverted ? 255 : 0);
+                }
+            } else {
+                if (inverted ? i%2 == 0 : i%2 != 0) {
+                    intervalDatas.get(i).setStartY(inverted ? 255 : 0);
+                    intervalDatas.get(i).setEndY(inverted ? 0 : 255);
+                }
+            }
+        }
+        this.streched = strech;
+        layoutPlotChildren();
     }
 
     class IntervalData {
