@@ -39,7 +39,7 @@ public class FileMenuUtils {
         }
     }
 
-    public static File openDialog(Pane layoutRoot) {
+    public static File openFileDialog(Pane layoutRoot) {
         Window window = layoutRoot.getScene().getWindow();
         final FileChooser fileChooser = new FileChooser();
         return fileChooser.showOpenDialog(window);

@@ -188,7 +188,7 @@ public class MainController implements Initializable, ToolController {
         System.exit(0);
     }
     public void handleOpen(ActionEvent actionEvent) {
-        File file = FileMenuUtils.openDialog(rootLayout);
+        File file = FileMenuUtils.openFileDialog(rootLayout);
         ImagePane pane = new ImagePane(histogramPane, file);
         ImageTab imageTab = new ImageTab(pane);
         attachTab(imageTab);
@@ -354,6 +354,11 @@ public class MainController implements Initializable, ToolController {
     public void handleCurves(ActionEvent actionEvent) {
         addToToolbox(CurvesTool.getInstance(this));
     }
+
+    public void handleBinaryOperationsTool(ActionEvent actionEvent) {
+        addToToolbox(BinaryOperationsTool.getInstance(this));
+    }
+
 
     /***************************************************************************
      *                                                                         *
