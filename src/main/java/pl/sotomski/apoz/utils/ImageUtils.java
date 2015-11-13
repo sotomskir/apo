@@ -65,4 +65,11 @@ public class ImageUtils {
     }
 
 
+    public static void applyMask(BufferedImage bi, int[] mask) {
+        int width = bi.getWidth();
+        int height = bi.getHeight();
+        int channels = bi.getColorModel().getNumComponents();
+        byte[] a = ((DataBufferByte)bi.getRaster().getDataBuffer()).getData();
+        for (int i = 0; i < width*height*channels; ++i) a[i] = (byte) 128;
+    }
 }

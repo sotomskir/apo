@@ -354,6 +354,9 @@ public class MainController implements Initializable, ToolController {
     public void handleCurves(ActionEvent actionEvent) {
         addToToolbox(CurvesTool.getInstance(this));
     }
+    public void handleMaskTool(ActionEvent actionEvent) {
+        addToToolbox(MaskTool.getInstance(this));
+    }
 
     public void handleBinaryOperationsTool(ActionEvent actionEvent) {
         addToToolbox(BinaryOperationsTool.getInstance(this));

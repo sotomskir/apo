@@ -35,6 +35,7 @@
                     <MenuItem onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
                     <MenuItem onAction="#handleCurves" text="%Curves"/>
                     <MenuItem onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>
+                    <MenuItem onAction="#handleMaskTool" text="%MaskTool"/>
                     <MenuItem onAction="#handleSampleTool" text="Sample Tool"/>
                 </Menu>
                 <Menu text="%Help">
