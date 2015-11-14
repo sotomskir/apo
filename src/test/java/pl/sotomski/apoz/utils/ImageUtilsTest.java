@@ -43,4 +43,19 @@ public class ImageUtilsTest {
     public void testDeepCopy() throws Exception {
 
     }
+
+    @Test
+    public void testApplyLUT() throws Exception {
+
+    }
+
+    @Test
+    public void testGetPixelNeighbors() throws Exception {
+
+    }
+
+    @Test
+    public void testApplyMask() throws Exception {
+
+    }
 }

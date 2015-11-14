@@ -49,7 +49,6 @@ public class CurvesTool extends Tool {
         updateImageViewAndHistogram();
     }
 
-
     private void updateImageViewAndHistogram() {
         ImagePane ap = toolController.getActivePaneProperty();
         BufferedImage image = ImageUtils.applyLUT(toolController.getBufferedImage(), curvesControl.getLUT());

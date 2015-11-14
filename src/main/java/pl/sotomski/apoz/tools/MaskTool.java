@@ -2,16 +2,16 @@ package pl.sotomski.apoz.tools;
 
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.MaskCommand;
 import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.ImagePane;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MaskTool extends VBox {
@@ -20,6 +20,17 @@ public class MaskTool extends VBox {
     private ToolController toolController;
     private ChoiceBox<String> choiceBox;
     private String[] masks;
+    private int[] mask = new int[9];
+    private List<Spinner> spinners;
+        private static int[][] maskTemplates = {
+            {1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {1, 1, 1, 1, 8, 1, 1, 1, 1},
+            {1, 2, 1, 2, 4, 2, 1, 2, 1},
+            {0, 1, 0, 1, 4, 1, 0, 1, 0},
+            {-1, -1, -1, -1, 8, -1, -1, -1, -1},
+            {0, -1, 0, -1, 4, -1, 0, -1, 0},
+            {1, -2, 1, -2, 4, -2, 1, -2, 1},
+            {0, 1, 0, 1, -4, 1, 0, 1, 0}};
 
     protected MaskTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
@@ -35,9 +46,22 @@ public class MaskTool extends VBox {
         this.choiceBox = new ChoiceBox<>();
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);
-        Label label = new Label(bundle.getString("Blur"));
+        Label label = new Label(bundle.getString("MaskTool"));
+        GridPane maskGridPane = new GridPane();
+        spinners = new ArrayList<>();
+        for (int x = 0; x < 3; x++)
+            for (int y = 0; y < 3; y++) {
+                Spinner<Integer> spinner = new Spinner<>(-9, 9, 1);
+                spinners.add(spinner);
+                maskGridPane.add(spinner, x, y);
+            }
         choiceBox.getItems().addAll(masks);
         choiceBox.getSelectionModel().select(0);
+        choiceBox.getSelectionModel().selectedItemProperty().addListener(observable -> {
+            int selectedMask = choiceBox.getSelectionModel().getSelectedIndex();
+            for (int i = 0; i < 9; ++i) spinners.get(i).getValueFactory().setValue(maskTemplates[selectedMask][i]);
+
+        });
         Button button = new Button(bundle.getString("Apply"));
         button.setOnAction((actionEvent) -> {
             try {
@@ -46,7 +70,7 @@ public class MaskTool extends VBox {
                 e.printStackTrace();
             }
         });
-        getChildren().addAll(separator, label, choiceBox, button);
+        getChildren().addAll(separator, label, maskGridPane, choiceBox, button);
     }
 
     public static VBox getInstance(ToolController controller) {
@@ -57,7 +81,8 @@ public class MaskTool extends VBox {
     public void handleApply(ActionEvent actionEvent) throws Exception {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
-        manager.executeCommand(new MaskCommand(imagePane, choiceBox.getSelectionModel().getSelectedIndex()));
+        for (int i = 0; i < 9; ++i) mask[i] = (int) spinners.get(i).getValue();
+        manager.executeCommand(new MaskCommand(imagePane, mask));
         imagePane.setImage(imagePane.getImage());
     }
 
