@@ -74,8 +74,8 @@ public class ThresholdTool extends VBox {
 
     public static BufferedImage calculateImage(BufferedImage bi, int threshold, boolean reverse) {
         BufferedImage grayBI;
-        if(bi.getColorModel().getNumComponents()>1) grayBI = ImageUtils.rgbToGrayscale(bi);
-        else grayBI = ImageUtils.deepCopy(bi);
+        if(bi.getColorModel().getNumComponents()>1) ImageUtils.rgbToGrayscale(bi);
+        grayBI = ImageUtils.deepCopy(bi);
         int width = grayBI.getWidth();
         int height = grayBI.getHeight();
         BufferedImage binaryImage = new BufferedImage(grayBI.getWidth(), grayBI.getHeight(), BufferedImage.TYPE_BYTE_GRAY);

@@ -2,6 +2,7 @@ package pl.sotomski.apoz.commands;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import pl.sotomski.apoz.nodes.ImagePane;
 
 import java.util.Stack;
 
@@ -13,12 +14,14 @@ public class CommandManager {
     private Stack<Command> redoStack;
     private BooleanProperty undoAvailable;
     private BooleanProperty redoAvailable;
+    private ImagePane imagePane;
 
-    public CommandManager() {
+    public CommandManager(ImagePane imagePane) {
         undoStack = new Stack<>();
         redoStack = new Stack<>();
         undoAvailable = new SimpleBooleanProperty(false);
         redoAvailable = new SimpleBooleanProperty(false);
+        this.imagePane = imagePane;
     }
 
     public void executeCommand(Command command) {
@@ -32,6 +35,7 @@ public class CommandManager {
             redoStack.clear();
             redoAvailable.setValue(false);
         }
+        imagePane.refresh();
     }
 
     public void undo() {
@@ -42,6 +46,7 @@ public class CommandManager {
             redoAvailable.setValue(true);
             if (undoStack.size()==0) undoAvailable.setValue(false);
         }
+        imagePane.refresh();
     }
 
     public void redo() {
@@ -52,6 +57,7 @@ public class CommandManager {
             undoAvailable.setValue(true);
             if (redoStack.size()==0) redoAvailable.setValue(false);
         }
+        imagePane.refresh();
     }
 
     public boolean getUndoAvailable() {

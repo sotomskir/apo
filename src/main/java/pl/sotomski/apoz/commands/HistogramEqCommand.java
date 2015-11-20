@@ -14,34 +14,19 @@ import java.util.Random;
 public class HistogramEqCommand extends UndoableCommand implements Command {
     private int method;
 
-    public HistogramEqCommand(ImagePane imagePane, int method) throws Exception {
-        super(imagePane);
+    public HistogramEqCommand(ImagePane image, int method) throws Exception {
+        super(image);
         if (method < 1 || method > 5) throw new IllegalArgumentException("Bad method. Eligible methods: 1, 2, 3, 4, 5");
         this.method = method;
     }
 
     @Override
     public void execute() {
-        if (method==1)      {
-            method1(imagePane.getImage());
-            imagePane.refresh();
-        }
-        else if (method==2) {
-            method2(imagePane.getImage());
-            imagePane.refresh();
-        }
-        else if (method == 3) {
-            method3(imagePane.getImage());
-            imagePane.refresh();
-        }
-        else if (method == 4) {
-            method4(imagePane.getImage());
-            imagePane.refresh();
-        }
-        else if (method == 5) {
-            method5(imagePane.getImage());
-            imagePane.refresh();
-        }
+        if (method==1) method1(imagePane.getImage());
+        else if (method==2) method2(imagePane.getImage());
+        else if (method == 3) method3(imagePane.getImage());
+        else if (method == 4) method4(imagePane.getImage());
+        else if (method == 5) method5(imagePane.getImage());
     }
 
     private BufferedImage method1(BufferedImage bufferedImage) {

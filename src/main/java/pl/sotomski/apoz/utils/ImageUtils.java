@@ -82,6 +82,20 @@ public class ImageUtils {
         return pixels;
     }
 
+    public static int[] getPixelDiamond(byte[] imageData, int i, int channels, int width, int height) {
+        int[] pixels = new int[5*channels];
+        try {
+            pixels[0] = imageData[i - width * channels] & 0xFF;
+            pixels[1] = imageData[i - channels] & 0xFF;
+            pixels[2] = imageData[i] & 0xFF;
+            pixels[3] = imageData[i + channels] & 0xFF;
+            pixels[4] = imageData[i + width * channels] & 0xFF;
+        } catch (IndexOutOfBoundsException e) {
+
+        }
+        return pixels;
+    }
+
     public static void applyMask(BufferedImage bi, int[] mask) {
         int width = bi.getWidth();
         int height = bi.getHeight();
@@ -108,5 +122,16 @@ public class ImageUtils {
             for (int i = 0; i < width * height * channels; ++i)
                 a[i] = (byte) (((b[i] - min) / (max - min)) * 255);
         }
+    }
+
+    public static BufferedImage morphOperation(BufferedImage image, String action) {
+        //TODO
+        return image;
+    }
+
+    public static void rewriteImage(BufferedImage previousImage, BufferedImage image) {
+        byte[] a = ((DataBufferByte)previousImage.getRaster().getDataBuffer()).getData();
+        byte[] b = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+
     }
 }

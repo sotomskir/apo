@@ -9,7 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.ImageUtils;
@@ -21,7 +21,7 @@ import java.io.File;
 /**
  * Created by sotomski on 10/10/15.
  */
-public class ImagePane extends Pane {
+public class ImagePane extends VBox {
 
     private ImageView imageView;
     private BufferedImage bufferedImage;
@@ -36,7 +36,7 @@ public class ImagePane extends Pane {
     private ImagePane() {
         super();
         this.tabbed = true;
-        this.commandManager = new CommandManager();
+        this.commandManager = new CommandManager(this);
         this.zoomProperty = new SimpleDoubleProperty(1);
         this.imageVersion = new SimpleIntegerProperty(0);
         this.imageView = new ImageView();

@@ -32,7 +32,7 @@ public class PrefsController implements Initializable {
 
     @FXML private GridPane rootLayout;
     @FXML private TextField screenshotPath;
-    @FXML private ComboBox languageBox;
+    @FXML private ComboBox<String> languageBox;
 
     @Override
     public void initialize(java.net.URL arg0, ResourceBundle resources) {

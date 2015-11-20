@@ -31,6 +31,11 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>1.8.0.RELEASE</version>
+        </dependency>
         <!--<dependency>-->
             <!--<groupId>log4j</groupId>-->
             <!--<artifactId>log4j</artifactId>-->
@@ -93,5 +98,4 @@
         </plugin>
         </plugins>
     </build>
-
 </project>

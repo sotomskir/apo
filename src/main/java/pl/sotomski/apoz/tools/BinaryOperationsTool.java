@@ -7,10 +7,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.BinaryOperationCommand;
+import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.ImagePane;
-import pl.sotomski.apoz.commands.CommandManager;
-import pl.sotomski.apoz.commands.HistogramEqCommand;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 
 import java.io.File;
