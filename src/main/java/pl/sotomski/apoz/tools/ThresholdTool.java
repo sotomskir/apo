@@ -20,7 +20,7 @@ public class ThresholdTool extends VBox {
     private static VBox instance;
     private ToolController toolController;
     private Slider slider;
-    private CheckBox checkBox;
+    private CheckBox reverseCheckBox;
     private Label sliderValue;
 
     protected ThresholdTool(ToolController controller) {
@@ -35,8 +35,8 @@ public class ThresholdTool extends VBox {
         slider.setBlockIncrement(1.0f);
         slider.setOrientation(Orientation.HORIZONTAL);
         sliderValue = new Label("128");
-        checkBox = new CheckBox(bundle.getString("Reverse"));
-        checkBox.selectedProperty().addListener(e -> updateImageView());
+        reverseCheckBox = new CheckBox(bundle.getString("Reverse"));
+        reverseCheckBox.selectedProperty().addListener(e -> updateImageView());
         slider.valueProperty().addListener(e -> updateImageView());
         Button buttonApply = new Button(bundle.getString("Apply"));
         Button buttonCancel = new Button(bundle.getString("Cancel"));
@@ -48,14 +48,14 @@ public class ThresholdTool extends VBox {
             }
         });
         buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
-        getChildren().addAll(separator, label, slider, sliderValue, checkBox, buttonApply, buttonCancel);
+        getChildren().addAll(separator, label, slider, sliderValue, reverseCheckBox, buttonApply, buttonCancel);
         updateImageView();
     }
 
     private void updateImageView() {
         sliderValue.setText(String.valueOf(((int) slider.getValue())));
         ImagePane ap = toolController.getActivePaneProperty();
-        BufferedImage image = calculateImage(ap.getImage(), (int) slider.getValue(), checkBox.isSelected());
+        BufferedImage image = calculateImage(ap.getImage(), (int) slider.getValue(), reverseCheckBox.isSelected());
         ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
         ap.getHistogramPane().update(image);
         ap.getHistogramPane().update(image);
@@ -74,7 +74,7 @@ public class ThresholdTool extends VBox {
 
     public static BufferedImage calculateImage(BufferedImage bi, int threshold, boolean reverse) {
         BufferedImage grayBI;
-        if(bi.getColorModel().getNumComponents()>1) ImageUtils.rgbToGrayscale(bi);
+        if(bi.getColorModel().getNumComponents()>1) bi = ImageUtils.rgbToGrayscale(bi);
         grayBI = ImageUtils.deepCopy(bi);
         int width = grayBI.getWidth();
         int height = grayBI.getHeight();
@@ -94,9 +94,9 @@ public class ThresholdTool extends VBox {
     }
 
     public int[] getLUT() {
-        int[] LUT = new int[255];
-        if (checkBox.isSelected()) for (int i=0; i<(int)slider.getValue(); ++i) LUT[i]=1;
-        else for (int i=(int)slider.getValue(); i<256; ++i) LUT[i]=1;
+        int[] LUT = new int[256];
+        if (reverseCheckBox.isSelected()) for (int i = 0; i<(int)slider.getValue(); ++i) LUT[i]=255;
+        else for (int i=(int)slider.getValue(); i<256; ++i) LUT[i]=255;
         return LUT;
     }
 }
