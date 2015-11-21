@@ -12,22 +12,20 @@ import java.awt.image.DataBufferByte;
 public class LUTCommand extends UndoableCommand implements Command {
     private int[] LUT;
 
-    public LUTCommand(ImagePane imagePane, int[] LUT) {
-        super(imagePane);
+    public LUTCommand(ImagePane image, int[] LUT) {
+        super(image);
         this.LUT = LUT;
     }
 
     @Override
     public void execute() {
-        BufferedImage bi = imagePane.getImage();
-        if (bi.getColorModel().getNumComponents() > 1) bi = ImageUtils.rgbToGrayscale(bi);
-        int width = bi.getWidth();
-        int height = bi.getHeight();
-        BufferedImage binaryImage = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        final byte[] a = ((DataBufferByte) bi.getRaster().getDataBuffer()).getData();
+        BufferedImage image = imagePane.getImage();
+        if (image.getColorModel().getNumComponents() > 1) ImageUtils.rgbToGrayscale(image);
+        int width = image.getWidth();
+        int height = image.getHeight();
+        BufferedImage binaryImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+        final byte[] a = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
         final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
         for (int p = width * height - 1; p >= 0; p--) b[p] = (byte) (LUT[a[p] & 0xFF]);
-        imagePane.setImage(binaryImage);
-        imagePane.refresh();
     }
 }

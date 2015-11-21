@@ -64,12 +64,151 @@ public class ImageUtils {
         return binaryImage;
     }
 
+    public static int[] getPixelNeighbors(byte[] imageData, int i, int channels, int width, int height) {
+        int[] pixels = new int[9*channels];
+        try {
+            pixels[0] = imageData[i - width * channels - channels] & 0xFF;
+            pixels[1] = imageData[i - width * channels] & 0xFF;
+            pixels[2] = imageData[i - width * channels + channels] & 0xFF;
+            pixels[3] = imageData[i - channels] & 0xFF;
+            pixels[4] = imageData[i] & 0xFF;
+            pixels[5] = imageData[i + channels] & 0xFF;
+            pixels[6] = imageData[i + width * channels - channels] & 0xFF;
+            pixels[7] = imageData[i + width * channels] & 0xFF;
+            pixels[8] = imageData[i + width * channels + channels] & 0xFF;
+        } catch (IndexOutOfBoundsException e) {
+
+        }
+        return pixels;
+    }
+
+    public static int[] getPixelDiamond(byte[] imageData, int i, int channels, int width, int height) {
+        int[] pixels = new int[5*channels];
+        try {
+            pixels[0] = imageData[i - width * channels] & 0xFF;
+            pixels[1] = imageData[i - channels] & 0xFF;
+            pixels[2] = imageData[i] & 0xFF;
+            pixels[3] = imageData[i + channels] & 0xFF;
+            pixels[4] = imageData[i + width * channels] & 0xFF;
+        } catch (IndexOutOfBoundsException e) {
+
+        }
+        return pixels;
+    }
 
     public static void applyMask(BufferedImage bi, int[] mask) {
         int width = bi.getWidth();
         int height = bi.getHeight();
         int channels = bi.getColorModel().getNumComponents();
         byte[] a = ((DataBufferByte)bi.getRaster().getDataBuffer()).getData();
-        for (int i = 0; i < width*height*channels; ++i) a[i] = (byte) 128;
+        double min = 255, max = 0;
+        int multiplier = 0;
+        for (int p = 0; p < 9; ++p) multiplier += mask[p];
+        if (multiplier == 0) multiplier = 1;
+
+        int[] b = new int[a.length];
+        for (int i = width*channels; i < width*height*channels-width*channels; ++i) {
+            int[] pixels = getPixelNeighbors(a, i, channels, width, height);
+            int sum = 0;
+            for (int p = 0; p < 9; ++p) sum += pixels[p] * mask[p];
+            int v = (sum / multiplier);
+            if (v < min) min = v;
+            if (v > max) max = v;
+            b[i] = v;
+        }
+
+        // skalowanie
+        if (multiplier == 1) {
+            for (int i = 0; i < a.length; ++i)
+                a[i] = (byte) (((b[i] - min) / (max - min)) * 255);
+        } else for (int i = 0; i < a.length; ++i) a[i] = (byte) b[i];
+
+    }
+
+    public static void rewriteImage(BufferedImage previousImage, BufferedImage image) {
+        byte[] a = ((DataBufferByte)previousImage.getRaster().getDataBuffer()).getData();
+        byte[] b = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+        System.arraycopy(a, 0, b, 0, a.length);
+    }
+
+    public static void dilatation(BufferedImage image) {
+        byte[] a = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+        byte[] b = new byte[a.length];
+        int channels = image.getColorModel().getNumComponents();
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int pixels[];
+        int min;
+        for (int i = 0; i < a.length; ++i) {
+            pixels = getPixelNeighbors(a, i, channels, width, height);
+            min = 255;
+            for (int x = 0; x < 9; ++x) if (pixels[x] < min) min = pixels[x];
+            b[i] = (byte) min;
+        }
+        System.arraycopy(b, 0, a, 0, a.length);
+    }
+
+    public static void erosion(BufferedImage image) {
+        byte[] a = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+        byte[] b = new byte[a.length];
+        int channels = image.getColorModel().getNumComponents();
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int pixels[];
+        int max;
+        for (int i = 0; i < a.length; ++i) {
+            pixels = getPixelNeighbors(a, i, channels, width, height);
+            max = 0;
+            for (int x = 0; x < 9; ++x) if (pixels[x] > max) max = pixels[x];
+            b[i] = (byte) max;
+        }
+        System.arraycopy(b, 0, a, 0, a.length);
+    }
+
+    public static void outline(BufferedImage image) {
+        BufferedImage before = deepCopy(image);
+        erosion(image);
+        substract(image, before);
+    }
+
+    public static void skeleton(BufferedImage image) {
+
+    }
+
+    public static void thickening(BufferedImage image) {
+
+    }
+
+
+    public static void thinning(BufferedImage image) {
+
+    }
+
+    public static void close(BufferedImage image) {
+        dilatation(image);
+        erosion(image);
+    }
+
+    public static void open(BufferedImage image) {
+        erosion(image);
+        dilatation(image);
+    }
+
+    public static BufferedImage substract(BufferedImage image1, BufferedImage image2) {
+        //TODO
+        byte[] a = ((DataBufferByte) image1.getRaster().getDataBuffer()).getData();
+        byte[] b = ((DataBufferByte) image2.getRaster().getDataBuffer()).getData();
+        int channels = image1.getColorModel().getNumComponents();
+        int width = image1.getWidth();
+        int height = image1.getHeight();
+        int valueA, valueB;
+        for (int i = 0; i < a.length; ++i) {
+            valueA = a[i] & 0xFF;
+            valueB = b[i] & 0xFF;
+            valueA = valueA - valueB;
+            if (valueA < 0) valueA = 0;
+            a[i] = (byte) valueA;
+        }
+        return image1;
     }
 }

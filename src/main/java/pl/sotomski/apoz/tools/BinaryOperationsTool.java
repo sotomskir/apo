@@ -3,14 +3,13 @@ package pl.sotomski.apoz.tools;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.BinaryOperationCommand;
+import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.ImagePane;
-import pl.sotomski.apoz.commands.CommandManager;
-import pl.sotomski.apoz.commands.HistogramEqCommand;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 
 import java.io.File;
@@ -39,7 +38,7 @@ public class BinaryOperationsTool extends VBox {
         HBox hBox = new HBox(textField, buttonFile);
 
         buttonFile.setOnAction(event -> {
-            secondFile = FileMenuUtils.openFileDialog((Pane) getScene().getRoot());
+            secondFile = FileMenuUtils.openFileDialog((BorderPane) getScene().getRoot());
             textField.setText(secondFile.getAbsolutePath());
         });
 

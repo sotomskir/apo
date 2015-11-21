@@ -1,19 +1,11 @@
 package pl.sotomski.apoz.commands;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.stage.Stage;
-import pl.sotomski.apoz.controllers.PrefsController;
-import pl.sotomski.apoz.nodes.HistogramPane;
 import pl.sotomski.apoz.nodes.ImagePane;
-import pl.sotomski.apoz.utils.UTF8Control;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by sotomski on 03/11/15.

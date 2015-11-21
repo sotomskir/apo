@@ -19,6 +19,5 @@ public class UndoableCommand {
 
     public void undo() {
         imagePane.setImage(ImageUtils.deepCopy(previousImage));
-        imagePane.refresh();
     }
 }

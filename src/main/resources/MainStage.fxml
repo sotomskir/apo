@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
             minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
             xmlns="http://javafx.com/javafx/null" fx:controller="pl.sotomski.apoz.controllers.MainController">
@@ -36,6 +36,7 @@
                     <MenuItem onAction="#handleCurves" text="%Curves"/>
                     <MenuItem onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>
                     <MenuItem onAction="#handleMaskTool" text="%MaskTool"/>
+                    <MenuItem onAction="#handleMorphTool" text="%MorphTool"/>
                     <MenuItem onAction="#handleSampleTool" text="Sample Tool"/>
                 </Menu>
                 <Menu text="%Help">
@@ -149,28 +150,42 @@
         </TabPane>
     </center>
     <right>
-        <VBox styleClass="center" BorderPane.alignment="CENTER">
-            <Pane fx:id="histogramPaneContainer"/>
-            <HBox>
+        <BorderPane styleClass="center" BorderPane.alignment="CENTER">
+            <top>
                 <VBox>
-                    <Label fx:id="labelDepth" text="%Depth"/>
-                    <Label fx:id="labelR" text="R: -"/>
-                    <Label fx:id="labelG" text="G: -"/>
-                    <Label fx:id="labelB" text="B: -"/>
-                </VBox>
-                <Separator orientation="VERTICAL"/>
-                <VBox>
+                    <padding>
+                        <Insets bottom="10.0" left="0.0" right ="10.0" top="0.0"/>
+                    </padding>
 
-                    <Label fx:id="labelWidth" text="%Width"/>
-                    <Label fx:id="labelHeight" text="%Heigth"/>
-                    <Label fx:id="labelX" text="x: -"/>
-                    <Label fx:id="labelY" text="y: -"/>
+                    <VBox fx:id="histogramPaneContainer">
+                    <padding>
+                        <Insets bottom="10.0" left="0.0" right ="10.0" top="0.0"/>
+                    </padding>
+
+                    </VBox>
+                    <HBox fx:id="labels">
+                        <VBox>
+                            <Label fx:id="labelDepth" text="%Depth"/>
+                            <Label fx:id="labelR" text="R: -"/>
+                            <Label fx:id="labelG" text="G: -"/>
+                            <Label fx:id="labelB" text="B: -"/>
+                        </VBox>
+                        <Separator orientation="VERTICAL"/>
+                        <VBox>
+                            <Label fx:id="labelWidth" text="%Width"/>
+                            <Label fx:id="labelHeight" text="%Heigth"/>
+                            <Label fx:id="labelX" text="x: -"/>
+                            <Label fx:id="labelY" text="y: -"/>
+                        </VBox>
+                    </HBox>
                 </VBox>
-            </HBox>
-            <!--<ScrollPane >-->
-                <VBox fx:id="toolbox" BorderPane.alignment="CENTER"/>
-            <!--</ScrollPane>-->
-        </VBox>
+            </top>
+            <center>
+                <ScrollPane fx:id="toolboxScrollPane" vbarPolicy="NEVER" hbarPolicy="AS_NEEDED">
+                    <VBox fx:id="toolbox" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS"/>
+                </ScrollPane>
+            </center>
+        </BorderPane>
     </right>
     <bottom>
         <ToolBar>

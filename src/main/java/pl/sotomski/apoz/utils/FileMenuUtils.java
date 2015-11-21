@@ -1,5 +1,6 @@
 package pl.sotomski.apoz.utils;
 
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -15,7 +16,7 @@ import java.io.IOException;
  */
 public class FileMenuUtils {
 
-    public static File saveAsDialog(Pane layoutRoot, BufferedImage image) {
+    public static File saveAsDialog(BorderPane layoutRoot, BufferedImage image) {
         Window window = layoutRoot.getScene().getWindow();
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Images", "*.jpg", "*.png", "*.bmp"));
@@ -39,7 +40,7 @@ public class FileMenuUtils {
         }
     }
 
-    public static File openFileDialog(Pane layoutRoot) {
+    public static File openFileDialog(BorderPane layoutRoot) {
         Window window = layoutRoot.getScene().getWindow();
         final FileChooser fileChooser = new FileChooser();
         return fileChooser.showOpenDialog(window);
