@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
+import java.util.Arrays;
 
 /**
  * Created by sotomski on 01/10/15.
@@ -199,4 +200,104 @@ public class ImageUtils {
         }
         return image1;
     }
+
+    public static int[] iToXY(int i, int width, int channels) {
+        int[] c = new int[2];
+        c[0] = (i % (width * channels)) / channels;
+        c[1] =  i / (width * channels);
+        return c;
+    }
+
+    public static int xyToI(int x, int y, int width, int channels) {
+        return y * width * channels + (x * channels);
+    }
+
+    /**
+     * Transforms image data index of image1 to index of image2
+     * @param i1 index of image1
+     * @param width1 width of image1
+     * @param width2 width of image2
+     * @param channels channels
+     * @return index of image2 data with the same x,y coordinates as i1
+     */
+    public static int i1ToI2(int i1, int width1, int width2, int channels) {
+        int y = i1 / (width1 * channels);
+        return i1 + (y * (width2 - width1) * channels);
+    }
+
+    public static BufferedImage binaryOperation(BufferedImage image1, BufferedImage image2, String operation) {
+        //TODO
+        int channels = image1.getColorModel().getNumComponents();
+        if (channels > 1) image1 = rgbToGrayscale(image1);
+        channels = image2.getColorModel().getNumComponents();
+        if (channels > 1) image2 = rgbToGrayscale(image2);
+        channels = 1;
+        byte[] a = ((DataBufferByte) image1.getRaster().getDataBuffer()).getData();
+        byte[] b = ((DataBufferByte) image2.getRaster().getDataBuffer()).getData();
+        int width1 = image1.getWidth();
+        int width2 = image2.getWidth();
+        int width  = image1.getWidth() > image2.getWidth() ? image1.getWidth() : image2.getWidth();
+        int height = image1.getHeight() > image2.getHeight() ? image1.getHeight() : image2.getHeight();
+        BufferedImage resultImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        byte[] d = ((DataBufferByte) resultImage.getRaster().getDataBuffer()).getData();
+        int[] c = new int[d.length];
+        Arrays.fill(c, 255);
+        int i2;
+        for (int i = 0; i < a.length; ++i) {
+            i2 = i1ToI2(i, width1, width, channels);
+            c[i2] = a[i] & 0xFF;
+        }
+
+        switch (operation) {
+            case "add":
+                for (int i = 0; i < b.length; ++i) {
+                    i2 = i1ToI2(i, width2, width, channels);
+                    c[i2] += b[i] & 0xFF;
+                }
+                break;
+            case "sub":
+                for (int i = 0; i < b.length; ++i) {
+                    i2 = i1ToI2(i, width2, width, channels);
+                    c[i2] -= b[i] & 0xFF;
+                }
+                break;
+            case "multiply":
+                for (int i = 0; i < b.length; ++i) {
+                    i2 = i1ToI2(i, width2, width, channels);
+                    c[i2] *= b[i] & 0xFF;
+                }
+                break;
+            case "divide":
+                for (int i = 0; i < b.length; ++i) {
+                    i2 = i1ToI2(i, width2, width, channels);
+                    c[i2] /= ((b[i] & 0xFF) == 0 ? 1 : b[i] & 0xFF);
+                }
+                break;
+            case "AND":
+                for (int i = 0; i < b.length; ++i) {
+                    i2 = i1ToI2(i, width2, width, channels);
+                    c[i2] &= b[i] & 0xFF;
+                }
+                break;
+            case "OR":
+                for (int i = 0; i < b.length; ++i) {
+                    i2 = i1ToI2(i, width2, width, channels);
+                    c[i2] |= b[i] & 0xFF;
+                }
+                break;
+            case "XOR":
+                for (int i = 0; i < b.length; ++i) {
+                    i2 = i1ToI2(i, width2, width, channels);
+                    c[i2] ^= b[i] & 0xFF;
+                }
+                break;
+        }
+
+        for (int i = 0; i < d.length; ++i) {
+            d[i] = (byte) (c[i] < 0 ? 0 : c[i] > 255 ? 255 : c[i]);
+        }
+
+        return resultImage;
+    }
+
 }
