@@ -64,36 +64,37 @@ public class ImageUtils {
         return binaryImage;
     }
 
-    public static int[] getPixelNeighbors(byte[] imageData, int i, int channels, int width, int height) {
-        int[] pixels = new int[9*channels];
-        try {
-            pixels[0] = imageData[i - width * channels - channels] & 0xFF;
-            pixels[1] = imageData[i - width * channels] & 0xFF;
-            pixels[2] = imageData[i - width * channels + channels] & 0xFF;
-            pixels[3] = imageData[i - channels] & 0xFF;
-            pixels[4] = imageData[i] & 0xFF;
-            pixels[5] = imageData[i + channels] & 0xFF;
-            pixels[6] = imageData[i + width * channels - channels] & 0xFF;
-            pixels[7] = imageData[i + width * channels] & 0xFF;
-            pixels[8] = imageData[i + width * channels + channels] & 0xFF;
-        } catch (IndexOutOfBoundsException e) {
+    public static int[] getPixelNeighbors(byte[] imageData, int i, int channels, int width, int height, int neighborhood) {
+        if (neighborhood == 0) { // square neighborhood
+            int[] pixels = new int[9];
+            try {
+                pixels[0] = imageData[i - width * channels - channels] & 0xFF;
+                pixels[1] = imageData[i - width * channels] & 0xFF;
+                pixels[2] = imageData[i - width * channels + channels] & 0xFF;
+                pixels[3] = imageData[i - channels] & 0xFF;
+                pixels[4] = imageData[i] & 0xFF;
+                pixels[5] = imageData[i + channels] & 0xFF;
+                pixels[6] = imageData[i + width * channels - channels] & 0xFF;
+                pixels[7] = imageData[i + width * channels] & 0xFF;
+                pixels[8] = imageData[i + width * channels + channels] & 0xFF;
+            } catch (IndexOutOfBoundsException e) {
 
-        }
-        return pixels;
-    }
+            }
+            return pixels;
 
-    public static int[] getPixelDiamond(byte[] imageData, int i, int channels, int width, int height) {
-        int[] pixels = new int[5*channels];
-        try {
-            pixels[0] = imageData[i - width * channels] & 0xFF;
-            pixels[1] = imageData[i - channels] & 0xFF;
-            pixels[2] = imageData[i] & 0xFF;
-            pixels[3] = imageData[i + channels] & 0xFF;
-            pixels[4] = imageData[i + width * channels] & 0xFF;
-        } catch (IndexOutOfBoundsException e) {
+        } else if (neighborhood == 1) { // diamond neighborhood
+            int[] pixels = new int[5];
+            try {
+                pixels[0] = imageData[i - width * channels] & 0xFF;
+                pixels[1] = imageData[i - channels] & 0xFF;
+                pixels[2] = imageData[i] & 0xFF;
+                pixels[3] = imageData[i + channels] & 0xFF;
+                pixels[4] = imageData[i + width * channels] & 0xFF;
+            } catch (IndexOutOfBoundsException e) {
 
-        }
-        return pixels;
+            }
+            return pixels;
+        } else throw new IllegalArgumentException("Illegal neighborhood argument value");
     }
 
     public static void applyMask(BufferedImage bi, int[] mask) {
@@ -108,7 +109,7 @@ public class ImageUtils {
 
         int[] b = new int[a.length];
         for (int i = width*channels; i < width*height*channels-width*channels; ++i) {
-            int[] pixels = getPixelNeighbors(a, i, channels, width, height);
+            int[] pixels = getPixelNeighbors(a, i, channels, width, height, 0);
             int sum = 0;
             for (int p = 0; p < 9; ++p) sum += pixels[p] * mask[p];
             int v = (sum / multiplier);
@@ -131,67 +132,54 @@ public class ImageUtils {
         System.arraycopy(a, 0, b, 0, a.length);
     }
 
-    public static void dilatation(BufferedImage image) {
+    public static void dilatation(BufferedImage image, int neighborhood) {
         byte[] a = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
         byte[] b = new byte[a.length];
         int channels = image.getColorModel().getNumComponents();
-        int width = image.getWidth();
-        int height = image.getHeight();
-        int pixels[];
+        int width    = image.getWidth();
+        int height   = image.getHeight();
+        int[] pixels;
         int min;
         for (int i = 0; i < a.length; ++i) {
-            pixels = getPixelNeighbors(a, i, channels, width, height);
+            pixels = getPixelNeighbors(a, i, channels, width, height, neighborhood);
             min = 255;
-            for (int x = 0; x < 9; ++x) if (pixels[x] < min) min = pixels[x];
+            for (int pixel : pixels) if (pixel < min) min = pixel;
             b[i] = (byte) min;
         }
         System.arraycopy(b, 0, a, 0, a.length);
     }
 
-    public static void erosion(BufferedImage image) {
+    public static void erosion(BufferedImage image, int neighborhood) {
         byte[] a = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
         byte[] b = new byte[a.length];
         int channels = image.getColorModel().getNumComponents();
-        int width = image.getWidth();
-        int height = image.getHeight();
-        int pixels[];
+        int width    = image.getWidth();
+        int height   = image.getHeight();
+        int[] pixels;
         int max;
         for (int i = 0; i < a.length; ++i) {
-            pixels = getPixelNeighbors(a, i, channels, width, height);
+            pixels = getPixelNeighbors(a, i, channels, width, height, neighborhood);
             max = 0;
-            for (int x = 0; x < 9; ++x) if (pixels[x] > max) max = pixels[x];
+            for (int pixel : pixels) if (pixel > max) max = pixel;
             b[i] = (byte) max;
         }
         System.arraycopy(b, 0, a, 0, a.length);
     }
 
-    public static void outline(BufferedImage image) {
+    public static void outline(BufferedImage image, int neighborhood) {
         BufferedImage before = deepCopy(image);
-        erosion(image);
+        erosion(image, neighborhood);
         substract(image, before);
     }
 
-    public static void skeleton(BufferedImage image) {
-
+    public static void close(BufferedImage image, int neighborhood) {
+        dilatation(image, neighborhood);
+        erosion(image, neighborhood);
     }
 
-    public static void thickening(BufferedImage image) {
-
-    }
-
-
-    public static void thinning(BufferedImage image) {
-
-    }
-
-    public static void close(BufferedImage image) {
-        dilatation(image);
-        erosion(image);
-    }
-
-    public static void open(BufferedImage image) {
-        erosion(image);
-        dilatation(image);
+    public static void open(BufferedImage image, int neighborhood) {
+        erosion(image, neighborhood);
+        dilatation(image, neighborhood);
     }
 
     public static BufferedImage substract(BufferedImage image1, BufferedImage image2) {
