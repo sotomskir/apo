@@ -2,7 +2,7 @@ package pl.sotomski.apoz.nodes;
 
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.charts.CumulativeHistogramChart;
 import pl.sotomski.apoz.charts.LineProfileChart;
 import pl.sotomski.apoz.charts.MonoHistogramChart;
@@ -33,10 +33,10 @@ public class HistogramPane extends TabPane {
         monoHistogramChart = new MonoHistogramChart();
         cumulativeHistogramChart = new CumulativeHistogramChart();
         lineProfileChart = new LineProfileChart();
-        Pane histogramPane = new Pane(monoHistogramChart);
-        Pane rgbHistogramPane = new Pane(rgbHistogramChart);
-        Pane cumulativeHistogramPane = new Pane(cumulativeHistogramChart);
-        Pane lineProfilePane = new Pane(lineProfileChart);
+        VBox histogramPane = new VBox(monoHistogramChart);
+        VBox rgbHistogramPane = new VBox(rgbHistogramChart);
+        VBox cumulativeHistogramPane = new VBox(cumulativeHistogramChart);
+        VBox lineProfilePane = new VBox(lineProfileChart);
         tab1.setContent(histogramPane);
         tab2.setContent(rgbHistogramPane);
         tab3.setContent(cumulativeHistogramPane);

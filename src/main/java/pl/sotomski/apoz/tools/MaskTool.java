@@ -3,7 +3,7 @@ package pl.sotomski.apoz.tools;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.MaskCommand;
@@ -47,14 +47,15 @@ public class MaskTool extends VBox {
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("MaskTool"));
-        GridPane maskGridPane = new GridPane();
+        TilePane tilePane = new TilePane();
+        tilePane.setPrefColumns(3);
+        tilePane.setPrefRows(3);
         spinners = new ArrayList<>();
-        for (int x = 0; x < 3; x++)
-            for (int y = 0; y < 3; y++) {
+        for (int x = 0; x < 9; x++) {
                 Spinner<Integer> spinner = new Spinner<>(-9, 9, 1);
                 spinners.add(spinner);
-                maskGridPane.add(spinner, x, y);
-            }
+                tilePane.getChildren().add(spinner);
+        }
         choiceBox.getItems().addAll(masks);
         choiceBox.getSelectionModel().select(0);
         choiceBox.getSelectionModel().selectedItemProperty().addListener(observable -> {
@@ -70,7 +71,7 @@ public class MaskTool extends VBox {
                 e.printStackTrace();
             }
         });
-        getChildren().addAll(separator, label, maskGridPane, choiceBox, button);
+        getChildren().addAll(separator, label, tilePane, choiceBox, button);
     }
 
     public static VBox getInstance(ToolController controller) {

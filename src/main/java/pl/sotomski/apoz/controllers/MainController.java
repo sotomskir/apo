@@ -17,7 +17,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -45,13 +45,21 @@ import java.util.prefs.Preferences;
 
 public class MainController implements Initializable, ToolController {
 
+
+    /***************************************************************************
+     *                                                                         *
+     *                               FIELDS                                    *
+     *                                                                         *
+     **************************************************************************/
     private ResourceBundle bundle;
     private HistogramPane histogramPane;
     private ObjectProperty<ImagePane> activePaneProperty;
     private Preferences prefs;
+    @FXML public ScrollPane toolboxScrollPane;
+    @FXML public HBox labels;
     @FXML private MenuBar menuBar;
     @FXML private VBox toolbox;
-    @FXML private Pane histogramPaneContainer;
+    @FXML private VBox histogramPaneContainer;
     @FXML private BorderPane rootLayout;
     @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
     @FXML TabPane tabPane;
@@ -101,6 +109,9 @@ public class MainController implements Initializable, ToolController {
             activePaneProperty.setValue(selectedTab.getPane());
         });
 
+        labels.setMinHeight(Control.USE_PREF_SIZE);
+        histogramPaneContainer.setMinHeight(Control.USE_PREF_SIZE);
+        toolboxScrollPane.setFitToHeight(true);
     }
 
     private void updateLabels(ImagePane pane) {
@@ -137,7 +148,7 @@ public class MainController implements Initializable, ToolController {
         tabPane.getSelectionModel().select(imageTab);
     }
 
-    private void addToToolbox(Pane tool) {
+    private void addToToolbox(VBox tool) {
         toolbox.getChildren().clear();
         toolbox.getChildren().add(tool);
     }
@@ -361,6 +372,9 @@ public class MainController implements Initializable, ToolController {
     public void handleBinaryOperationsTool(ActionEvent actionEvent) {
         addToToolbox(BinaryOperationsTool.getInstance(this));
     }
+    public void handleMorphTool(ActionEvent actionEvent) {
+        addToToolbox(MorphTool.getInstance(this));
+    }
 
 
     /***************************************************************************
@@ -368,7 +382,6 @@ public class MainController implements Initializable, ToolController {
      *                               GETTERS                                   *
      *                                                                         *
      **************************************************************************/
-
     public ResourceBundle getBundle() {
         return bundle;
     }
@@ -379,5 +392,6 @@ public class MainController implements Initializable, ToolController {
     @Override public ImagePane getActivePaneProperty() {
         return activePaneProperty.getValue();
     }
+
 
 }
