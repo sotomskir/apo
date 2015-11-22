@@ -409,4 +409,8 @@ public class MainController implements Initializable, ToolController {
     public void handleLogicalFilterTool(ActionEvent actionEvent) {
         addToToolbox(LogicalFilterTool.getInstance(this));
     }
+
+    public void handleGradientMaskTool(ActionEvent actionEvent) {
+        addToToolbox(GradientMaskTool.getInstance(this));
+    }
 }
