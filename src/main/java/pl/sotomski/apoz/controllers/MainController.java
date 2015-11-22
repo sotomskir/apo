@@ -68,6 +68,22 @@ public class MainController implements Initializable, ToolController {
 
     /***************************************************************************
      *                                                                         *
+     *                               GETTERS                                   *
+     *                                                                         *
+     **************************************************************************/
+    public ResourceBundle getBundle() {
+        return bundle;
+    }
+
+    @Override public BufferedImage getBufferedImage() {
+        return activePaneProperty.getValue().getImage();
+    }
+    @Override public ImagePane getActivePaneProperty() {
+        return activePaneProperty.getValue();
+    }
+
+    /***************************************************************************
+     *                                                                         *
      *                               METHODS                                   *
      *                                                                         *
      **************************************************************************/
@@ -195,9 +211,11 @@ public class MainController implements Initializable, ToolController {
             }
         }
     }
+
     public void handleExit(ActionEvent actionEvent) {
         System.exit(0);
     }
+
     public void handleOpen(ActionEvent actionEvent) {
         File file = FileMenuUtils.openFileDialog(rootLayout);
         ImagePane pane = new ImagePane(histogramPane, file);
@@ -230,6 +248,7 @@ public class MainController implements Initializable, ToolController {
         toolbox.getChildren().clear();
         toolbox.getChildren().add(HistogramEqTool.getInstance(this));
     }
+
     public void handleMouseMoved(MouseEvent event) {
         int x = (int)event.getX();
         int y = (int)event.getY();
@@ -290,6 +309,7 @@ public class MainController implements Initializable, ToolController {
             e.printStackTrace();
         }
     }
+
     public void handleUnpinTab(ActionEvent actionEvent) {
         ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
         selectedTab.getPane().setTabbed(false);
@@ -310,6 +330,7 @@ public class MainController implements Initializable, ToolController {
             }
         });
     }
+
     public void handleUndo(ActionEvent actionEvent) {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
         manager.undo();
@@ -320,6 +341,7 @@ public class MainController implements Initializable, ToolController {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
         manager.redo();
     }
+
     public void handlePreferences(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -338,10 +360,12 @@ public class MainController implements Initializable, ToolController {
             e.printStackTrace();
         }
     }
+
     public void handleNegativeConversion(ActionEvent actionEvent) {
         CommandManager manager = activePaneProperty.getValue().getCommandManager();
         manager.executeCommand(new NegativeCommand(activePaneProperty.getValue()));
     }
+
     public void handleThresholding(ActionEvent actionEvent) {
         addToToolbox(ThresholdTool.getInstance(this));
     }
@@ -365,6 +389,7 @@ public class MainController implements Initializable, ToolController {
     public void handleCurves(ActionEvent actionEvent) {
         addToToolbox(CurvesTool.getInstance(this));
     }
+
     public void handleMaskTool(ActionEvent actionEvent) {
         addToToolbox(MaskTool.getInstance(this));
     }
@@ -372,26 +397,13 @@ public class MainController implements Initializable, ToolController {
     public void handleBinaryOperationsTool(ActionEvent actionEvent) {
         addToToolbox(BinaryOperationsTool.getInstance(this));
     }
+
     public void handleMorphTool(ActionEvent actionEvent) {
         addToToolbox(MorphTool.getInstance(this));
     }
 
-
-    /***************************************************************************
-     *                                                                         *
-     *                               GETTERS                                   *
-     *                                                                         *
-     **************************************************************************/
-    public ResourceBundle getBundle() {
-        return bundle;
+    public void handleMedianTool(ActionEvent actionEvent) {
+        addToToolbox(MedianTool.getInstance(this));
     }
-
-    @Override public BufferedImage getBufferedImage() {
-        return activePaneProperty.getValue().getImage();
-    }
-    @Override public ImagePane getActivePaneProperty() {
-        return activePaneProperty.getValue();
-    }
-
 
 }

@@ -311,4 +311,35 @@ public class ImageUtils {
         return resultImage;
     }
 
+    public static byte[] getImageData(BufferedImage image) {
+        return ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+    }
+
+    public static int[] getPixelNeighbors(byte[] imageData, int i, int channels, int width, int diameter) {
+        int[] pixels = new int[diameter*diameter];
+        int c = 0;
+        int maxOffset = (diameter - 1) / 2;
+        int minOffset = -maxOffset;
+        for (int yOffset = minOffset; yOffset <= maxOffset; ++yOffset) {
+            for (int xOffset = minOffset; xOffset <= maxOffset; ++xOffset) {
+                pixels[c] = imageData[i + width * channels * yOffset + xOffset] & 0xFF;
+                ++c;
+            }
+        }
+        return pixels;
+    }
+
+    public static void medianOperation(BufferedImage image, int diameter) {
+        byte[] a = getImageData(image);
+        byte[] b = new byte[a.length];
+        int width = image.getWidth();
+        int channels = image.getColorModel().getNumComponents();
+        int offset = (diameter - 1) / 2 * width * channels + ((diameter - 1) / 2);
+        for (int i = offset; i < a.length - offset; ++i) {
+            int[] pixels = getPixelNeighbors(a, i, channels, width, diameter);
+            Arrays.sort(pixels);
+            b[i] = (byte) pixels[diameter/2];
+        }
+        System.arraycopy(b, 0, a, 0, a.length);
+    }
 }

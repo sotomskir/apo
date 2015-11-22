@@ -34,10 +34,11 @@
                     <MenuItem onAction="#handleLevelsReduction" text="%LevelsReduction"/>
                     <MenuItem onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
                     <MenuItem onAction="#handleCurves" text="%Curves"/>
+                    <SeparatorMenuItem/>
                     <MenuItem onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>
                     <MenuItem onAction="#handleMaskTool" text="%MaskTool"/>
+                    <MenuItem onAction="#handleMedianTool" text="%MedianTool"/>
                     <MenuItem onAction="#handleMorphTool" text="%MorphTool"/>
-                    <MenuItem onAction="#handleSampleTool" text="Sample Tool"/>
                 </Menu>
                 <Menu text="%Help">
                     <MenuItem disable="true" text="%Search"/>
