@@ -342,4 +342,42 @@ public class ImageUtils {
         }
         System.arraycopy(b, 0, a, 0, a.length);
     }
+
+    public static void logicalFilter(BufferedImage image, int direction) {
+        byte[] a = getImageData(image);
+        byte[] b = new byte[a.length];
+        int width = image.getWidth();
+        int channels = image.getColorModel().getNumComponents();
+        int offset =width * channels + channels;
+        switch (direction) {
+            case 0:
+                for (int i = offset; i < a.length - offset; ++i) {
+                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 0);
+                    b[i] = pixels[1] == pixels[7] ? (byte) pixels[1] : a[i];
+                }
+                break;
+            case 1:
+                for (int i = offset; i < a.length - offset; ++i) {
+                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 0);
+                    b[i] = pixels[0] == pixels[8] ? (byte) pixels[0] : a[i];
+                }
+                break;
+            case 2:
+                for (int i = offset; i < a.length - offset; ++i) {
+                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 0);
+                    b[i] = pixels[3] == pixels[5] ? (byte) pixels[3] : a[i];
+                }
+                break;
+            case 3:
+                for (int i = offset; i < a.length - offset; ++i) {
+                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 0);
+                    b[i] = pixels[2] == pixels[6] ? (byte) pixels[2] : a[i];
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal direction. Shoult be 0, 1, 2 or 3");
+        }
+        System.arraycopy(b, 0, a, 0, a.length);
+    }
 }
+
