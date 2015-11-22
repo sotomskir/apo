@@ -105,25 +105,36 @@ public class ImageUtils {
         byte[] a = ((DataBufferByte)bi.getRaster().getDataBuffer()).getData();
         double min = 255, max = 0;
         int multiplier = 0;
+        boolean sharpening = false;
         for (int p = 0; p < 9; ++p) multiplier += mask[p];
-        if (multiplier == 0) multiplier = 1;
+        if (multiplier == 0) {
+            sharpening = true;
+            multiplier = 1;
+        }
 
         int[] b = new int[a.length];
         for (int i = width*channels; i < width*height*channels-width*channels; ++i) {
             int[] pixels = getPixelNeighbors(a, i, channels, width, height, 0);
-            int sum = 0;
+            double sum = 0;
             for (int p = 0; p < 9; ++p) sum += pixels[p] * mask[p];
-            int v = (sum / multiplier);
+            int v = (int) (sum / multiplier);
             if (v < min) min = v;
             if (v > max) max = v;
             b[i] = v;
         }
 
-        // skalowanie
-        if (multiplier == 1) {
-            for (int i = 0; i < a.length; ++i)
-                a[i] = (byte) (((b[i] - min) / (max - min)) * 255);
-        } else for (int i = 0; i < a.length; ++i) a[i] = (byte) b[i];
+        if (sharpening) {
+            for (int i = 0; i < a.length; ++i) {
+                b[i] = (b[i] < 0 ? 0 : b[i] > 255 ? 255 : b[i]); // skalowanie przez obcinanie
+                b[i] += a[i] & 0xFF;
+                a[i] = (byte) (b[i] < 0 ? 0 : b[i] > 255 ? 255 : b[i]); // skalowanie przez obcinanie
+//                a[i] = (byte) (((b[i] - min) / (max - min)) * 255); // skalowanie proporcjonalne
+            }
+        } else {
+            for (int i = 0; i < a.length; ++i) {
+                a[i] = (byte) (b[i] < 0 ? 0 : b[i] > 255 ? 255 : b[i]); // skalowanie przez obcinanie
+            }
+        }
 
     }
 

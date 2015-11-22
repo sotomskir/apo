@@ -30,11 +30,15 @@ public class MaskTool extends VBox {
             {-1, -1, -1, -1, 8, -1, -1, -1, -1},
             {0, -1, 0, -1, 4, -1, 0, -1, 0},
             {1, -2, 1, -2, 4, -2, 1, -2, 1},
-            {0, 1, 0, 1, -4, 1, 0, 1, 0}};
+            {0, 1, 0, 1, -4, 1, 0, 1, 0},
+            {1, -2, 1, -2, 5, -2, 1, -2, 1},
+            {-1, -1, -1, -1, 9, -1, -1, -1, -1},
+            {0, -1, 0, -1, 5, -1, 0, -1, 0}
+        };
 
     protected MaskTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
-        masks = new String[8];
+        masks = new String[11];
         masks[0] = bundle.getString("BlurMask1");
         masks[1] = bundle.getString("BlurMask2");
         masks[2] = bundle.getString("BlurMask3");
@@ -43,6 +47,9 @@ public class MaskTool extends VBox {
         masks[5] = bundle.getString("SharpenMask2");
         masks[6] = bundle.getString("SharpenMask3");
         masks[7] = bundle.getString("SharpenMask4");
+        masks[8] = bundle.getString("EdgeDetectionMask1");
+        masks[9] = bundle.getString("EdgeDetectionMask2");
+        masks[10] = bundle.getString("EdgeDetectionMask3");
         this.choiceBox = new ChoiceBox<>();
         this.toolController = controller;
         Separator separator = new Separator(Orientation.HORIZONTAL);
@@ -50,6 +57,8 @@ public class MaskTool extends VBox {
         TilePane tilePane = new TilePane();
         tilePane.setPrefColumns(3);
         tilePane.setPrefRows(3);
+
+        // create spinners
         spinners = new ArrayList<>();
         for (int x = 0; x < 9; x++) {
                 Spinner<Integer> spinner = new Spinner<>(-9, 9, 1);
@@ -58,6 +67,8 @@ public class MaskTool extends VBox {
         }
         choiceBox.getItems().addAll(masks);
         choiceBox.getSelectionModel().select(0);
+
+        // Update spinners on mask selection
         choiceBox.getSelectionModel().selectedItemProperty().addListener(observable -> {
             int selectedMask = choiceBox.getSelectionModel().getSelectedIndex();
             for (int i = 0; i < 9; ++i) spinners.get(i).getValueFactory().setValue(maskTemplates[selectedMask][i]);
