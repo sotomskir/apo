@@ -406,4 +406,7 @@ public class MainController implements Initializable, ToolController {
         addToToolbox(MedianTool.getInstance(this));
     }
 
+    public void handleLogicalFilterTool(ActionEvent actionEvent) {
+        addToToolbox(LogicalFilterTool.getInstance(this));
+    }
 }
