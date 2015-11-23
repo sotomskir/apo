@@ -30,6 +30,7 @@ public class MorphTool extends VBox {
         buttons.add(new Button(bundle.getString("Open2")));
         buttons.add(new Button(bundle.getString("Close")));
         buttons.add(new Button(bundle.getString("Outline")));
+        buttons.add(new Button(bundle.getString("Skeleton")));
         for (Button button : buttons) {
             button.setOnAction((actionEvent) -> handleAction(buttons.indexOf(button)));
             button.setMaxWidth(Double.MAX_VALUE);

@@ -27,12 +27,14 @@ public class MorphCommand extends UndoableCommand implements Command{
         //Dilatation
         if (action == 0) ImageUtils.dilatation(imagePane.getImage(), neighborhood);
         //Erosion
-        else if (action == 1) ImageUtils.erosion(imagePane.getImage(), neighborhood);
+        else if (action == 1) ImageUtils.erode(imagePane.getImage(), neighborhood);
         //Open
         else if (action == 2) ImageUtils.open(imagePane.getImage(), neighborhood);
         //Close
         else if (action == 3) ImageUtils.close(imagePane.getImage(), neighborhood);
         //Outline
         else if (action == 4) ImageUtils.outline(imagePane.getImage(), neighborhood);
+        //Skeleton
+        else if (action == 5) ImageUtils.skeleton(imagePane.getImage(), neighborhood);
     }
 }
