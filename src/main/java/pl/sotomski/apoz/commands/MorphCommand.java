@@ -25,7 +25,7 @@ public class MorphCommand extends UndoableCommand implements Command{
     @Override
     public void execute() {
         //Dilatation
-        if (action == 0) ImageUtils.dilatation(imagePane.getImage(), neighborhood);
+        if (action == 0) ImageUtils.dilate(imagePane.getImage(), neighborhood);
         //Erosion
         else if (action == 1) ImageUtils.erode(imagePane.getImage(), neighborhood);
         //Open

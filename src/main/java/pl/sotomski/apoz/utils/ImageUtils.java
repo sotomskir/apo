@@ -72,7 +72,7 @@ public class ImageUtils {
                 int wdth = channels * width;
                 int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
                 if (i < wdth) n = wdth;
-                if (i > imageData.length - wdth) s = -wdth;
+                if (i > imageData.length - wdth - channels) s = -wdth;
                 if (x <= channels) w = channels;
                 if (x >= wdth - channels) e = -channels;
                 pixels[0] = imageData[i + n + w - width * channels - channels] & 0xFF;
@@ -156,7 +156,7 @@ public class ImageUtils {
         System.arraycopy(a, 0, b, 0, a.length);
     }
 
-    private static byte[] dilatation(byte[] a, int channels, int width, int height, int neighborhood) {
+    private static byte[] erode(byte[] a, int channels, int width, int height, int neighborhood) {
         int[] pixels;
         int min;
         byte[] b = new byte[a.length];
@@ -169,16 +169,16 @@ public class ImageUtils {
         return b;
     }
 
-    public static void dilatation(BufferedImage image, int neighborhood) {
+    public static void erode(BufferedImage image, int neighborhood) {
         byte[] a = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
         int channels = image.getColorModel().getNumComponents();
         int width    = image.getWidth();
         int height   = image.getHeight();
-        byte[] b = dilatation(a, channels, width, height, neighborhood);
+        byte[] b = dilate(a, channels, width, height, neighborhood);
         System.arraycopy(b, 0, a, 0, a.length);
     }
 
-    public static void erode(BufferedImage image, int neighborhood) {
+    public static void dilate(BufferedImage image, int neighborhood) {
         byte[] a = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
         int channels = image.getColorModel().getNumComponents();
         int width    = image.getWidth();
@@ -187,7 +187,7 @@ public class ImageUtils {
         System.arraycopy(b, 0, a, 0, a.length);
     }
 
-    public static byte[] erode(byte[] a, int channels, int width, int height, int neighborhood) {
+    public static byte[] dilate(byte[] a, int channels, int width, int height, int neighborhood) {
         byte[] b = new byte[a.length];
         int[] pixels;
         int max;
@@ -207,18 +207,18 @@ public class ImageUtils {
     }
 
     public static void close(BufferedImage image, int neighborhood) {
-        dilatation(image, neighborhood);
+        dilate(image, neighborhood);
         erode(image, neighborhood);
     }
 
     public static byte[] open(byte[] a, int channels, int width, int height, int neighborhood) {
         byte[] b = erode(a, channels, width, height, neighborhood);
-        return dilatation(b, channels, width, height, neighborhood);
+        return dilate(b, channels, width, height, neighborhood);
     }
 
     public static void open(BufferedImage image, int neighborhood) {
         erode(image, neighborhood);
-        dilatation(image, neighborhood);
+        dilate(image, neighborhood);
     }
 
 
@@ -264,32 +264,52 @@ public class ImageUtils {
             return min;
         }
 
+    public static int countNonZero(byte[] a) {
+        int c = 0;
+        for (byte anA : a) if((anA & 0xFF) > 0) ++c;
+        return c;
+    }
+
     public static void skeleton(BufferedImage image, int neighborhood) {
-        //TODO
         //http://felix.abecassis.me/2011/09/opencv-morphological-skeleton/
         byte[] img = getImageData(image);
         byte[] temp;
+        byte[] eroded;
         byte[] skel = new byte[img.length];
         int channels = image.getColorModel().getNumComponents();
         int width = image.getWidth();
         int height = image.getHeight();
 
-        int min;
+        int nonZero;
         do
         {
-            temp = open(img, channels, width, height, 0);
-            temp = bitwise_not(temp);
-            temp = bitwise_and(img, temp);
+            eroded = erode(img, channels, width, height, 1);
+            temp = dilate(eroded, channels, width, height, 1);
+            temp = substract(img, temp);
             skel = bitwise_or(skel, temp);
-            img = erode(img, channels, width, height, 0);
-            min = min(img);
-        } while (min != 255);
+            System.arraycopy(eroded, 0, img, 0, img.length);
+            nonZero = countNonZero(img);
+            System.out.println(nonZero);
+        } while (nonZero != 0);
         byte[] a = getImageData(image);
-        System.arraycopy(img, 0, a, 0, img.length);
+        System.arraycopy(skel, 0, a, 0, img.length);
+    }
+
+    public static byte[] substract(byte[] a, byte[] b) {
+        byte[] c = new byte[a.length];
+        for (int i = 0; i < a.length; ++i) c[i] = (byte) ((a[i] & 0xFF) - (b[i] & 0xFF));
+        return c;
+    }
+
+    private static void printimg(byte[] a, int width) {
+        for (int i = 0; i < a.length; ++i) {
+            if (i % width == 0) System.out.println();
+            System.out.print((a[i] & 0xFF) + ",");
+        }
+        System.out.println();
     }
 
     public static BufferedImage substract(BufferedImage image1, BufferedImage image2) {
-        //TODO
         byte[] a = ((DataBufferByte) image1.getRaster().getDataBuffer()).getData();
         byte[] b = ((DataBufferByte) image2.getRaster().getDataBuffer()).getData();
         int channels = image1.getColorModel().getNumComponents();
@@ -331,7 +351,6 @@ public class ImageUtils {
     }
 
     public static BufferedImage binaryOperation(BufferedImage image1, BufferedImage image2, String operation) {
-        //TODO
         int channels = image1.getColorModel().getNumComponents();
         if (channels > 1) image1 = rgbToGrayscale(image1);
         channels = image2.getColorModel().getNumComponents();
