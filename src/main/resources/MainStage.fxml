@@ -39,6 +39,7 @@
                     <MenuItem onAction="#handleMaskTool" text="%MaskTool"/>
                     <MenuItem onAction="#handleMedianTool" text="%MedianTool"/>
                     <MenuItem onAction="#handleLogicalFilterTool" text="%LogicalFilterTool"/>
+                    <MenuItem onAction="#handleGradientMaskTool" text="%GradientMaskTool"/>
                     <MenuItem onAction="#handleMorphTool" text="%MorphTool"/>
                 </Menu>
                 <Menu text="%Help">
