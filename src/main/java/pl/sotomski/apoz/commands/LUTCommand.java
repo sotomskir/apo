@@ -27,5 +27,6 @@ public class LUTCommand extends UndoableCommand implements Command {
         final byte[] a = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
         final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
         for (int p = width * height - 1; p >= 0; p--) b[p] = (byte) (LUT[a[p] & 0xFF]);
+        imagePane.setImage(binaryImage);
     }
 }
