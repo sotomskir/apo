@@ -35,6 +35,6 @@ public class MorphCommand extends UndoableCommand implements Command{
         //Outline
         else if (action == 4) ImageUtils.outline(imagePane.getImage(), neighborhood);
         //Skeleton
-        else if (action == 5) ImageUtils.skeleton(imagePane.getImage(), neighborhood);
+        else if (action == 5) ImageUtils.skeleton(imagePane, neighborhood);
     }
 }

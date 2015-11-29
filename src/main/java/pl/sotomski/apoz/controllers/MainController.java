@@ -122,7 +122,7 @@ public class MainController implements Initializable, ToolController {
 
         tabPane.focusedProperty().addListener(e -> {
             ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
-            activePaneProperty.setValue(selectedTab.getPane());
+            if (selectedTab != null) activePaneProperty.setValue(selectedTab.getPane());
         });
 
         labels.setMinHeight(Control.USE_PREF_SIZE);
@@ -218,9 +218,11 @@ public class MainController implements Initializable, ToolController {
 
     public void handleOpen(ActionEvent actionEvent) {
         File file = FileMenuUtils.openFileDialog(rootLayout);
-        ImagePane pane = new ImagePane(histogramPane, file);
-        ImageTab imageTab = new ImageTab(pane);
-        attachTab(imageTab);
+        if (file != null) {
+            ImagePane pane = new ImagePane(histogramPane, file);
+            ImageTab imageTab = new ImageTab(pane);
+            attachTab(imageTab);
+        }
     }
 
     public void handleDuplicate(ActionEvent actionEvent) {

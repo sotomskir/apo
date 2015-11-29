@@ -17,7 +17,10 @@ public class ExceptionDialog {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
         alert.setHeaderText(header);
-        alert.setContentText(ex.getMessage());
+        String content =
+                "message: " + ex.getMessage() + "\n" +
+                "cause: " + ex.getCause();
+        alert.setContentText(content);
 
 
 // Create expandable Exception.

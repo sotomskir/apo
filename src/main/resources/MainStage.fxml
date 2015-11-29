@@ -25,7 +25,7 @@
                     <MenuItem onAction="#handleUndo" text="%Undo"/>
                     <MenuItem onAction="#handleRedo" text="%Redo"/>
                 </Menu>
-                <Menu text="%Tools">
+                <Menu text="%PointOperations">
                     <MenuItem onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale"/>
                     <MenuItem onAction="#handleNegativeConversion" text="%NegativeConversion"/>
                     <MenuItem onAction="#handleHistogramEqualisation" text="%HistogramEqualisation"/>
@@ -34,8 +34,9 @@
                     <MenuItem onAction="#handleLevelsReduction" text="%LevelsReduction"/>
                     <MenuItem onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
                     <MenuItem onAction="#handleCurves" text="%Curves"/>
-                    <SeparatorMenuItem/>
                     <MenuItem onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>
+                </Menu>
+                <Menu text="%NeighborhoodOperations">
                     <MenuItem onAction="#handleMaskTool" text="%MaskTool"/>
                     <MenuItem onAction="#handleMedianTool" text="%MedianTool"/>
                     <MenuItem onAction="#handleLogicalFilterTool" text="%LogicalFilterTool"/>

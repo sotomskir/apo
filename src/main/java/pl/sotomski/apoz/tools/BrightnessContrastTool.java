@@ -27,6 +27,7 @@ public class BrightnessContrastTool extends VBox {
     private Slider gammaSlider;
     private int[] LUT;
 
+
     private BrightnessContrastTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
         this.toolController = controller;

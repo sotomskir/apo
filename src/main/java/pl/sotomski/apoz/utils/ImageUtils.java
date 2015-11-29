@@ -1,5 +1,7 @@
 package pl.sotomski.apoz.utils;
 
+import pl.sotomski.apoz.nodes.ImagePane;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
@@ -174,7 +176,7 @@ public class ImageUtils {
         int channels = image.getColorModel().getNumComponents();
         int width    = image.getWidth();
         int height   = image.getHeight();
-        byte[] b = dilate(a, channels, width, height, neighborhood);
+        byte[] b = erode(a, channels, width, height, neighborhood);
         System.arraycopy(b, 0, a, 0, a.length);
     }
 
@@ -183,7 +185,7 @@ public class ImageUtils {
         int channels = image.getColorModel().getNumComponents();
         int width    = image.getWidth();
         int height   = image.getHeight();
-        byte[] b = erode(a, channels, width, height, neighborhood);
+        byte[] b = dilate(a, channels, width, height, neighborhood);
         System.arraycopy(b, 0, a, 0, a.length);
     }
 
@@ -270,11 +272,13 @@ public class ImageUtils {
         return c;
     }
 
-    public static void skeleton(BufferedImage image, int neighborhood) {
+    public static void skeleton(ImagePane imagePane, int neighborhood) {
         //http://felix.abecassis.me/2011/09/opencv-morphological-skeleton/
-        byte[] img = getImageData(image);
+        BufferedImage image = imagePane.getImage();
+        byte[] img = getImageData(deepCopy(image));
         byte[] temp;
         byte[] eroded;
+        byte[] ret = new byte[0];
         byte[] skel = new byte[img.length];
         int channels = image.getColorModel().getNumComponents();
         int width = image.getWidth();
@@ -290,9 +294,20 @@ public class ImageUtils {
             System.arraycopy(eroded, 0, img, 0, img.length);
             nonZero = countNonZero(img);
             System.out.println(nonZero);
+            ret = appendVertical(ret, temp);
         } while (nonZero != 0);
-        byte[] a = getImageData(image);
-        System.arraycopy(skel, 0, a, 0, img.length);
+        BufferedImage r = new BufferedImage(image.getWidth(), ret.length / image.getWidth(), image.getType());
+        byte[] a = getImageData(r);
+        System.arraycopy(ret, 0, a, 0, ret.length);
+        imagePane.setImage(r);
+        imagePane.refresh();
+    }
+
+    public static byte[] appendVertical(byte[] base, byte[] image) {
+        byte[] tmp = new byte[base.length + image.length];
+        System.arraycopy(base, 0, tmp, 0, base.length);
+        System.arraycopy(image, 0, tmp, base.length, image.length);
+        return tmp;
     }
 
     public static byte[] substract(byte[] a, byte[] b) {
@@ -493,5 +508,14 @@ public class ImageUtils {
         System.arraycopy(b, 0, a, 0, a.length);
     }
 
+    public static BufferedImage convertTo3Byte(BufferedImage image) {
+        BufferedImage ret = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+        int rgb;
+        for (int x = 0; x < ret.getWidth(); ++x)
+        for (int y = 0; y < ret.getHeight(); ++y) {
+            rgb = image.getRGB(x, y);
+            ret.setRGB(x, y, rgb);
+        }
+        return ret;
+    }
 }
-
