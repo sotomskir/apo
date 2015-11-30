@@ -64,7 +64,7 @@ public class FileMenuUtils {
             BufferedImage image;
             String fileExtension = getFileExtension(file);
             System.out.println(fileExtension);
-            if (fileExtension.equals("tiff")) {
+            if (fileExtension.equals("tiff") || fileExtension.equals("tif")) {
                 System.out.println("Opening tiff image");
                 FileSeekableStream stream = new FileSeekableStream(file);
                 TIFFDecodeParam decodeParam = new TIFFDecodeParam();
