@@ -154,7 +154,7 @@ public class MainController implements Initializable, ToolController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("APOZ");
         alert.setHeaderText(bundle.getString("About"));
-        alert.setContentText(bundle.getString("Author"));
+        alert.setContentText(bundle.getString("Author") + "\nhttps://github.com/sotomskir/apo");
         alert.showAndWait();
     }
 
@@ -414,5 +414,9 @@ public class MainController implements Initializable, ToolController {
 
     public void handleGradientMaskTool(ActionEvent actionEvent) {
         addToToolbox(GradientMaskTool.getInstance(this));
+    }
+
+    public void handleTwoStepFilterTool(ActionEvent actionEvent) {
+        addToToolbox(TwoStepFilterTool.getInstance(this));
     }
 }

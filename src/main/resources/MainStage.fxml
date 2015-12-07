@@ -38,6 +38,7 @@
                 </Menu>
                 <Menu text="%NeighborhoodOperations">
                     <MenuItem onAction="#handleMaskTool" text="%MaskTool"/>
+                    <MenuItem onAction="#handleTwoStepFilterTool" text="%TwoStepFilterTool"/>
                     <MenuItem onAction="#handleMedianTool" text="%MedianTool"/>
                     <MenuItem onAction="#handleLogicalFilterTool" text="%LogicalFilterTool"/>
                     <MenuItem onAction="#handleGradientMaskTool" text="%GradientMaskTool"/>

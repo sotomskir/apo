@@ -24,6 +24,11 @@ public class ImageUtilsTest {
     }
 
     @Test
+    public void testGetPixelNeighbors() {
+
+    }
+
+    @Test
     public void testIToXY() throws Exception {
         final int width = 10;
         int[] xy;

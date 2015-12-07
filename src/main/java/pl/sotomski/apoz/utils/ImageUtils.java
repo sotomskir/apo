@@ -67,9 +67,35 @@ public class ImageUtils {
         return binaryImage;
     }
 
-    public static int[] getPixelNeighbors(byte[] imageData, int i, int channels, int width, int height, int neighborhood) {
+    /**
+     * @deprecated
+     */
+    public static int[] getPixelNeighbors(byte[] imageData, int i, int channels, int width, int diameter) {
+        int[] pixels = new int[diameter*diameter];
+        int c = 0;
+        int maxOffset = (diameter - 1) / 2;
+        int minOffset = -maxOffset;
+        for (int yOffset = minOffset; yOffset <= maxOffset; ++yOffset) {
+            for (int xOffset = minOffset; xOffset <= maxOffset; ++xOffset) {
+                pixels[c] = imageData[i + width * channels * yOffset + xOffset] & 0xFF;
+                ++c;
+            }
+        }
+        return pixels;
+    }
+
+    //TODO test this
+    public static int[] getPixelNeighbors(byte[] imageData, int i, int channels, int width, int height, int diameter, int neighborhood) {
         if (neighborhood == 0) { // square neighborhood
-            int[] pixels = new int[9];
+            int[] pixels = new int[diameter*diameter];
+            int xy[] = iToXY(i, width, channels);
+            int min = diameter / 2 * channels;
+            int maxX = width * channels - min;
+            int maxY = width * channels;
+            if (xy[0] < min)   
+            if (xy[0] > maxX)
+            if (xy[1] < min)
+            if (xy[1] > maxY)
             try {
                 int wdth = channels * width;
                 int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
@@ -120,7 +146,7 @@ public class ImageUtils {
         double min = 255, max = 0;
         int multiplier = 0;
         boolean sharpening = false;
-        for (int p = 0; p < 9; ++p) multiplier += mask[p];
+        for (int p = 0; p < mask.length; ++p) multiplier += mask[p];
         if (multiplier == 0) {
             sharpening = true;
             multiplier = 1;
@@ -128,9 +154,9 @@ public class ImageUtils {
 
         int[] b = new int[a.length];
         for (int i = width*channels; i < width*height*channels-width*channels; ++i) {
-            int[] pixels = getPixelNeighbors(a, i, channels, width, height, 0);
+            int[] pixels = getPixelNeighbors(a, i, channels, width, height, (int) Math.sqrt(mask.length), 0);
             double sum = 0;
-            for (int p = 0; p < 9; ++p) sum += pixels[p] * mask[p];
+            for (int p = 0; p < mask.length; ++p) sum += pixels[p] * mask[p];
             int v = (int) (sum / multiplier);
             if (v < min) min = v;
             if (v > max) max = v;
@@ -163,7 +189,7 @@ public class ImageUtils {
         int min;
         byte[] b = new byte[a.length];
         for (int i = 0; i < a.length; ++i) {
-            pixels = getPixelNeighbors(a, i, channels, width, height, neighborhood);
+            pixels = getPixelNeighbors(a, i, channels, width, height, 9, neighborhood);
             min = 255;
             for (int pixel : pixels) if (pixel < min) min = pixel;
             b[i] = (byte) min;
@@ -194,7 +220,7 @@ public class ImageUtils {
         int[] pixels;
         int max;
         for (int i = 0; i < a.length; ++i) {
-            pixels = getPixelNeighbors(a, i, channels, width, height, neighborhood);
+            pixels = getPixelNeighbors(a, i, channels, width, height, 9, neighborhood);
             max = 0;
             for (int pixel : pixels) if (pixel > max) max = pixel;
             b[i] = (byte) max;
@@ -443,20 +469,6 @@ public class ImageUtils {
         return ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
     }
 
-    public static int[] getPixelNeighbors(byte[] imageData, int i, int channels, int width, int diameter) {
-        int[] pixels = new int[diameter*diameter];
-        int c = 0;
-        int maxOffset = (diameter - 1) / 2;
-        int minOffset = -maxOffset;
-        for (int yOffset = minOffset; yOffset <= maxOffset; ++yOffset) {
-            for (int xOffset = minOffset; xOffset <= maxOffset; ++xOffset) {
-                pixels[c] = imageData[i + width * channels * yOffset + xOffset] & 0xFF;
-                ++c;
-            }
-        }
-        return pixels;
-    }
-
     public static void medianOperation(BufferedImage image, int diameter) {
         byte[] a = getImageData(image);
         byte[] b = new byte[a.length];
@@ -480,25 +492,25 @@ public class ImageUtils {
         switch (direction) {
             case 0:
                 for (int i = offset; i < a.length - offset; ++i) {
-                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 0);
+                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 9, 0);
                     b[i] = pixels[1] == pixels[7] ? (byte) pixels[1] : a[i];
                 }
                 break;
             case 1:
                 for (int i = offset; i < a.length - offset; ++i) {
-                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 0);
+                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 9, 0);
                     b[i] = pixels[0] == pixels[8] ? (byte) pixels[0] : a[i];
                 }
                 break;
             case 2:
                 for (int i = offset; i < a.length - offset; ++i) {
-                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 0);
+                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 9, 0);
                     b[i] = pixels[3] == pixels[5] ? (byte) pixels[3] : a[i];
                 }
                 break;
             case 3:
                 for (int i = offset; i < a.length - offset; ++i) {
-                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 0);
+                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 9, 0);
                     b[i] = pixels[2] == pixels[6] ? (byte) pixels[2] : a[i];
                 }
                 break;
