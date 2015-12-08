@@ -66,8 +66,8 @@ public class MainController implements Initializable, ToolController {
     @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
     @FXML TabPane tabPane;
     private final BooleanProperty needsImage = new SimpleBooleanProperty(true);
-    private final BooleanProperty undoAvailable = new SimpleBooleanProperty(true);
-    private final BooleanProperty redoAvailable = new SimpleBooleanProperty(true);
+    private final BooleanProperty undoUnavailable = new SimpleBooleanProperty(true);
+    private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
 
     /***************************************************************************
      *                                                                         *
@@ -90,28 +90,28 @@ public class MainController implements Initializable, ToolController {
         this.needsImage.set(needsImage);
     }
 
-    public boolean getUndoAvailable() {
-        return undoAvailable.get();
+    public boolean getUndoUnavailable() {
+        return undoUnavailable.get();
     }
 
-    public BooleanProperty undoAvailableProperty() {
-        return undoAvailable;
+    public BooleanProperty undoUnavailableProperty() {
+        return undoUnavailable;
     }
 
-    public void setUndoAvailable(boolean undoAvailable) {
-        this.undoAvailable.set(undoAvailable);
+    public void setUndoUnavailable(boolean undoUnavailable) {
+        this.undoUnavailable.set(undoUnavailable);
     }
 
-    public boolean getRedoAvailable() {
-        return redoAvailable.get();
+    public boolean getRedoUnavailable() {
+        return redoUnavailable.get();
     }
 
-    public BooleanProperty redoAvailableProperty() {
-        return redoAvailable;
+    public BooleanProperty redoUnavailableProperty() {
+        return redoUnavailable;
     }
 
-    public void setRedoAvailable(boolean redoAvailable) {
-        this.redoAvailable.set(redoAvailable);
+    public void setRedoUnavailable(boolean redoUnavailable) {
+        this.redoUnavailable.set(redoUnavailable);
     }
 
     @Override public BufferedImage getBufferedImage() {
@@ -150,8 +150,8 @@ public class MainController implements Initializable, ToolController {
             ImageTab newActiveTab = (ImageTab) newValue;
 
             if (oldActiveTab != null) {
-                undoAvailable.unbind();
-                redoAvailable.unbind();
+                undoUnavailable.unbind();
+                redoUnavailable.unbind();
             }
             if (newActiveTab != null) {
                 activePaneProperty.setValue(newActiveTab.getPane());
@@ -159,12 +159,12 @@ public class MainController implements Initializable, ToolController {
                     updateLabels(activePaneProperty.getValue());
                 });
                 updateLabels(newActiveTab.getPane());
-                undoAvailable.bind(newActiveTab.getPane().getCommandManager().undoAvailableProperty().not());
-                redoAvailable.bind(newActiveTab.getPane().getCommandManager().redoAvailableProperty().not());
+                undoUnavailable.bind(newActiveTab.getPane().getCommandManager().undoAvailableProperty().not());
+                redoUnavailable.bind(newActiveTab.getPane().getCommandManager().redoAvailableProperty().not());
             } else {
                 activePaneProperty.setValue(null);
-                undoAvailable.setValue(false);
-                redoAvailable.setValue(false);
+                undoUnavailable.setValue(true);
+                redoUnavailable.setValue(true);
             }
         });
 
