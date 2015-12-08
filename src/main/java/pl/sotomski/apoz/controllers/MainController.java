@@ -1,6 +1,8 @@
 package pl.sotomski.apoz.controllers;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -65,6 +67,7 @@ public class MainController implements Initializable, ToolController {
     @FXML TabPane tabPane;
     @FXML private Button undoButton;
     @FXML private Button redoButton;
+    private final BooleanProperty needsImage = new SimpleBooleanProperty(true);
 
     /***************************************************************************
      *                                                                         *
@@ -73,6 +76,18 @@ public class MainController implements Initializable, ToolController {
      **************************************************************************/
     public ResourceBundle getBundle() {
         return bundle;
+    }
+
+    public boolean getNeedsImage() {
+        return needsImage.get();
+    }
+
+    public BooleanProperty needsImageProperty() {
+        return needsImage;
+    }
+
+    public void setNeedsImage(boolean needsImage) {
+        this.needsImage.set(needsImage);
     }
 
     @Override public BufferedImage getBufferedImage() {
@@ -89,17 +104,19 @@ public class MainController implements Initializable, ToolController {
      **************************************************************************/
     @Override public void initialize(java.net.URL arg0, ResourceBundle resources) {
         prefs = Preferences.userNodeForPackage(Main.class);
-
         bundle = resources;
         activePaneProperty = new SimpleObjectProperty<>();
         histogramPane = new HistogramPane(bundle);
         histogramPaneContainer.getChildren().add(histogramPane);
         activePaneProperty.addListener(e -> {
-            if (activePaneProperty.getValue().isTabbed()) {
-                histogramPane.update(activePaneProperty.getValue().getImage());
+            if (activePaneProperty.getValue() != null) {
+                if (activePaneProperty.getValue().isTabbed()) {
+                    histogramPane.update(activePaneProperty.getValue().getImage());
+                }
+                zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
+                updateUndoRedoListeners();
             }
-            zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
-            updateUndoRedoListeners();
+            needsImage.setValue(activePaneProperty.getValue() == null);
         });
 
         menuBar.setFocusTraversable(false);
@@ -116,6 +133,8 @@ public class MainController implements Initializable, ToolController {
                     updateLabels(activePaneProperty.getValue());
                 });
                 updateLabels(newActiveTab.getPane());
+            } else {
+                activePaneProperty.setValue(null);
             }
 
         });
