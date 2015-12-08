@@ -70,7 +70,7 @@ public class ImageUtils {
     /**
      * @deprecated
      */
-    public static int[] getPixelNeighbors(byte[] imageData, int i, int channels, int width, int diameter) {
+    public static int[] get3x3Pixels(byte[] imageData, int i, int channels, int width, int diameter) {
         int[] pixels = new int[diameter*diameter];
         int c = 0;
         int maxOffset = (diameter - 1) / 2;
@@ -85,17 +85,9 @@ public class ImageUtils {
     }
 
     //TODO test this
-    public static int[] getPixelNeighbors(byte[] imageData, int i, int channels, int width, int height, int diameter, int neighborhood) {
+    public static int[] get3x3Pixels(byte[] imageData, int i, int channels, int width, int height, int bordersMethod, int neighborhood) {
         if (neighborhood == 0) { // square neighborhood
-            int[] pixels = new int[diameter*diameter];
-            int xy[] = iToXY(i, width, channels);
-            int min = diameter / 2 * channels;
-            int maxX = width * channels - min;
-            int maxY = width * channels;
-            if (xy[0] < min)   
-            if (xy[0] > maxX)
-            if (xy[1] < min)
-            if (xy[1] > maxY)
+            int[] pixels = new int[9];
             try {
                 int wdth = channels * width;
                 int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
@@ -154,7 +146,7 @@ public class ImageUtils {
 
         int[] b = new int[a.length];
         for (int i = width*channels; i < width*height*channels-width*channels; ++i) {
-            int[] pixels = getPixelNeighbors(a, i, channels, width, height, (int) Math.sqrt(mask.length), 0);
+            int[] pixels = get3x3Pixels(a, i, channels, width, height, (int) Math.sqrt(mask.length), 0);
             double sum = 0;
             for (int p = 0; p < mask.length; ++p) sum += pixels[p] * mask[p];
             int v = (int) (sum / multiplier);
@@ -189,7 +181,7 @@ public class ImageUtils {
         int min;
         byte[] b = new byte[a.length];
         for (int i = 0; i < a.length; ++i) {
-            pixels = getPixelNeighbors(a, i, channels, width, height, 9, neighborhood);
+            pixels = get3x3Pixels(a, i, channels, width, height, 9, neighborhood);
             min = 255;
             for (int pixel : pixels) if (pixel < min) min = pixel;
             b[i] = (byte) min;
@@ -220,7 +212,7 @@ public class ImageUtils {
         int[] pixels;
         int max;
         for (int i = 0; i < a.length; ++i) {
-            pixels = getPixelNeighbors(a, i, channels, width, height, 9, neighborhood);
+            pixels = get3x3Pixels(a, i, channels, width, height, 9, neighborhood);
             max = 0;
             for (int pixel : pixels) if (pixel > max) max = pixel;
             b[i] = (byte) max;
@@ -476,7 +468,7 @@ public class ImageUtils {
         int channels = image.getColorModel().getNumComponents();
         int offset = (diameter - 1) / 2 * width * channels + ((diameter - 1) / 2);
         for (int i = offset; i < a.length - offset; ++i) {
-            int[] pixels = getPixelNeighbors(a, i, channels, width, diameter);
+            int[] pixels = get3x3Pixels(a, i, channels, width, diameter);
             Arrays.sort(pixels);
             b[i] = (byte) pixels[diameter/2];
         }
@@ -492,25 +484,25 @@ public class ImageUtils {
         switch (direction) {
             case 0:
                 for (int i = offset; i < a.length - offset; ++i) {
-                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 9, 0);
+                    int[] pixels = get3x3Pixels(a, i, channels, width, 0, 9, 0);
                     b[i] = pixels[1] == pixels[7] ? (byte) pixels[1] : a[i];
                 }
                 break;
             case 1:
                 for (int i = offset; i < a.length - offset; ++i) {
-                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 9, 0);
+                    int[] pixels = get3x3Pixels(a, i, channels, width, 0, 9, 0);
                     b[i] = pixels[0] == pixels[8] ? (byte) pixels[0] : a[i];
                 }
                 break;
             case 2:
                 for (int i = offset; i < a.length - offset; ++i) {
-                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 9, 0);
+                    int[] pixels = get3x3Pixels(a, i, channels, width, 0, 9, 0);
                     b[i] = pixels[3] == pixels[5] ? (byte) pixels[3] : a[i];
                 }
                 break;
             case 3:
                 for (int i = offset; i < a.length - offset; ++i) {
-                    int[] pixels = getPixelNeighbors(a, i, channels, width, 0, 9, 0);
+                    int[] pixels = get3x3Pixels(a, i, channels, width, 0, 9, 0);
                     b[i] = pixels[2] == pixels[6] ? (byte) pixels[2] : a[i];
                 }
                 break;

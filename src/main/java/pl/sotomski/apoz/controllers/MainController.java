@@ -65,9 +65,9 @@ public class MainController implements Initializable, ToolController {
     @FXML private BorderPane rootLayout;
     @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
     @FXML TabPane tabPane;
-    @FXML private Button undoButton;
-    @FXML private Button redoButton;
     private final BooleanProperty needsImage = new SimpleBooleanProperty(true);
+    private final BooleanProperty undoAvailable = new SimpleBooleanProperty(true);
+    private final BooleanProperty redoAvailable = new SimpleBooleanProperty(true);
 
     /***************************************************************************
      *                                                                         *
@@ -88,6 +88,30 @@ public class MainController implements Initializable, ToolController {
 
     public void setNeedsImage(boolean needsImage) {
         this.needsImage.set(needsImage);
+    }
+
+    public boolean getUndoAvailable() {
+        return undoAvailable.get();
+    }
+
+    public BooleanProperty undoAvailableProperty() {
+        return undoAvailable;
+    }
+
+    public void setUndoAvailable(boolean undoAvailable) {
+        this.undoAvailable.set(undoAvailable);
+    }
+
+    public boolean getRedoAvailable() {
+        return redoAvailable.get();
+    }
+
+    public BooleanProperty redoAvailableProperty() {
+        return redoAvailable;
+    }
+
+    public void setRedoAvailable(boolean redoAvailable) {
+        this.redoAvailable.set(redoAvailable);
     }
 
     @Override public BufferedImage getBufferedImage() {
@@ -114,7 +138,6 @@ public class MainController implements Initializable, ToolController {
                     histogramPane.update(activePaneProperty.getValue().getImage());
                 }
                 zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
-                updateUndoRedoListeners();
             }
             needsImage.setValue(activePaneProperty.getValue() == null);
         });
@@ -122,21 +145,27 @@ public class MainController implements Initializable, ToolController {
         menuBar.setFocusTraversable(false);
         zoomLabel.setOnInputMethodTextChanged(e -> activePaneProperty.getValue().handleZoomChange(zoomLabel.getText()));
 
-        tabPane.getSelectionModel().selectedItemProperty().addListener(e ->
-        {
-            ImagePane oldActivePane = activePaneProperty.getValue();
-            ImageTab newActiveTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            ImageTab oldActiveTab = (ImageTab) oldValue;
+            ImageTab newActiveTab = (ImageTab) newValue;
 
+            if (oldActiveTab != null) {
+                undoAvailable.unbind();
+                redoAvailable.unbind();
+            }
             if (newActiveTab != null) {
                 activePaneProperty.setValue(newActiveTab.getPane());
                 newActiveTab.getPane().imageVersionProperty().addListener(ev -> {
                     updateLabels(activePaneProperty.getValue());
                 });
                 updateLabels(newActiveTab.getPane());
+                undoAvailable.bind(newActiveTab.getPane().getCommandManager().undoAvailableProperty().not());
+                redoAvailable.bind(newActiveTab.getPane().getCommandManager().redoAvailableProperty().not());
             } else {
                 activePaneProperty.setValue(null);
+                undoAvailable.setValue(false);
+                redoAvailable.setValue(false);
             }
-
         });
 
         tabPane.focusedProperty().addListener(e -> {
@@ -153,17 +182,6 @@ public class MainController implements Initializable, ToolController {
         labelDepth.setText(bundle.getString("Depth") + ": " + (pane.getImage().getColorModel().getNumComponents() > 1 ? "RGB" : "Gray"));
         labelWidth.setText(bundle.getString("Width") + ": " + pane.getImage().getWidth());
         labelHeight.setText(bundle.getString("Heigth") + ": " + pane.getImage().getHeight());
-    }
-
-    private void updateUndoRedoListeners() {
-        activePaneProperty.getValue().getCommandManager().undoAvailableProperty().addListener(e -> {
-            undoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getUndoAvailable());
-        });
-        activePaneProperty.getValue().getCommandManager().redoAvailableProperty().addListener(e -> {
-            redoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getRedoAvailable());
-        });
-        undoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getUndoAvailable());
-        redoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getRedoAvailable());
     }
 
     /**

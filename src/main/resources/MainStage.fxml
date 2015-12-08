@@ -22,8 +22,8 @@
                     <MenuItem onAction="#handleExit" text="%Quit"/>
                 </Menu>
                 <Menu text="%Edit">
-                    <MenuItem disable="${controller.needsImage}" onAction="#handleUndo" text="%Undo"/>
-                    <MenuItem disable="${controller.needsImage}" onAction="#handleRedo" text="%Redo"/>
+                    <MenuItem disable="${controller.undoAvailable}" onAction="#handleUndo" text="%Undo"/>
+                    <MenuItem disable="${controller.redoAvailable}" onAction="#handleRedo" text="%Redo"/>
                 </Menu>
                 <Menu text="%PointOperations">
                     <MenuItem disable="${controller.needsImage}" onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale"/>
@@ -86,7 +86,7 @@
                     </graphic>
                 </Button>
 
-                <Button fx:id="undoButton" disable="true" mnemonicParsing="false" onAction="#handleUndo">
+                <Button disable="${controller.undoAvailable}" mnemonicParsing="false" onAction="#handleUndo">
                     <tooltip>
                         <Tooltip text="%Undo"/>
                     </tooltip>
@@ -97,7 +97,7 @@
                     </graphic>
                 </Button>
 
-                <Button fx:id="redoButton" disable="true" mnemonicParsing="false" onAction="#handleRedo">
+                <Button disable="${controller.redoAvailable}" mnemonicParsing="false" onAction="#handleRedo">
                     <tooltip>
                         <Tooltip text="%Redo"/>
                     </tooltip>
