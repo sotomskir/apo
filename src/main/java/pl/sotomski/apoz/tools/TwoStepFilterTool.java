@@ -46,7 +46,10 @@ public class TwoStepFilterTool extends VBox {
         spinners = new ArrayList<>();
         addSpinners(gridPane1, 3, 3);
         addSpinners(gridPane2, 3, 3);
+        initSpinners();
         addLabels(gridPane3, 5, 5);
+        updateMasksValues();
+        updateLabels();
 
         EventHandler<MouseEvent> updateMaskM = event -> {
             updateMasksValues();
@@ -112,6 +115,18 @@ public class TwoStepFilterTool extends VBox {
                 spinners.add(spinner);
                 gridPane.add(spinner, x, y);
             }
+    }
+
+    private void initSpinners() {
+        final int[] template = new int[] {
+                1,2,1,
+                2,4,2,
+                1,2,1,
+                0,-1, 0,
+                -1, 4,-1,
+                0,-1, 0
+        };
+        for (int i = 0; i < 18; ++i) spinners.get(i).getValueFactory().setValue(template[i]);
     }
 
     private void addLabels(GridPane gridPane, int xV, int yV) {

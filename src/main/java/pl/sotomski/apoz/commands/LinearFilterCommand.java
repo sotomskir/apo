@@ -18,8 +18,7 @@ public class LinearFilterCommand extends UndoableCommand implements Command {
 
     @Override
     public void execute() {
-        if(mask.length == 9) ImageUtils.applyMask(imagePane.getImage(), mask, bordersMethod);
-        else if(mask.length == 25) ImageUtils.applyMask(imagePane.getImage(), mask, bordersMethod);
+        ImageUtils.linearFilter(imagePane.getImage(), mask, bordersMethod);
     }
 
 }

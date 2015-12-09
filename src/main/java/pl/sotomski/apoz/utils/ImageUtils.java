@@ -84,7 +84,9 @@ public class ImageUtils {
         return pixels;
     }
 
-    //TODO test this
+    /**
+     * @deprecated
+     */
     public static int[] get3x3Pixels(byte[] imageData, int i, int channels, int width, int height, int bordersMethod, int neighborhood) {
         if (neighborhood == 0) { // square neighborhood
             int[] pixels = new int[9];
@@ -122,6 +124,9 @@ public class ImageUtils {
         } else throw new IllegalArgumentException("Illegal neighborhood argument value");
     }
 
+    /**
+     * @deprecated
+     */
     public static int[] get5x5Pixels(byte[] imageData, int i, int channels, int width, int height, int bordersMethod) {
         int[] pixels = new int[25];
         int wdth = channels * width;
@@ -162,36 +167,22 @@ public class ImageUtils {
         return pixels;
     }
 
-    public int[] getPixel(BufferedImage image, int x, int y) {
-        byte[] data = getImageData(image);
-        int channels = getImageChannels(image);
-        int i = xyToI(x, y, image.getWidth(), channels);
-        if (channels == 3) {
-            int[] ret = new int[3];
-            ret[0] = data[i] & 0xFF;
-            ret[1] = data[i+1] & 0xFF;
-            ret[2] = data[i+2] & 0xFF;
-            return ret;
-        } else if (channels == 1) {
-            int[] ret = new int[1];
-            ret[0] = data[i] & 0xFF;
-            return ret;
-        } else throw new IllegalArgumentException("Unsupported channels number: " + channels);
-    }
-
-    private int getImageChannels(BufferedImage image) {
-        return image.getColorModel().getNumComponents();
-    }
-
-    public static void applyMask(BufferedImage bi, int[] mask, int bordersMethod) {
+    public static void linearFilter(BufferedImage bi, int[] mask, int bordersMethod) {
         int width = bi.getWidth();
         int height = bi.getHeight();
         int channels = bi.getColorModel().getNumComponents();
         byte[] a = getImageData(bi);
         final int bordersWidth = (int) (Math.sqrt(mask.length));
-        BufferedImage tmpImage = new BufferedImage(bi.getWidth() + bordersWidth, bi.getHeight() + bordersWidth, bi.getType());
+
+        //create temporary image with extended borders
+        BufferedImage tmpImage = new BufferedImage(bi.getWidth() + bordersWidth-1, bi.getHeight() + bordersWidth-1, bi.getType());
         rewriteImage(bi, tmpImage, bordersWidth/2, bordersWidth/2);
-        double min = 255, max = 0;
+
+        //calculate mask multiplier
+        double[] min = new double[channels];
+        double[] max = new double[channels];
+        Arrays.fill(min, 255);
+        Arrays.fill(max, 0);
         int multiplier = 0;
         boolean sharpening = false;
         for (int p = 0; p < mask.length; ++p) multiplier += mask[p];
@@ -200,20 +191,27 @@ public class ImageUtils {
             multiplier = 1;
         }
 
+        //filter image
         int[] b = new int[a.length];
-        for (int i = width*channels; i < width*height*channels-width*channels; ++i) {
-            int[] pixels;
-            if (mask.length == 9) pixels = get3x3Pixels(a, i, channels, width, height, (int) Math.sqrt(mask.length), 0);
-            else if (mask.length == 25) pixels = get5x5Pixels(a, i, channels, width, height, (int) Math.sqrt(mask.length));
-            else throw new IllegalArgumentException("Unsupported mask size: " + mask.length);
-            double sum = 0;
-            for (int p = 0; p < mask.length; ++p) sum += pixels[p] * mask[p];
-            int v = (int) (sum / multiplier);
-            if (v < min) min = v;
-            if (v > max) max = v;
-            b[i] = v;
-        }
+        for (int y = 0; y < bi.getHeight(); ++y)
+            for (int x = 0; x < bi.getWidth(); ++x) {
+                int[][] pixels;
+                int diameter = (int) Math.sqrt(mask.length);
+                pixels = getPixels(tmpImage, diameter, x+diameter/2, y+diameter/2);
+                double[] sum = new double[channels];
+                for (int p = 0; p < mask.length; ++p) {
+                    for (int i = 0; i < channels; ++i)
+                        sum[i] += pixels[p][i] * mask[p];
+                }
+                for (int i = 0; i < channels; ++i) {
+                    int tmp = (int) (sum[i] / multiplier);
+                    if (tmp < min[i]) min[i] = tmp;
+                    if (tmp > max[i]) max[i] = tmp;
+                    b[xyToI(x, y, width, channels) + i] = tmp;
+                }
+            }
 
+        //scale image levels
         if (sharpening) {
             for (int i = 0; i < a.length; ++i) {
                 b[i] = (b[i] < 0 ? 0 : b[i] > 255 ? 255 : b[i]); // skalowanie przez obcinanie
@@ -226,20 +224,50 @@ public class ImageUtils {
                 a[i] = (byte) (b[i] < 0 ? 0 : b[i] > 255 ? 255 : b[i]); // skalowanie przez obcinanie
             }
         }
+    }
 
+    public static int[] getPixel(BufferedImage image, int x, int y) {
+        byte[] data = getImageData(image);
+        int channels = getImageChannels(image);
+        int i = xyToI(x, y, image.getWidth(), channels);
+        int[] ret = new int[channels];
+        for (int c = 0; c < channels; ++c) ret[c] = data[i + c] & 0xFF;
+        return ret;
+    }
+
+    private static void setPixel(BufferedImage image, int x, int y, int[] pixel) {
+        byte[] data = getImageData(image);
+        int channels = getImageChannels(image);
+        int i = xyToI(x, y, image.getWidth(), channels);
+        for (int c = 0; c < channels; ++c) data[i + c] = (byte) pixel[c];
+    }
+
+    private static int getImageChannels(BufferedImage image) {
+        return image.getColorModel().getNumComponents();
+    }
+
+    private static int[][] getPixels(BufferedImage image, int diameter, int x, int y) {
+        int[][] ret = new int[diameter*diameter][];
+        int i = 0;
+        for (int yi = -diameter/2; yi <= diameter/2; ++yi)
+            for (int xi = -diameter/2; xi <= diameter/2; ++xi)
+                ret[i++] = getPixel(image, xi+x, yi+y);
+        return ret;
     }
 
     public static void rewriteImage(BufferedImage srcImage, BufferedImage destImage, int xShift, int yShift) {
         byte[] a = getImageData(srcImage);
         byte[] b = getImageData(destImage);
         int channels = srcImage.getColorModel().getNumComponents();
-        if (xShift == 0 && yShift == 0) System.arraycopy(a, 0, b, 0, a.length);
+        if (xShift == 0 && yShift == 0 && srcImage.getHeight() == destImage.getHeight() &&
+                srcImage.getWidth() == destImage.getWidth()) System.arraycopy(a, 0, b, 0, a.length);
         else {
             int[] xy;
             int srcWidth = srcImage.getWidth();
             int dstWidth = destImage.getWidth();
             for (int i = 0; i < a.length; ++i) {
                 xy = iToXY(i, srcWidth, channels);
+                //TODO handle 3 channels
                 int i2 = xyToI(xy[0] + xShift * channels, xy[1] + yShift * channels, dstWidth, channels);
                 b[i2] = a[i];
             }

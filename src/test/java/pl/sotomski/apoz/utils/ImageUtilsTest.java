@@ -58,8 +58,6 @@ public class ImageUtilsTest {
                 0,0,0,0,0,0,0
         };
         actuals = ImageUtils.getImageData(growedImage);
-        for (int i = 0; i < actuals.length; ++i) System.out.print((int)actuals[i] + ", ");
-        System.out.println();
         assertArrayEquals(expecteds, actuals);
     }
 
