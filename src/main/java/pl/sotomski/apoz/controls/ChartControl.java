@@ -367,7 +367,7 @@ public class ChartControl extends LineChart {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.E_RESIZE);
                     menuItem.setText("X:" + data.getX().intValue());
-                    menu.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
+//                    menu.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
                 }
             });
 

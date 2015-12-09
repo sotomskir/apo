@@ -8,7 +8,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
-import pl.sotomski.apoz.commands.MaskCommand;
+import pl.sotomski.apoz.commands.LinearFilterCommand;
 import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.Mask;
@@ -133,13 +133,13 @@ public class TwoStepFilterTool extends VBox {
         if (oneStepRadio.isSelected()) {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
-            manager.executeCommand(new MaskCommand(imagePane, maskM.getData()));
+            manager.executeCommand(new LinearFilterCommand(imagePane, maskM.getData(), 0));
             imagePane.refresh();
         } else if (twoStepRadio.isSelected()) {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
-            manager.executeCommand(new MaskCommand(imagePane, maskF.getData()));
-            manager.executeCommand(new MaskCommand(imagePane, maskG.getData()));
+            manager.executeCommand(new LinearFilterCommand(imagePane, maskF.getData(), 0));
+            manager.executeCommand(new LinearFilterCommand(imagePane, maskG.getData(), 0));
             imagePane.refresh();
         }
     }

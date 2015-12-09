@@ -88,53 +88,109 @@ public class ImageUtils {
     public static int[] get3x3Pixels(byte[] imageData, int i, int channels, int width, int height, int bordersMethod, int neighborhood) {
         if (neighborhood == 0) { // square neighborhood
             int[] pixels = new int[9];
-            try {
-                int wdth = channels * width;
-                int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
-                if (i < wdth) n = wdth;
-                if (i > imageData.length - wdth - channels) s = -wdth;
-                if (x <= channels) w = channels;
-                if (x >= wdth - channels) e = -channels;
-                pixels[0] = imageData[i + n + w - width * channels - channels] & 0xFF;
-                pixels[1] = imageData[i + n - width * channels] & 0xFF;
-                pixels[2] = imageData[i + n + e - width * channels + channels] & 0xFF;
-                pixels[3] = imageData[i + w - channels] & 0xFF;
-                pixels[4] = imageData[i] & 0xFF;
-                pixels[5] = imageData[i + e + channels] & 0xFF;
-                pixels[6] = imageData[i + s + w + width * channels - channels] & 0xFF;
-                pixels[7] = imageData[i + s + width * channels] & 0xFF;
-                pixels[8] = imageData[i + s + e + width * channels + channels] & 0xFF;
-            } catch (IndexOutOfBoundsException e) {
-
-            }
+            int wdth = channels * width;
+            int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
+            if (i < wdth) n = wdth;
+            if (i > imageData.length - wdth - channels) s = -wdth;
+            if (x <= channels) w = channels;
+            if (x >= wdth - channels) e = -channels;
+            pixels[0] = imageData[i + n + w - width * channels - channels] & 0xFF;
+            pixels[1] = imageData[i + n - width * channels] & 0xFF;
+            pixels[2] = imageData[i + n + e - width * channels + channels] & 0xFF;
+            pixels[3] = imageData[i + w - channels] & 0xFF;
+            pixels[4] = imageData[i] & 0xFF;
+            pixels[5] = imageData[i + e + channels] & 0xFF;
+            pixels[6] = imageData[i + s + w + width * channels - channels] & 0xFF;
+            pixels[7] = imageData[i + s + width * channels] & 0xFF;
+            pixels[8] = imageData[i + s + e + width * channels + channels] & 0xFF;
             return pixels;
 
         } else if (neighborhood == 1) { // diamond neighborhood
             int[] pixels = new int[5];
-            try {
-                int wdth = channels * width;
-                int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
-                if (i < wdth) n = wdth;
-                if (i > imageData.length - wdth) s = -wdth;
-                if (x <= channels) w = channels;
-                if (x >= wdth - channels) e = -channels;
-                pixels[0] = imageData[i + n - width * channels] & 0xFF;
-                pixels[1] = imageData[i + e - channels] & 0xFF;
-                pixels[2] = imageData[i] & 0xFF;
-                pixels[3] = imageData[i + w + channels] & 0xFF;
-                pixels[4] = imageData[i + s + width * channels] & 0xFF;
-            } catch (IndexOutOfBoundsException e) {
-
-            }
+            int wdth = channels * width;
+            int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
+            if (i < wdth) n = wdth;
+            if (i > imageData.length - wdth) s = -wdth;
+            if (x <= channels) w = channels;
+            if (x >= wdth - channels) e = -channels;
+            pixels[0] = imageData[i + n - width * channels] & 0xFF;
+            pixels[1] = imageData[i + e - channels] & 0xFF;
+            pixels[2] = imageData[i] & 0xFF;
+            pixels[3] = imageData[i + w + channels] & 0xFF;
+            pixels[4] = imageData[i + s + width * channels] & 0xFF;
             return pixels;
         } else throw new IllegalArgumentException("Illegal neighborhood argument value");
     }
 
-    public static void applyMask(BufferedImage bi, int[] mask) {
+    public static int[] get5x5Pixels(byte[] imageData, int i, int channels, int width, int height, int bordersMethod) {
+        int[] pixels = new int[25];
+        int wdth = channels * width;
+        int[] xy = iToXY(i, width, channels);
+        int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
+        if (i < wdth * 2) n = (i / wdth); //north
+        if (i > imageData.length - 2 * wdth - channels) s = ((imageData.length - i) / wdth + 1); //south
+        if (x < channels * 2) w = x; //west
+        if (x > wdth - channels * 2) e = (wdth - x); //east
+        final int closerFactor = 2 * channels;
+        final int yShift = wdth * channels;
+        final int xShift = channels;
+        pixels[0] =  imageData[i + n + w - yShift*2 - xShift*2] & 0xFF;
+        pixels[1] =  imageData[i + n + w / closerFactor - yShift*2 - xShift] & 0xFF;
+        pixels[2] =  imageData[i + n - yShift*2] & 0xFF;
+        pixels[3] =  imageData[i + n + e / closerFactor - yShift*2 + xShift] & 0xFF;
+        pixels[4] =  imageData[i + n + e - yShift*2 + xShift*2] & 0xFF;
+        pixels[5] =  imageData[i + n / closerFactor + w - yShift - xShift*2] & 0xFF;
+        pixels[6] =  imageData[i + n / closerFactor + w / closerFactor - yShift - xShift] & 0xFF;
+        pixels[7] =  imageData[i + n / closerFactor - yShift] & 0xFF;
+        pixels[8] =  imageData[i + n / closerFactor + e / closerFactor - yShift + xShift] & 0xFF;
+        pixels[9] =  imageData[i + n / closerFactor + e - yShift + xShift*2] & 0xFF;
+        pixels[10] = imageData[i + w - xShift*2] & 0xFF;
+        pixels[11] = imageData[i + w / closerFactor - xShift] & 0xFF;
+        pixels[12] = imageData[i] & 0xFF;
+        pixels[13] = imageData[i + e / closerFactor + xShift] & 0xFF;
+        pixels[14] = imageData[i + e + xShift*2] & 0xFF;
+        pixels[15] = imageData[i + s / closerFactor + w + yShift - xShift*2] & 0xFF;
+        pixels[16] = imageData[i + s / closerFactor + w / closerFactor + yShift - xShift] & 0xFF;
+        pixels[17] = imageData[i + s / closerFactor + yShift] & 0xFF;
+        pixels[18] = imageData[i + s / closerFactor + e / closerFactor + yShift + xShift] & 0xFF;
+        pixels[19] = imageData[i + s / closerFactor + e  + yShift + xShift*2] & 0xFF;
+        pixels[20] = imageData[i + s + w + yShift*2 - xShift*2] & 0xFF;
+        pixels[21] = imageData[i + s + w / closerFactor + yShift*2 - xShift] & 0xFF;
+        pixels[22] = imageData[i + s + yShift*2] & 0xFF;
+        pixels[23] = imageData[i + s + e / closerFactor + yShift*2 + xShift] & 0xFF;
+        pixels[24] = imageData[i + s + e + yShift*2 + xShift*2] & 0xFF;
+        return pixels;
+    }
+
+    public int[] getPixel(BufferedImage image, int x, int y) {
+        byte[] data = getImageData(image);
+        int channels = getImageChannels(image);
+        int i = xyToI(x, y, image.getWidth(), channels);
+        if (channels == 3) {
+            int[] ret = new int[3];
+            ret[0] = data[i] & 0xFF;
+            ret[1] = data[i+1] & 0xFF;
+            ret[2] = data[i+2] & 0xFF;
+            return ret;
+        } else if (channels == 1) {
+            int[] ret = new int[1];
+            ret[0] = data[i] & 0xFF;
+            return ret;
+        } else throw new IllegalArgumentException("Unsupported channels number: " + channels);
+    }
+
+    private int getImageChannels(BufferedImage image) {
+        return image.getColorModel().getNumComponents();
+    }
+
+    public static void applyMask(BufferedImage bi, int[] mask, int bordersMethod) {
         int width = bi.getWidth();
         int height = bi.getHeight();
         int channels = bi.getColorModel().getNumComponents();
-        byte[] a = ((DataBufferByte)bi.getRaster().getDataBuffer()).getData();
+        byte[] a = getImageData(bi);
+        final int bordersWidth = (int) (Math.sqrt(mask.length));
+        BufferedImage tmpImage = new BufferedImage(bi.getWidth() + bordersWidth, bi.getHeight() + bordersWidth, bi.getType());
+        rewriteImage(bi, tmpImage, bordersWidth/2, bordersWidth/2);
         double min = 255, max = 0;
         int multiplier = 0;
         boolean sharpening = false;
@@ -146,7 +202,10 @@ public class ImageUtils {
 
         int[] b = new int[a.length];
         for (int i = width*channels; i < width*height*channels-width*channels; ++i) {
-            int[] pixels = get3x3Pixels(a, i, channels, width, height, (int) Math.sqrt(mask.length), 0);
+            int[] pixels;
+            if (mask.length == 9) pixels = get3x3Pixels(a, i, channels, width, height, (int) Math.sqrt(mask.length), 0);
+            else if (mask.length == 25) pixels = get5x5Pixels(a, i, channels, width, height, (int) Math.sqrt(mask.length));
+            else throw new IllegalArgumentException("Unsupported mask size: " + mask.length);
             double sum = 0;
             for (int p = 0; p < mask.length; ++p) sum += pixels[p] * mask[p];
             int v = (int) (sum / multiplier);
@@ -170,10 +229,21 @@ public class ImageUtils {
 
     }
 
-    public static void rewriteImage(BufferedImage previousImage, BufferedImage image) {
-        byte[] a = ((DataBufferByte)previousImage.getRaster().getDataBuffer()).getData();
-        byte[] b = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
-        System.arraycopy(a, 0, b, 0, a.length);
+    public static void rewriteImage(BufferedImage srcImage, BufferedImage destImage, int xShift, int yShift) {
+        byte[] a = getImageData(srcImage);
+        byte[] b = getImageData(destImage);
+        int channels = srcImage.getColorModel().getNumComponents();
+        if (xShift == 0 && yShift == 0) System.arraycopy(a, 0, b, 0, a.length);
+        else {
+            int[] xy;
+            int srcWidth = srcImage.getWidth();
+            int dstWidth = destImage.getWidth();
+            for (int i = 0; i < a.length; ++i) {
+                xy = iToXY(i, srcWidth, channels);
+                int i2 = xyToI(xy[0] + xShift * channels, xy[1] + yShift * channels, dstWidth, channels);
+                b[i2] = a[i];
+            }
+        }
     }
 
     private static byte[] erode(byte[] a, int channels, int width, int height, int neighborhood) {
@@ -242,47 +312,47 @@ public class ImageUtils {
     }
 
 
-        public static byte[] bitwise_not(byte[] image1) {
-            byte[] b = new byte[image1.length];
-            for (int i = 0; i < image1.length; ++i) {
-                b[i] = (byte) ~(image1[i] & 0xFF);
-            }
-            return b;
+    public static byte[] bitwise_not(byte[] image1) {
+        byte[] b = new byte[image1.length];
+        for (int i = 0; i < image1.length; ++i) {
+            b[i] = (byte) ~(image1[i] & 0xFF);
         }
+        return b;
+    }
 
-        public static byte[] bitwise_and(byte[] image1, byte[] image2) {
-            byte[] b = new byte[image1.length];
-            for (int i = 0; i < image1.length; ++i) {
-                b[i] = (byte) (image1[i] & image2[i]);
-            }
-            return b;
+    public static byte[] bitwise_and(byte[] image1, byte[] image2) {
+        byte[] b = new byte[image1.length];
+        for (int i = 0; i < image1.length; ++i) {
+            b[i] = (byte) (image1[i] & image2[i]);
         }
+        return b;
+    }
 
-        public static byte[] bitwise_or(byte[] image1, byte[] image2){
-            byte[] b = new byte[image1.length];
-            for (int i = 0; i < image1.length; ++i) {
-                b[i] = (byte) (image1[i] | image2[i]);
-            }
-            return b;
+    public static byte[] bitwise_or(byte[] image1, byte[] image2){
+        byte[] b = new byte[image1.length];
+        for (int i = 0; i < image1.length; ++i) {
+            b[i] = (byte) (image1[i] | image2[i]);
         }
+        return b;
+    }
 
-        public static int max(byte[] a) {
-            int max = 0, v;
-            for (byte anA : a) {
-                v = anA & 0xFF;
-                if (v > max) max = v;
-            }
-            return max;
+    public static int max(byte[] a) {
+        int max = 0, v;
+        for (byte anA : a) {
+            v = anA & 0xFF;
+            if (v > max) max = v;
         }
+        return max;
+    }
 
-        public static int min(byte[] a) {
-            int min = 255, v;
-            for (byte anA : a) {
-                v = anA & 0xFF;
-                if (v < min) min = v;
-            }
-            return min;
+    public static int min(byte[] a) {
+        int min = 255, v;
+        for (byte anA : a) {
+            v = anA & 0xFF;
+            if (v < min) min = v;
         }
+        return min;
+    }
 
     public static int countNonZero(byte[] a) {
         int c = 0;
@@ -516,10 +586,11 @@ public class ImageUtils {
         BufferedImage ret = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
         int rgb;
         for (int x = 0; x < ret.getWidth(); ++x)
-        for (int y = 0; y < ret.getHeight(); ++y) {
-            rgb = image.getRGB(x, y);
-            ret.setRGB(x, y, rgb);
-        }
+            for (int y = 0; y < ret.getHeight(); ++y) {
+                rgb = image.getRGB(x, y);
+                ret.setRGB(x, y, rgb);
+            }
         return ret;
     }
+
 }

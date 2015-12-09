@@ -4,6 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static pl.sotomski.apoz.utils.ImageUtils.*;
@@ -24,9 +27,109 @@ public class ImageUtilsTest {
     }
 
     @Test
-    public void testGetPixelNeighbors() {
+    public void rewriteImageTest() {
+        BufferedImage testImage = new BufferedImage(5, 5, BufferedImage.TYPE_BYTE_GRAY);
+        //TODO
+        byte[] a = ImageUtils.getImageData(testImage);
+        Arrays.fill(a, (byte) 1);
+        BufferedImage growedImage = new BufferedImage(testImage.getWidth()+2, testImage.getHeight()+2, testImage.getType());
+        ImageUtils.rewriteImage(testImage, growedImage, 1, 1);
+        byte[] expecteds = new byte[] {
+                0,0,0,0,0,0,0,
+                0,1,1,1,1,1,0,
+                0,1,1,1,1,1,0,
+                0,1,1,1,1,1,0,
+                0,1,1,1,1,1,0,
+                0,1,1,1,1,1,0,
+                0,0,0,0,0,0,0
+        };
+        byte[] actuals = ImageUtils.getImageData(growedImage);
+        assertArrayEquals(expecteds, actuals);
 
+        growedImage = new BufferedImage(testImage.getWidth()+2, testImage.getHeight()+2, testImage.getType());
+        ImageUtils.rewriteImage(testImage, growedImage, 0, 0);
+        expecteds = new byte[] {
+                1,1,1,1,1,0,0,
+                1,1,1,1,1,0,0,
+                1,1,1,1,1,0,0,
+                1,1,1,1,1,0,0,
+                1,1,1,1,1,0,0,
+                0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0
+        };
+        actuals = ImageUtils.getImageData(growedImage);
+        for (int i = 0; i < actuals.length; ++i) System.out.print((int)actuals[i] + ", ");
+        System.out.println();
+        assertArrayEquals(expecteds, actuals);
     }
+
+//    @Test
+//    public void testGet5x5Pixels() {
+//        byte[] imageData1 = new byte[100];
+//        byte[] imageData3 = new byte[300];
+//        for (int i = 0; i < 100; ++i) imageData1[i] = (byte) i;
+//        for (int i = 0; i < 300; ++i) imageData3[i] = (byte) i;
+//
+//        int[] actuals = ImageUtils.get5x5Pixels(imageData1, 22, 1, 10, 10, 0);
+//        int[] expecteds = new int[] {
+//                 0, 1, 2, 3, 4,
+//                10,11,12,13,14,
+//                20,21,22,23,24,
+//                30,31,32,33,34,
+//                40,41,42,43,44
+//        };
+//        assertArrayEquals(expecteds, actuals);
+//
+//        actuals = ImageUtils.get5x5Pixels(imageData1, 11, 1, 10, 10, 0);
+//        expecteds = new int[] {
+//                 0, 0, 1, 2, 3,
+//                 0, 0, 1, 2, 3,
+//                10,10,11,12,13,
+//                20,20,21,22,23,
+//                30,30,31,32,33
+//        };
+//        assertArrayEquals(expecteds, actuals);
+//
+//        actuals = ImageUtils.get5x5Pixels(imageData1, 0, 1, 10, 10, 0);
+//        expecteds = new int[] {
+//                 0, 0, 0, 1, 2,
+//                 0, 0, 0, 1, 2,
+//                 0, 0, 0, 1, 2,
+//                10,10,10,11,12,
+//                20,20,20,21,22
+//        };
+//        assertArrayEquals(expecteds, actuals);
+//
+//        actuals = ImageUtils.get5x5Pixels(imageData1, 77, 1, 10, 10, 0);
+//        expecteds = new int[] {
+//                55,56,57,58,59,
+//                65,66,67,68,69,
+//                75,76,77,78,79,
+//                85,86,87,88,89,
+//                95,96,97,98,99
+//        };
+//        assertArrayEquals(expecteds, actuals);
+//
+//        actuals = ImageUtils.get5x5Pixels(imageData1, 88, 1, 10, 10, 0);
+//        expecteds = new int[] {
+//                66,67,68,69,69,
+//                76,77,78,79,79,
+//                86,87,88,89,89,
+//                96,97,98,99,99,
+//                96,97,98,99,99
+//        };
+//        assertArrayEquals(expecteds, actuals);
+//
+//        actuals = ImageUtils.get5x5Pixels(imageData1, 99, 1, 10, 10, 0);
+//        expecteds = new int[] {
+//                77,78,79,79,79,
+//                87,88,89,89,89,
+//                97,98,99,99,99,
+//                97,98,99,99,99,
+//                97,98,99,99,99
+//        };
+//        assertArrayEquals(expecteds, actuals);
+//    }
 
     @Test
     public void testIToXY() throws Exception {

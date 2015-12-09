@@ -6,7 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
-import pl.sotomski.apoz.commands.MaskCommand;
+import pl.sotomski.apoz.commands.LinearFilterCommand;
 import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.ImagePane;
 
@@ -94,7 +94,7 @@ public class MaskTool extends VBox {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         for (int i = 0; i < 9; ++i) mask[i] = (int) spinners.get(i).getValue();
-        manager.executeCommand(new MaskCommand(imagePane, mask));
+        manager.executeCommand(new LinearFilterCommand(imagePane, mask, 0));
         imagePane.setImage(imagePane.getImage());
     }
 
