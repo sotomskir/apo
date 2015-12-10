@@ -175,8 +175,7 @@ public class ImageUtils {
         final int bordersWidth = (int) (Math.sqrt(mask.length));
 
         //create temporary image with extended borders
-        BufferedImage tmpImage = new BufferedImage(bi.getWidth() + bordersWidth-1, bi.getHeight() + bordersWidth-1, bi.getType());
-        rewriteImage(bi, tmpImage, bordersWidth/2, bordersWidth/2);
+        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
 
         //calculate mask multiplier
         double[] min = new double[channels];
@@ -246,7 +245,7 @@ public class ImageUtils {
         return image.getColorModel().getNumComponents();
     }
 
-    private static int[][] getPixels(BufferedImage image, int diameter, int x, int y) {
+    private static int[][] getPixels(ExtendedBordersImage image, int diameter, int x, int y) {
         int[][] ret = new int[diameter*diameter][];
         int i = 0;
         for (int yi = -diameter/2; yi <= diameter/2; ++yi)
@@ -265,11 +264,10 @@ public class ImageUtils {
             int[] xy;
             int srcWidth = srcImage.getWidth();
             int dstWidth = destImage.getWidth();
-            for (int i = 0; i < a.length; ++i) {
+            for (int i = 0; i < a.length - channels; i+=channels) {
                 xy = iToXY(i, srcWidth, channels);
-                //TODO handle 3 channels
-                int i2 = xyToI(xy[0] + xShift * channels, xy[1] + yShift * channels, dstWidth, channels);
-                b[i2] = a[i];
+                int i2 = xyToI(xy[0] + xShift, xy[1] + yShift, dstWidth, channels);
+                for (int ch = 0; ch < channels; ++ch) b[i2+ch] = a[i+ch];
             }
         }
     }
@@ -621,4 +619,10 @@ public class ImageUtils {
         return ret;
     }
 
+    private static class ExtendedBordersImage extends BufferedImage {
+        public ExtendedBordersImage(BufferedImage image, int bordersWidth, int i) {
+            super(image.getWidth() + bordersWidth - 1, image.getHeight() + bordersWidth - 1, image.getType());
+            rewriteImage(image, this, bordersWidth / 2, bordersWidth / 2);
+        }
+    }
 }

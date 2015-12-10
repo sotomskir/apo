@@ -29,7 +29,6 @@ public class ImageUtilsTest {
     @Test
     public void rewriteImageTest() {
         BufferedImage testImage = new BufferedImage(5, 5, BufferedImage.TYPE_BYTE_GRAY);
-        //TODO
         byte[] a = ImageUtils.getImageData(testImage);
         Arrays.fill(a, (byte) 1);
         BufferedImage growedImage = new BufferedImage(testImage.getWidth()+2, testImage.getHeight()+2, testImage.getType());
