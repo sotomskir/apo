@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LinearFilterCommand;
 import pl.sotomski.apoz.controllers.ToolController;
+import pl.sotomski.apoz.nodes.BordersComboBox;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.Mask;
 
@@ -30,7 +31,7 @@ public class TwoStepFilterTool extends VBox {
     private Mask maskG = new Mask(3);
     private RadioButton oneStepRadio;
     private RadioButton twoStepRadio;
-
+    private BordersComboBox bordersMethodCombo;
 
 
     protected TwoStepFilterTool(ToolController controller) {
@@ -67,6 +68,8 @@ public class TwoStepFilterTool extends VBox {
         twoStepRadio.setToggleGroup(toggleGroup);
         oneStepRadio.setSelected(true);
 
+        bordersMethodCombo = new BordersComboBox(bundle);
+
         Button button = new Button(bundle.getString("Apply"));
         button.setOnAction((actionEvent) -> {
             try {
@@ -75,17 +78,20 @@ public class TwoStepFilterTool extends VBox {
                 e.printStackTrace();
             }
         });
+
         getChildren().addAll(
                 separator,
                 label,
-                new Label("mask 1"),
+                new Label("mask F"),
                 gridPane1,
-                new Label("mask 2"),
+                new Label("mask G"),
                 gridPane2,
-                new Label("mask 3"),
+                new Label("mask M"),
                 gridPane3,
                 oneStepRadio,
                 twoStepRadio,
+                new Label(bundle.getString("extremePixelsMethod")),
+                bordersMethodCombo,
                 button
         );
     }
@@ -148,13 +154,13 @@ public class TwoStepFilterTool extends VBox {
         if (oneStepRadio.isSelected()) {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
-            manager.executeCommand(new LinearFilterCommand(imagePane, maskM.getData(), 0));
+            manager.executeCommand(new LinearFilterCommand(imagePane, maskM.getData(), bordersMethodCombo.getMethod()));
             imagePane.refresh();
         } else if (twoStepRadio.isSelected()) {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
-            manager.executeCommand(new LinearFilterCommand(imagePane, maskF.getData(), 0));
-            manager.executeCommand(new LinearFilterCommand(imagePane, maskG.getData(), 0));
+            manager.executeCommand(new LinearFilterCommand(imagePane, maskF.getData(), bordersMethodCombo.getMethod()));
+            manager.executeCommand(new LinearFilterCommand(imagePane, maskG.getData(), bordersMethodCombo.getMethod()));
             imagePane.refresh();
         }
     }

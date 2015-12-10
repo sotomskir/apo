@@ -430,7 +430,7 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleMaskTool(ActionEvent actionEvent) {
-        addToToolbox(MaskTool.getInstance(this));
+        addToToolbox(LinearFilterTool.getInstance(this));
     }
 
     public void handleBinaryOperationsTool(ActionEvent actionEvent) {
