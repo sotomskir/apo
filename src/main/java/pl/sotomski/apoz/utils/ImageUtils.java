@@ -182,9 +182,9 @@ public class ImageUtils {
         double[] max = new double[channels];
         Arrays.fill(min, 255);
         Arrays.fill(max, 0);
-        int multiplier = 0;
+        int multiplier = arraySum(mask);
         boolean sharpening = false;
-        for (int p = 0; p < mask.length; ++p) multiplier += mask[p];
+
         if (multiplier == 0) {
             sharpening = true;
             multiplier = 1;
@@ -196,18 +196,25 @@ public class ImageUtils {
             for (int x = 0; x < bi.getWidth(); ++x) {
                 int[][] pixels;
                 int diameter = (int) Math.sqrt(mask.length);
-                pixels = getPixels(tmpImage, diameter, x+diameter/2, y+diameter/2);
+                pixels = getPixels(tmpImage, diameter, x+diameter/2, y+diameter/2, bordersMethod);
                 double[] sum = new double[channels];
+                int tmpMultiplier = multiplier;
                 for (int p = 0; p < mask.length; ++p) {
-                    for (int i = 0; i < channels; ++i)
-                        sum[i] += pixels[p][i] * mask[p];
+                    if (pixels[p][0] == -1) {
+                        tmpMultiplier -= mask[p];
+                    } else {
+                        for (int i = 0; i < channels; ++i)
+                            sum[i] += pixels[p][i] * mask[p];
+                    }
                 }
+
                 for (int i = 0; i < channels; ++i) {
-                    int tmp = (int) (sum[i] / multiplier);
+                    int tmp = (int) (sum[i] / tmpMultiplier);
                     if (tmp < min[i]) min[i] = tmp;
                     if (tmp > max[i]) max[i] = tmp;
                     b[xyToI(x, y, width, channels) + i] = tmp;
                 }
+
             }
 
         //scale image levels
@@ -223,6 +230,12 @@ public class ImageUtils {
                 a[i] = (byte) (b[i] < 0 ? 0 : b[i] > 255 ? 255 : b[i]); // skalowanie przez obcinanie
             }
         }
+    }
+
+    private static int arraySum(int[] mask) {
+        int multiplier = 0;
+        for (int aMask : mask) multiplier += aMask;
+        return multiplier;
     }
 
     public static int[] getPixel(BufferedImage image, int x, int y) {
@@ -245,9 +258,23 @@ public class ImageUtils {
         return image.getColorModel().getNumComponents();
     }
 
-    private static int[][] getPixels(ExtendedBordersImage image, int diameter, int x, int y) {
+    /**
+     *
+     * @param image
+     * @param diameter
+     * @param x
+     * @param y
+     * @param bordersMethod 0 fill black
+     *                      1 fill white
+     *                      2 copy borders
+     *                      3 use existing pixels
+     *                      4 dont't change extreme pixels
+     * @return
+     */
+    private static int[][] getPixels(ExtendedBordersImage image, int diameter, int x, int y, int bordersMethod) {
         int[][] ret = new int[diameter*diameter][];
         int i = 0;
+
         for (int yi = -diameter/2; yi <= diameter/2; ++yi)
             for (int xi = -diameter/2; xi <= diameter/2; ++xi)
                 ret[i++] = getPixel(image, xi+x, yi+y);
@@ -620,9 +647,28 @@ public class ImageUtils {
     }
 
     private static class ExtendedBordersImage extends BufferedImage {
-        public ExtendedBordersImage(BufferedImage image, int bordersWidth, int i) {
+        public ExtendedBordersImage(BufferedImage image, int bordersWidth, int borderFillMethod) {
             super(image.getWidth() + bordersWidth - 1, image.getHeight() + bordersWidth - 1, image.getType());
             rewriteImage(image, this, bordersWidth / 2, bordersWidth / 2);
+            fillBorders(this, borderFillMethod);
         }
+
+        /**
+         * Fills borders of image.
+         * @param image
+         * @param borderFillMethod 0 fill black
+         *                         1 fill white
+         *                         2 copy borders
+         *                         3 use existing pixels
+         *                         4 dont't change extreme pixels
+         */
+        private void fillBorders(ExtendedBordersImage image, int borderFillMethod) {
+            switch (borderFillMethod) {
+                case 0:
+
+            }
+        }
+
+
     }
 }
