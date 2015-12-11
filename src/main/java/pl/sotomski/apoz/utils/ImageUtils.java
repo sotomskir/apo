@@ -281,36 +281,58 @@ public class ImageUtils {
      * @return
      */
     private static int[][] getPixels(ExtendedBordersImage image, int diameter, int x, int y, int bordersMethod) {
-        int[][] ret = new int[diameter*diameter][];
+        int[][] ret = new int[diameter*diameter][image.getColorModel().getNumComponents()];
         int i = 0;
-
-        if (bordersMethod == 0 || bordersMethod == 1 || bordersMethod == 2) {
+        boolean flag = false;
+        String[] debug = new String[9];
+        if (bordersMethod == 2 || bordersMethod == 1 || bordersMethod == 0) {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi)
                     ret[i++] = getPixel(image, xi+x, yi+y);
-
+        // 3 use existing pixels
         } else if (bordersMethod == 3) {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi) {
                     int xx = xi + x;
                     int yy = yi + y;
                     if (xx == 0 || xx == image.getWidth()-1 || yy == 0 || yy == image.getHeight()-1) {
-                        ret[i] = new int[image.getColorModel().getNumComponents()];
                         Arrays.fill(ret[i++], -1);
-                    } else ret[i++] = getPixel(image, xx, yy);
+                    } else {
+                        ret[i++] = getPixel(image, xx, yy);
+                    }
                 }
-
+        // 4 don't change extreme pixels
         } else if (bordersMethod == 4) {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi) {
+                    int xx = xi + x;
+                    int yy = yi + y;
                     if (x <= 1 || x >= image.getWidth()-2 || y <= 1 || y >= image.getHeight()-2) {
-                        ret[i] = new int[image.getColorModel().getNumComponents()];
-                        Arrays.fill(ret, -1);
-                        ret[ret.length/2] = getPixel(image, xi + x, yi + y);
-                        return ret;
-                    } else ret[i++] = getPixel(image, xi + x, yi + y);
-                }
+                        for (int[] array : ret) Arrays.fill(array, -1);
+                        flag = true;
+                        ret[ret.length/2] = getPixel(image, x, y);
+                        for (int iii = 0; iii < 9; ++iii) debug[iii] = String.valueOf(ret[iii][0]);
 
+                            System.out.println("X:"+x+" Y:"+y);
+                            for (int xz = 0; xz < 9; ++xz) {
+                                System.out.print(debug[xz] + "; ");
+                                if(xz % 3 == 2) System.out.println();
+                            }
+                            System.out.println();
+                        return ret;
+                    } else {
+                        debug[i] = "X:"+xx+" Y:"+yy+"V:" + getPixel(image, xx, yy)[0];
+                        ret[i++] = getPixel(image, xi + x, yi + y);
+                    }
+                }
+        }
+        if (flag) {
+            System.out.println("X:"+x+" Y:"+y);
+            for (int xz = 0; xz < 9; ++xz) {
+                    System.out.print(debug[xz] + "; ");
+                    if(xz % 3 == 2) System.out.println();
+            }
+            System.out.println();
         }
         return ret;
     }
@@ -325,7 +347,7 @@ public class ImageUtils {
             int[] xy;
             int srcWidth = srcImage.getWidth();
             int dstWidth = destImage.getWidth();
-            for (int i = 0; i < a.length - channels; i+=channels) {
+            for (int i = 0; i < a.length; i+=channels) {
                 xy = iToXY(i, srcWidth, channels);
                 int i2 = xyToI(xy[0] + xShift, xy[1] + yShift, dstWidth, channels);
                 for (int ch = 0; ch < channels; ++ch) b[i2+ch] = a[i+ch];
@@ -705,19 +727,32 @@ public class ImageUtils {
                     fillBordersWithValue(image, bordersWidth, 255);
                     break;
                 case 2:
+                    int width = image.getWidth();
+                    int height = image.getHeight();
+                    // upper border
                     for (int y = 0; y < bordersWidth; ++y)
-                        for (int x = 0; x < image.getWidth(); ++x) setPixel(image, x, y, getPixel(image, x, bordersWidth));
-
-                    for (int y = image.getHeight()-bordersWidth; y < image.getHeight(); ++y)
-                        for (int x = 0; x < image.getWidth(); ++x) setPixel(image, x, y, getPixel(image, x, image.getHeight()-bordersWidth-1));
-
+                        for (int x = 0; x < width; ++x) setPixel(image, x, y, getPixel(image, x, bordersWidth));
+                    // lower border
+                    for (int y = height-bordersWidth; y < height; ++y)
+                        for (int x = 0; x < width; ++x) setPixel(image, x, y, getPixel(image, x, height-bordersWidth-1));
+                    // left border
                     for (int x = 0; x < bordersWidth; ++x)
-                        for (int y = 0; y < image.getHeight(); ++y) setPixel(image, x, y, getPixel(image, bordersWidth, y));
-
-                    for (int x = image.getWidth()-bordersWidth; x < image.getWidth(); ++x)
-                        for (int y = 0; y < image.getHeight(); ++y) setPixel(image, x, y, getPixel(image, image.getWidth()-bordersWidth-1, y));
-                    //TODO fill corners
-
+                        for (int y = 0; y < height; ++y) setPixel(image, x, y, getPixel(image, bordersWidth, y));
+                    // right border
+                    for (int x = width-bordersWidth; x < width; ++x)
+                        for (int y = 0; y < height; ++y) setPixel(image, x, y, getPixel(image, width-bordersWidth-1, y));
+                    // NW corner
+                    for (int x = 0; x < bordersWidth; ++x)
+                        for (int y = 0; y < bordersWidth; ++y) setPixel(image, x, y, getPixel(image, bordersWidth, bordersWidth));
+                    // NE corner
+                    for (int x = width-bordersWidth; x < width; ++x)
+                        for (int y = 0; y < bordersWidth; ++y) setPixel(image, x, y, getPixel(image, width - 1 - bordersWidth, bordersWidth));
+                    // SE corner
+                    for (int x = width-bordersWidth; x < width; ++x)
+                        for (int y = height-bordersWidth; y < height; ++y) setPixel(image, x, y, getPixel(image, width - 1 - bordersWidth, height - 1 - bordersWidth));
+                    // SW corner
+                    for (int x = 0; x < bordersWidth; ++x)
+                        for (int y = height-bordersWidth; y < height; ++y) setPixel(image, x, y, getPixel(image, bordersWidth, height - 1 - bordersWidth));
             }
         }
 
