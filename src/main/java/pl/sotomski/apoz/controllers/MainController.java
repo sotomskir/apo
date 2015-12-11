@@ -1,6 +1,8 @@
 package pl.sotomski.apoz.controllers;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -63,8 +65,9 @@ public class MainController implements Initializable, ToolController {
     @FXML private BorderPane rootLayout;
     @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
     @FXML TabPane tabPane;
-    @FXML private Button undoButton;
-    @FXML private Button redoButton;
+    private final BooleanProperty needsImage = new SimpleBooleanProperty(true);
+    private final BooleanProperty undoUnavailable = new SimpleBooleanProperty(true);
+    private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
 
     /***************************************************************************
      *                                                                         *
@@ -73,6 +76,42 @@ public class MainController implements Initializable, ToolController {
      **************************************************************************/
     public ResourceBundle getBundle() {
         return bundle;
+    }
+
+    public boolean getNeedsImage() {
+        return needsImage.get();
+    }
+
+    public BooleanProperty needsImageProperty() {
+        return needsImage;
+    }
+
+    public void setNeedsImage(boolean needsImage) {
+        this.needsImage.set(needsImage);
+    }
+
+    public boolean getUndoUnavailable() {
+        return undoUnavailable.get();
+    }
+
+    public BooleanProperty undoUnavailableProperty() {
+        return undoUnavailable;
+    }
+
+    public void setUndoUnavailable(boolean undoUnavailable) {
+        this.undoUnavailable.set(undoUnavailable);
+    }
+
+    public boolean getRedoUnavailable() {
+        return redoUnavailable.get();
+    }
+
+    public BooleanProperty redoUnavailableProperty() {
+        return redoUnavailable;
+    }
+
+    public void setRedoUnavailable(boolean redoUnavailable) {
+        this.redoUnavailable.set(redoUnavailable);
     }
 
     @Override public BufferedImage getBufferedImage() {
@@ -89,35 +128,44 @@ public class MainController implements Initializable, ToolController {
      **************************************************************************/
     @Override public void initialize(java.net.URL arg0, ResourceBundle resources) {
         prefs = Preferences.userNodeForPackage(Main.class);
-
         bundle = resources;
         activePaneProperty = new SimpleObjectProperty<>();
         histogramPane = new HistogramPane(bundle);
         histogramPaneContainer.getChildren().add(histogramPane);
         activePaneProperty.addListener(e -> {
-            if (activePaneProperty.getValue().isTabbed()) {
-                histogramPane.update(activePaneProperty.getValue().getImage());
+            if (activePaneProperty.getValue() != null) {
+                if (activePaneProperty.getValue().isTabbed()) {
+                    histogramPane.update(activePaneProperty.getValue().getImage());
+                }
+                zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
             }
-            zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
-            updateUndoRedoListeners();
+            needsImage.setValue(activePaneProperty.getValue() == null);
         });
 
         menuBar.setFocusTraversable(false);
         zoomLabel.setOnInputMethodTextChanged(e -> activePaneProperty.getValue().handleZoomChange(zoomLabel.getText()));
 
-        tabPane.getSelectionModel().selectedItemProperty().addListener(e ->
-        {
-            ImagePane oldActivePane = activePaneProperty.getValue();
-            ImageTab newActiveTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            ImageTab oldActiveTab = (ImageTab) oldValue;
+            ImageTab newActiveTab = (ImageTab) newValue;
 
+            if (oldActiveTab != null) {
+                undoUnavailable.unbind();
+                redoUnavailable.unbind();
+            }
             if (newActiveTab != null) {
                 activePaneProperty.setValue(newActiveTab.getPane());
                 newActiveTab.getPane().imageVersionProperty().addListener(ev -> {
                     updateLabels(activePaneProperty.getValue());
                 });
                 updateLabels(newActiveTab.getPane());
+                undoUnavailable.bind(newActiveTab.getPane().getCommandManager().undoAvailableProperty().not());
+                redoUnavailable.bind(newActiveTab.getPane().getCommandManager().redoAvailableProperty().not());
+            } else {
+                activePaneProperty.setValue(null);
+                undoUnavailable.setValue(true);
+                redoUnavailable.setValue(true);
             }
-
         });
 
         tabPane.focusedProperty().addListener(e -> {
@@ -136,17 +184,6 @@ public class MainController implements Initializable, ToolController {
         labelHeight.setText(bundle.getString("Heigth") + ": " + pane.getImage().getHeight());
     }
 
-    private void updateUndoRedoListeners() {
-        activePaneProperty.getValue().getCommandManager().undoAvailableProperty().addListener(e -> {
-            undoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getUndoAvailable());
-        });
-        activePaneProperty.getValue().getCommandManager().redoAvailableProperty().addListener(e -> {
-            redoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getRedoAvailable());
-        });
-        undoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getUndoAvailable());
-        redoButton.setDisable(!activePaneProperty.getValue().getCommandManager().getRedoAvailable());
-    }
-
     /**
      * Perform functionality associated with "About" menu selection or CTRL-A.
      */
@@ -154,7 +191,7 @@ public class MainController implements Initializable, ToolController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("APOZ");
         alert.setHeaderText(bundle.getString("About"));
-        alert.setContentText(bundle.getString("Author"));
+        alert.setContentText(bundle.getString("Author") + "\nhttps://github.com/sotomskir/apo");
         alert.showAndWait();
     }
 
@@ -393,7 +430,7 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleMaskTool(ActionEvent actionEvent) {
-        addToToolbox(MaskTool.getInstance(this));
+        addToToolbox(LinearFilterTool.getInstance(this));
     }
 
     public void handleBinaryOperationsTool(ActionEvent actionEvent) {
@@ -414,5 +451,9 @@ public class MainController implements Initializable, ToolController {
 
     public void handleGradientMaskTool(ActionEvent actionEvent) {
         addToToolbox(GradientMaskTool.getInstance(this));
+    }
+
+    public void handleTwoStepFilterTool(ActionEvent actionEvent) {
+        addToToolbox(TwoStepFilterTool.getInstance(this));
     }
 }

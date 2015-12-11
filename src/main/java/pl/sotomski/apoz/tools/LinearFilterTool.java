@@ -6,15 +6,16 @@ import javafx.scene.control.*;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
-import pl.sotomski.apoz.commands.MaskCommand;
+import pl.sotomski.apoz.commands.LinearFilterCommand;
 import pl.sotomski.apoz.controllers.ToolController;
+import pl.sotomski.apoz.nodes.BordersComboBox;
 import pl.sotomski.apoz.nodes.ImagePane;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class MaskTool extends VBox {
+public class LinearFilterTool extends VBox {
 
     private static VBox instance;
     private ToolController toolController;
@@ -22,7 +23,8 @@ public class MaskTool extends VBox {
     private String[] masks;
     private int[] mask = new int[9];
     private List<Spinner> spinners;
-        private static int[][] maskTemplates = {
+    private BordersComboBox bordersComboBox;
+    private static int[][] maskTemplates = {
             {1, 1, 1, 1, 1, 1, 1, 1, 1},
             {1, 1, 1, 1, 8, 1, 1, 1, 1},
             {1, 2, 1, 2, 4, 2, 1, 2, 1},
@@ -34,9 +36,9 @@ public class MaskTool extends VBox {
             {1, -2, 1, -2, 5, -2, 1, -2, 1},
             {-1, -1, -1, -1, 9, -1, -1, -1, -1},
             {0, -1, 0, -1, 5, -1, 0, -1, 0}
-        };
+    };
 
-    protected MaskTool(ToolController controller) {
+    protected LinearFilterTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
         masks = new String[11];
         masks[0] = bundle.getString("BlurMask1");
@@ -61,9 +63,9 @@ public class MaskTool extends VBox {
         // create spinners
         spinners = new ArrayList<>();
         for (int x = 0; x < 9; x++) {
-                Spinner<Integer> spinner = new Spinner<>(-9, 9, 1);
-                spinners.add(spinner);
-                tilePane.getChildren().add(spinner);
+            Spinner<Integer> spinner = new Spinner<>(-9, 9, 1);
+            spinners.add(spinner);
+            tilePane.getChildren().add(spinner);
         }
         choiceBox.getItems().addAll(masks);
         choiceBox.getSelectionModel().select(0);
@@ -74,6 +76,9 @@ public class MaskTool extends VBox {
             for (int i = 0; i < 9; ++i) spinners.get(i).getValueFactory().setValue(maskTemplates[selectedMask][i]);
 
         });
+
+        // add other controls
+        bordersComboBox = new BordersComboBox(bundle);
         Button button = new Button(bundle.getString("Apply"));
         button.setOnAction((actionEvent) -> {
             try {
@@ -82,11 +87,11 @@ public class MaskTool extends VBox {
                 e.printStackTrace();
             }
         });
-        getChildren().addAll(separator, label, tilePane, choiceBox, button);
+        getChildren().addAll(separator, label, tilePane, choiceBox, bordersComboBox, button);
     }
 
     public static VBox getInstance(ToolController controller) {
-        if(instance == null) instance = new MaskTool(controller);
+        if(instance == null) instance = new LinearFilterTool(controller);
         return instance;
     }
 
@@ -94,7 +99,7 @@ public class MaskTool extends VBox {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         for (int i = 0; i < 9; ++i) mask[i] = (int) spinners.get(i).getValue();
-        manager.executeCommand(new MaskCommand(imagePane, mask));
+        manager.executeCommand(new LinearFilterCommand(imagePane, mask, bordersComboBox.getMethod()));
         imagePane.setImage(imagePane.getImage());
     }
 

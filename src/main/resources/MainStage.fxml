@@ -12,36 +12,37 @@
             <MenuBar fx:id="menuBar" onKeyPressed="#handleKeyInput">
                 <Menu text="%File">
                     <MenuItem onAction="#handleOpen" text="%Open"/>
-                    <MenuItem onAction="#handleRevert" text="%Revert"/>
-                    <MenuItem onAction="#handleDuplicate" text="%Duplicate"/>
-                    <MenuItem onAction="#handleSave" text="%Save"/>
-                    <MenuItem onAction="#handleSaveAs" text="%SaveAs"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleRevert" text="%Revert"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleDuplicate" text="%Duplicate"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleSave" text="%Save"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleSaveAs" text="%SaveAs"/>
                     <SeparatorMenuItem/>
                     <MenuItem onAction="#handlePreferences" text="%Preferences"/>
                     <SeparatorMenuItem/>
                     <MenuItem onAction="#handleExit" text="%Quit"/>
                 </Menu>
                 <Menu text="%Edit">
-                    <MenuItem onAction="#handleUndo" text="%Undo"/>
-                    <MenuItem onAction="#handleRedo" text="%Redo"/>
+                    <MenuItem disable="${controller.undoUnavailable}" onAction="#handleUndo" text="%Undo"/>
+                    <MenuItem disable="${controller.redoUnavailable}" onAction="#handleRedo" text="%Redo"/>
                 </Menu>
                 <Menu text="%PointOperations">
-                    <MenuItem onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale"/>
-                    <MenuItem onAction="#handleNegativeConversion" text="%NegativeConversion"/>
-                    <MenuItem onAction="#handleHistogramEqualisation" text="%HistogramEqualisation"/>
-                    <MenuItem onAction="#handleThresholding" text="%Thresholding"/>
-                    <MenuItem onAction="#handleIntervalThreshloding" text="%IntervalThresholding"/>
-                    <MenuItem onAction="#handleLevelsReduction" text="%LevelsReduction"/>
-                    <MenuItem onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
-                    <MenuItem onAction="#handleCurves" text="%Curves"/>
-                    <MenuItem onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleNegativeConversion" text="%NegativeConversion"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleHistogramEqualisation" text="%HistogramEqualisation"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleThresholding" text="%Thresholding"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleIntervalThreshloding" text="%IntervalThresholding"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleLevelsReduction" text="%LevelsReduction"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleCurves" text="%Curves"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>
                 </Menu>
                 <Menu text="%NeighborhoodOperations">
-                    <MenuItem onAction="#handleMaskTool" text="%MaskTool"/>
-                    <MenuItem onAction="#handleMedianTool" text="%MedianTool"/>
-                    <MenuItem onAction="#handleLogicalFilterTool" text="%LogicalFilterTool"/>
-                    <MenuItem onAction="#handleGradientMaskTool" text="%GradientMaskTool"/>
-                    <MenuItem onAction="#handleMorphTool" text="%MorphTool"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleMaskTool" text="%MaskTool"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleTwoStepFilterTool" text="%TwoStepFilterTool"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleMedianTool" text="%MedianTool"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleLogicalFilterTool" text="%LogicalFilterTool"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleGradientMaskTool" text="%GradientMaskTool"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleMorphTool" text="%MorphTool"/>
                 </Menu>
                 <Menu text="%Help">
                     <MenuItem disable="true" text="%Search"/>
@@ -63,7 +64,7 @@
                     </graphic>
                 </Button>
 
-                <Button mnemonicParsing="false" onAction="#handleRevert" prefHeight="24.0" prefWidth="24.0">
+                <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleRevert" prefHeight="24.0" prefWidth="24.0">
                     <tooltip>
                         <Tooltip text="%Revert"/>
                     </tooltip>
@@ -74,7 +75,7 @@
                     </graphic>
                 </Button>
 
-                <Button mnemonicParsing="false" onAction="#handleSaveAs">
+                <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleSaveAs">
                     <tooltip>
                         <Tooltip text="%Save"/>
                     </tooltip>
@@ -85,7 +86,7 @@
                     </graphic>
                 </Button>
 
-                <Button fx:id="undoButton" disable="true" mnemonicParsing="false" onAction="#handleUndo">
+                <Button disable="${controller.undoUnavailable}" mnemonicParsing="false" onAction="#handleUndo">
                     <tooltip>
                         <Tooltip text="%Undo"/>
                     </tooltip>
@@ -96,7 +97,7 @@
                     </graphic>
                 </Button>
 
-                <Button fx:id="redoButton" disable="true" mnemonicParsing="false" onAction="#handleRedo">
+                <Button disable="${controller.redoUnavailable}" mnemonicParsing="false" onAction="#handleRedo">
                     <tooltip>
                         <Tooltip text="%Redo"/>
                     </tooltip>
@@ -107,7 +108,7 @@
                     </graphic>
                 </Button>
 
-                <Button mnemonicParsing="false" onAction="#handleDuplicate">
+                <Button disable="${controller.needsImage}"  mnemonicParsing="false" onAction="#handleDuplicate">
                     <tooltip>
                         <Tooltip text="%Duplicate"/>
                     </tooltip>
@@ -129,7 +130,7 @@
                     </graphic>
                 </Button>
 
-                <Button mnemonicParsing="false" onAction="#handleUnpinTab">
+                <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleUnpinTab">
                     <tooltip>
                         <Tooltip text="%Detach"/>
                     </tooltip>
