@@ -6,7 +6,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by sotomski on 01/10/15.
@@ -700,6 +702,74 @@ public class ImageUtils {
                 ret.setRGB(x, y, rgb);
             }
         return ret;
+    }
+
+
+    public static int turtleAlgorithm(BufferedImage image, int objectColor) {
+        // Subroutine to perform chain coding
+        int xStart = -1, yStart = -1;
+        List<Integer> chainCode = new ArrayList<>();
+        final int TMAX = 20000;
+        int N1 = 0;
+        int M1 = 0;
+        int N2 = image.getWidth();
+        int M2 = image.getHeight();
+
+        int x,y,c;
+        int d=0;
+
+        //find starting point
+        for(x=N1;x<N2;++x)
+            for(y=M1;y<M2;++y)
+                if (getPixel(image, x, y)[0] == objectColor) { xStart = x; yStart = y; }
+
+        // Initialization
+        x = xStart; y = yStart;
+        //create chain head and tail
+
+
+        //Main loop. Border is followed.
+        c = 0;
+        do { //Follor border
+            if (getPixel(image, x, y)[0] == objectColor) d=((d+1)%4); else d=((d-1)%4);
+            switch (d) { //translate direction to pixel
+                case 0: x++; break;
+                case 1: y--; break;
+                case 2: x--; break;
+                case 3: y++; break;
+            }
+            //Borders of ROI have been violated
+            if (x<N1 || x>N2 || y<M1 || y>M2) return -93;
+            //Add direction to end of chain
+            if(d>-1)chainCode.add(d);
+            printChainCode(chainCode);
+            //check if turtle follower is running wild
+            if (c++ > TMAX) return -94;
+            // while not back at start point, continue
+        } while (x != xStart || y != yStart);
+        drawLine(image, xStart, yStart, chainCode);
+        return 0;
+    }
+
+    private static void printChainCode(List<Integer> chainCode) {
+        for (Integer d : chainCode) {
+            System.out.print((int)d + ":");
+        }
+        System.out.println();
+
+    }
+
+    private static void drawLine(BufferedImage image, int xStart, int yStart, List<Integer> chainCode) {
+        int x = xStart, y = yStart;
+        for (Integer d : chainCode) {
+            setPixel(image, x, y, new int[]{0,0,255});
+            switch (d) { //translate direction to pixel
+                case 0: x++; break;
+                case 1: y--; break;
+                case 2: x--; break;
+                case 3: y++; break;
+            }
+        }
     }
 
     private static class ExtendedBordersImage extends BufferedImage {

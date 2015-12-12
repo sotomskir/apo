@@ -456,4 +456,8 @@ public class MainController implements Initializable, ToolController {
     public void handleTwoStepFilterTool(ActionEvent actionEvent) {
         addToToolbox(TwoStepFilterTool.getInstance(this));
     }
+
+    public void handleTurtleAlgorithm(ActionEvent actionEvent) {
+        addToToolbox(TurtleAlgorithmTool.getInstance(this));
+    }
 }
