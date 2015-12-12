@@ -8,9 +8,6 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.util.Arrays;
 
-/**
- * Created by sotomski on 01/10/15.
- */
 public class ImageUtils {
     private static final double rPerc = 0.2;
     private static final double gPerc = 0.6;

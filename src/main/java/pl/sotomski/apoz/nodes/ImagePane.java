@@ -7,11 +7,12 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.ImageUtils;
@@ -25,6 +26,7 @@ import java.io.File;
  */
 public class ImagePane extends BorderPane {
 
+    ImageStack imageStack = new ImageStack();
     private ImageView imageView;
     private BufferedImage bufferedImage;
     private IntegerProperty imageVersion;
@@ -43,11 +45,11 @@ public class ImagePane extends BorderPane {
         this.imageVersion = new SimpleIntegerProperty(0);
         this.imageView = new ImageView();
         imageView.setStyle("-fx-background-color: BLACK");
-        VBox p = new VBox(imageView);
+        imageStack.getChildren().add(imageView);
         scrollPane = new ScrollPane();
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        Group groupWrapper = new Group(p);
+        Group groupWrapper = new Group(imageStack);
         groupWrapper.setStyle("-fx-background-color: BLACK");
         scrollPane.setContent(groupWrapper);
         scrollPane.setPickOnBounds(true);
@@ -79,6 +81,10 @@ public class ImagePane extends BorderPane {
         this.histogramPane = histogramPane;
         this.bufferedImage = image;
         refresh();
+    }
+
+    public ImageStack getImageStack() {
+        return imageStack;
     }
 
     public ScrollPane getScrollPane() {
@@ -188,5 +194,20 @@ public class ImagePane extends BorderPane {
 
     public void setTabbed(boolean tabbed) {
         this.tabbed = tabbed;
+    }
+
+    public class ImageStack extends AnchorPane {
+        public ImageStack() {
+            super();
+        }
+
+        public void push(Node node) {
+            getChildren().add(node);
+        }
+
+        public void clear() {
+            getChildren().clear();
+            getChildren().add(imageView);
+        }
     }
 }
