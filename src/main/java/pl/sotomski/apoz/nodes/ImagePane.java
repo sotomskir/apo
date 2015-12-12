@@ -1,5 +1,6 @@
 package pl.sotomski.apoz.nodes;
 
+import com.sun.javafx.geom.Rectangle;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -8,11 +9,15 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.shape.Line;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.ImageUtils;
@@ -195,6 +200,81 @@ public class ImagePane extends BorderPane {
     public void setTabbed(boolean tabbed) {
         this.tabbed = tabbed;
     }
+
+    public void mouseDraggedLine(MouseEvent mouseEvent, Line l) {
+        double newX = mouseEvent.getX();
+        double newY = mouseEvent.getY();
+        double maxX = getWidth();
+        double maxY = getHeight();
+        if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
+            l.setEndX(newX);
+            l.setEndY(newY);
+        }
+    }
+
+    public void enableProfileLineSelection() {
+        Line l = new Line();
+        System.out.println("Enable mouse events on:"+hashCode());
+
+        setOnMousePressed(mouseEvent -> {
+            getImageStack().push(l);
+            l.setStartX(mouseEvent.getX());
+            l.setStartY(mouseEvent.getY());
+            l.setEndX(mouseEvent.getX());
+            l.setEndY(mouseEvent.getY());
+            System.out.println("Mouse pressed X:"+ l.getStartX()+" Y:"+l.getStartY()+" source:"+mouseEvent.getSource().hashCode());
+        });
+
+
+        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, l));
+        setOnMouseReleased(mouseEvent -> getImageStack().clear());
+    }
+
+    private void mouseDraggedRect(MouseEvent mouseEvent, Canvas canvas, Rectangle r) {
+        double newX = mouseEvent.getX();
+        double newY = mouseEvent.getY();
+        double maxX = getScene().getWidth();
+        double maxY = getScene().getHeight();
+        if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            gc.clearRect(r.x, r.y, r.width, r.height);
+            r.width = (int) (newX);
+            r.height = (int) (newY);
+            gc.clearRect(0,0,canvas.getWidth(), canvas.getHeight());
+            drawRect(gc, r.x, r.y, r.width, r.height);
+        }
+    }
+
+    public void enableCropSelection() {
+        final Rectangle r = new Rectangle();
+        Canvas canvas = new Canvas(getWidth(), getHeight());
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        System.out.println("Enable mouse events on:"+hashCode());
+
+        setOnMousePressed(mouseEvent -> {
+            getImageStack().push(canvas);
+            r.x = (int) mouseEvent.getX();
+            r.y = (int) mouseEvent.getY();
+            r.width = (int) mouseEvent.getX();;
+            r.height = (int) mouseEvent.getY();;
+            System.out.println("Mouse pressed X:"+ r.x+" Y:"+r.y+" source:"+mouseEvent.getSource().hashCode());
+        });
+
+        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedRect(event, canvas, r));
+
+        setOnMouseReleased(mouseEvent -> {
+            gc.clearRect(0,0,canvas.getWidth(), canvas.getHeight());
+            getImageStack().clear();
+        });
+    }
+
+    private void drawRect(GraphicsContext gc, int x1, int y1, int x2, int y2) {
+        int xMin, xMax, yMin, yMax;
+        if (x1 < x2) { xMin = x1; xMax = x2; } else { xMin = x2; xMax = x1; }
+        if (y1 < y2) { yMin = y1; yMax = y2; } else { yMin = y2; yMax = y1; }
+        gc.strokeRect(xMin, yMin, xMax-xMin, yMax-yMin);
+    }
+
 
     public class ImageStack extends AnchorPane {
         public ImageStack() {

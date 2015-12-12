@@ -164,6 +164,17 @@
                     </graphic>
                 </ToggleButton>
 
+                <ToggleButton disable="${controller.needsImage}" fx:id="profileLineButton" mnemonicParsing="false" onAction="#handleProfileLineTool">
+                    <tooltip>
+                        <Tooltip text="%ProfileLine"/>
+                    </tooltip>
+                    <graphic>
+                        <!--<ImageView fitWidth="24" preserveRatio="true">-->
+                            <!--<Image url="@icons/Stock_Index_Up.png"/>-->
+                        <!--</ImageView>-->
+                    </graphic>
+                </ToggleButton>
+
             </ToolBar>
         </VBox>
     </top>

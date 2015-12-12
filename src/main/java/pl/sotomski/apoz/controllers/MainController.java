@@ -1,6 +1,5 @@
 package pl.sotomski.apoz.controllers;
 
-import com.sun.javafx.geom.Rectangle;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -12,11 +11,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.InputEvent;
@@ -72,6 +68,7 @@ public class MainController implements Initializable, ToolController {
     @FXML TabPane tabPane;
     @FXML private ToggleButton pointerButton;
     @FXML private ToggleButton cropButton;
+    @FXML private ToggleButton profileLineButton;
     private final BooleanProperty needsImage = new SimpleBooleanProperty(true);
     private final BooleanProperty undoUnavailable = new SimpleBooleanProperty(true);
     private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
@@ -187,6 +184,7 @@ public class MainController implements Initializable, ToolController {
         ToggleGroup pointersToggleGroup = new ToggleGroup();
         pointerButton.setToggleGroup(pointersToggleGroup);
         cropButton.setToggleGroup(pointersToggleGroup);
+        profileLineButton.setToggleGroup(pointersToggleGroup);
         pointerButton.setSelected(true);
     }
 
@@ -216,51 +214,6 @@ public class MainController implements Initializable, ToolController {
     private void addToToolbox(VBox tool) {
         toolbox.getChildren().clear();
         toolbox.getChildren().add(tool);
-    }
-
-    public void enableCropSelection(Node node) {
-        final Rectangle r = new Rectangle();
-        Canvas canvas = new Canvas(getActivePaneProperty().getWidth(), getActivePaneProperty().getHeight());
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        System.out.println("Enable mouse events on:"+node.hashCode());
-
-        node.setOnMousePressed(mouseEvent -> {
-            getActivePaneProperty().getImageStack().push(canvas);
-            r.x = (int) mouseEvent.getX();
-            r.y = (int) mouseEvent.getY();
-            r.width = (int) mouseEvent.getX();;
-            r.height = (int) mouseEvent.getY();;
-            System.out.println("Mouse pressed X:"+ r.x+" Y:"+r.y+" source:"+mouseEvent.getSource().hashCode());
-        });
-
-        // TODO Why this is not working
-        node.setOnMouseDragged(mouseEvent -> {
-            System.out.println("Mouse dragged");
-            double newX = mouseEvent.getX();
-            double newY = mouseEvent.getY();
-            double maxX = node.getScene().getWidth();
-            double maxY = node.getScene().getHeight();
-            if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
-                gc.clearRect(r.x, r.y, r.width, r.height);
-                r.width = (int) (newX);
-                r.height = (int) (newY);
-                gc.clearRect(0,0,canvas.getWidth(), canvas.getHeight());
-                drawRect(gc, r.x, r.y, r.width, r.height);
-            }
-        });
-
-        node.setOnMouseReleased(mouseEvent -> {
-            System.out.println("Mouse released Rect:"+r.x+","+r.y+";"+r.width+","+r.height);
-            gc.clearRect(0,0,canvas.getWidth(), canvas.getHeight());
-            getActivePaneProperty().getImageStack().clear();
-        });
-    }
-
-    private void drawRect(GraphicsContext gc, int x1, int y1, int x2, int y2) {
-        int xMin, xMax, yMin, yMax;
-        if (x1 < x2) { xMin = x1; xMax = x2; } else { xMin = x2; xMax = x1; }
-        if (y1 < y2) { yMin = y1; yMax = y2; } else { yMin = y2; yMax = y1; }
-        gc.strokeRect(xMin, yMin, xMax-xMin, yMax-yMin);
     }
 
     /***************************************************************************
@@ -516,10 +469,16 @@ public class MainController implements Initializable, ToolController {
 
     public void handleCropTool(ActionEvent actionEvent) {
         rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
-        enableCropSelection(getActivePaneProperty());
+        getActivePaneProperty().enableCropSelection();
     }
 
     public void handlePointerTool(ActionEvent actionEvent) {
         rootLayout.getScene().setCursor(Cursor.DEFAULT);
     }
+
+    public void handleProfileLineTool(ActionEvent actionEvent) {
+        rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
+        getActivePaneProperty().enableProfileLineSelection();
+    }
+
 }
