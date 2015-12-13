@@ -1,7 +1,6 @@
-package pl.sotomski.apoz.controls;
+package pl.sotomski.apoz.nodes;
 
 import javafx.beans.property.DoubleProperty;
-import pl.sotomski.apoz.controls.ChartControl;
 
 /**
  * Created by sotomski on 28/10/15.

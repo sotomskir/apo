@@ -1,4 +1,4 @@
-package pl.sotomski.apoz.controls;
+package pl.sotomski.apoz.nodes;
 
 import javafx.animation.Interpolator;
 import javafx.beans.binding.Bindings;

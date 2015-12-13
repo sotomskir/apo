@@ -17,7 +17,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.shape.Line;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.ImageUtils;
@@ -201,33 +200,34 @@ public class ImagePane extends BorderPane {
         this.tabbed = tabbed;
     }
 
-    public void mouseDraggedLine(MouseEvent mouseEvent, Line l) {
-        double newX = mouseEvent.getX();
-        double newY = mouseEvent.getY();
-        double maxX = getWidth();
-        double maxY = getHeight();
-        if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
-            l.setEndX(newX);
-            l.setEndY(newY);
+    public void mouseDraggedLine(MouseEvent mouseEvent, ProfileLine l) {
+        if (!l.isPressed()) {
+            double newX = mouseEvent.getX();
+            double newY = mouseEvent.getY();
+            double maxX = getWidth();
+            double maxY = getHeight();
+            if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
+                l.setEndPoint(newX, newY);
+            }
         }
     }
 
     public void enableProfileLineSelection() {
-        Line l = new Line();
+        ProfileLine l = new ProfileLine();
         System.out.println("Enable mouse events on:"+hashCode());
 
         setOnMousePressed(mouseEvent -> {
-            getImageStack().push(l);
-            l.setStartX(mouseEvent.getX());
-            l.setStartY(mouseEvent.getY());
-            l.setEndX(mouseEvent.getX());
-            l.setEndY(mouseEvent.getY());
-            System.out.println("Mouse pressed X:"+ l.getStartX()+" Y:"+l.getStartY()+" source:"+mouseEvent.getSource().hashCode());
+            if (!l.isHoverEndpoint()) {
+                if (!getImageStack().contains(l)) getImageStack().push(l);
+                l.setStartPoint(mouseEvent.getX(), mouseEvent.getY());
+                l.setEndPoint(mouseEvent.getX(), mouseEvent.getY());
+                System.out.println("Mouse pressed X:" + l.getStartX() + " Y:" + l.getStartY() + " source:" + mouseEvent.getSource().getClass().getName());
+            }
         });
 
-
         addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, l));
-        setOnMouseReleased(mouseEvent -> getImageStack().clear());
+
+//        setOnMouseReleased(mouseEvent -> getImageStack().clear());
     }
 
     private void mouseDraggedRect(MouseEvent mouseEvent, Canvas canvas, Rectangle r) {
@@ -275,7 +275,6 @@ public class ImagePane extends BorderPane {
         gc.strokeRect(xMin, yMin, xMax-xMin, yMax-yMin);
     }
 
-
     public class ImageStack extends AnchorPane {
         public ImageStack() {
             super();
@@ -288,6 +287,10 @@ public class ImagePane extends BorderPane {
         public void clear() {
             getChildren().clear();
             getChildren().add(imageView);
+        }
+
+        public boolean contains(Node node) {
+            return getChildren().contains(node);
         }
     }
 }
