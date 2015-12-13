@@ -40,6 +40,7 @@ public class ImagePane extends BorderPane {
     private File file;
     private ScrollPane scrollPane;
     private boolean tabbed;
+    ProfileLine profileLine;
 
     private ImagePane() {
         super();
@@ -110,6 +111,10 @@ public class ImagePane extends BorderPane {
 
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    public ProfileLine getProfileLine() {
+        return profileLine;
     }
 
     public void setFitHeight(double fitHeight) {
@@ -213,21 +218,29 @@ public class ImagePane extends BorderPane {
     }
 
     public void enableProfileLineSelection() {
-        ProfileLine l = new ProfileLine();
+        profileLine = new ProfileLine();
+        histogramPane.updateProfileLineChart(getImage(), profileLine);
         System.out.println("Enable mouse events on:"+hashCode());
 
         setOnMousePressed(mouseEvent -> {
-            if (!l.isHoverEndpoint()) {
-                if (!getImageStack().contains(l)) getImageStack().push(l);
-                l.setStartPoint(mouseEvent.getX(), mouseEvent.getY());
-                l.setEndPoint(mouseEvent.getX(), mouseEvent.getY());
-                System.out.println("Mouse pressed X:" + l.getStartX() + " Y:" + l.getStartY() + " source:" + mouseEvent.getSource().getClass().getName());
+            if (!profileLine.isHoverEndpoint()) {
+                if (!getImageStack().contains(profileLine)) getImageStack().push(profileLine);
+                profileLine.setStartPoint(mouseEvent.getX(), mouseEvent.getY());
+                profileLine.setEndPoint(mouseEvent.getX(), mouseEvent.getY());
+                System.out.println("Mouse pressed X:" + profileLine.getStartX() + " Y:" + profileLine.getStartY() + " source:" + mouseEvent.getSource().getClass().getName());
             }
         });
 
-        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, l));
+        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, profileLine));
 
-//        setOnMouseReleased(mouseEvent -> getImageStack().clear());
+        setOnMouseReleased(mouseEvent -> histogramPane.updateProfileLineChart(getImage(), profileLine));
+    }
+
+    public void enablePointerSelection() {
+        setOnMousePressed(event -> {});
+        setOnMouseReleased(event -> {});
+        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
+        getImageStack().clear();
     }
 
     private void mouseDraggedRect(MouseEvent mouseEvent, Canvas canvas, Rectangle r) {

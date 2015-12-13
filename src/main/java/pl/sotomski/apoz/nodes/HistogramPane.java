@@ -4,10 +4,11 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.charts.CumulativeHistogramChart;
-import pl.sotomski.apoz.charts.LineProfileChart;
+import pl.sotomski.apoz.charts.ProfileLineChart;
 import pl.sotomski.apoz.charts.MonoHistogramChart;
 import pl.sotomski.apoz.charts.RGBHistogramChart;
 import pl.sotomski.apoz.utils.Histogram;
+import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.util.ResourceBundle;
@@ -20,7 +21,7 @@ public class HistogramPane extends TabPane {
     private RGBHistogramChart rgbHistogramChart;
     private MonoHistogramChart monoHistogramChart;
     private CumulativeHistogramChart cumulativeHistogramChart;
-    private LineProfileChart lineProfileChart;
+    private ProfileLineChart profileLineChart;
 
     public HistogramPane(ResourceBundle bundle) {
         super();
@@ -32,11 +33,11 @@ public class HistogramPane extends TabPane {
         rgbHistogramChart = new RGBHistogramChart();
         monoHistogramChart = new MonoHistogramChart();
         cumulativeHistogramChart = new CumulativeHistogramChart();
-        lineProfileChart = new LineProfileChart();
+        profileLineChart = new ProfileLineChart();
         VBox histogramPane = new VBox(monoHistogramChart);
         VBox rgbHistogramPane = new VBox(rgbHistogramChart);
         VBox cumulativeHistogramPane = new VBox(cumulativeHistogramChart);
-        VBox lineProfilePane = new VBox(lineProfileChart);
+        VBox lineProfilePane = new VBox(profileLineChart);
         tab1.setContent(histogramPane);
         tab2.setContent(rgbHistogramPane);
         tab3.setContent(cumulativeHistogramPane);
@@ -49,7 +50,13 @@ public class HistogramPane extends TabPane {
         rgbHistogramChart.update(histogram);
         monoHistogramChart.update(histogram);
         cumulativeHistogramChart.update(histogram);
-        lineProfileChart.update(histogram);
     }
 
+    public void updateProfileLineChart(BufferedImage image, ProfileLine line) {
+        profileLineChart.update(ImageUtils.getLineProfilePixels(image, line));
+    }
+
+    public ProfileLineChart getProfileLineChart() {
+        return profileLineChart;
+    }
 }

@@ -1,6 +1,8 @@
 package pl.sotomski.apoz.nodes;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -13,15 +15,18 @@ import javafx.scene.shape.Line;
 public class ProfileLine extends Group {
     Line line;
     Endpoint startPoint, endPoint;
+    IntegerProperty changed = new SimpleIntegerProperty();
 
     public ProfileLine() {
         super();
         line = new Line();
+        line.setStroke(Color.RED);
         startPoint = new Endpoint(line.startXProperty(), line.startYProperty());
         endPoint = new Endpoint(line.endXProperty(), line.endYProperty());
         this.getChildren().addAll(line, endPoint, startPoint);
         startPoint.enableDrag();
         endPoint.enableDrag();
+        changed.setValue(0);
     }
 
     public void setStartPoint(double startPointX, double startPointY) {
@@ -34,6 +39,14 @@ public class ProfileLine extends Group {
         endPoint.setCenterY(endPointY);
     }
 
+    public Endpoint getStartPoint() {
+        return startPoint;
+    }
+
+    public Endpoint getEndPoint() {
+        return endPoint;
+    }
+
     public double getStartX() {
         return line.getStartX();
     }
@@ -42,8 +55,54 @@ public class ProfileLine extends Group {
         return line.getStartY();
     }
 
+    public double getEndX() {
+        return line.getEndX();
+    }
+
+    public double getEndY() {
+        return line.getEndY();
+    }
+
+    public int getChanged() {
+        return changed.get();
+    }
+
+    public IntegerProperty changedProperty() {
+        return changed;
+    }
+
+    public int[][] getLinePoints() {
+        int minX, maxX;
+        if (getEndX() > getStartX()) { minX = (int) getStartX(); maxX = (int) getEndX(); }
+        else { minX = (int) getEndX(); maxX = (int) getStartX(); }
+        int size = maxX - minX;
+        int[][] points = new int [size][2];
+        double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
+        for (int x = minX; x < maxX; ++x) {
+            points[x-minX][0] = x;
+            points[x-minX][1] = (int) (slope * ((double) x - getEndX()) + getEndY());
+        }
+        return points;
+    }
+
     public boolean isHoverEndpoint() {
         return endPoint.isHover() || startPoint.isHover();
+    }
+
+    public DoubleProperty startXProperty() {
+        return line.startXProperty();
+    }
+
+    public DoubleProperty startYProperty() {
+        return line.startYProperty();
+    }
+
+    public DoubleProperty endXProperty() {
+        return line.startXProperty();
+    }
+
+    public DoubleProperty endYProperty() {
+        return line.startYProperty();
     }
 
     private class Endpoint extends Circle {
@@ -51,10 +110,9 @@ public class ProfileLine extends Group {
             super(x.getValue(), y.getValue(), 4);
             x.bind(centerXProperty());
             y.bind(centerYProperty());
-            this.setStroke(Color.BLACK);
+            this.setStroke(Color.RED);
             this.setFill(Color.rgb(222, 222, 222));
         }
-
 
         public void enableDrag() {
             final Delta dragDelta = new Delta();
@@ -70,6 +128,8 @@ public class ProfileLine extends Group {
             setOnMouseReleased(mouseEvent -> {
                 System.out.println("Released " + this.getClass().getName());
                 getScene().setCursor(Cursor.DEFAULT);
+                changed.set(getChanged()+1);
+
             });
 
             setOnMouseDragged(mouseEvent -> {
@@ -93,7 +153,6 @@ public class ProfileLine extends Group {
                 getScene().setCursor(Cursor.DEFAULT);
                 System.out.println("Exited " + this.getClass().getName());
             });
-
             // records relative x and y co-ordinates.
         }
 

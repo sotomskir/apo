@@ -474,11 +474,15 @@ public class MainController implements Initializable, ToolController {
 
     public void handlePointerTool(ActionEvent actionEvent) {
         rootLayout.getScene().setCursor(Cursor.DEFAULT);
+        getActivePaneProperty().enablePointerSelection();
     }
 
     public void handleProfileLineTool(ActionEvent actionEvent) {
         rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
         getActivePaneProperty().enableProfileLineSelection();
+//        getActivePaneProperty().getProfileLine().changedProperty().addListener(observable -> {
+//            getActivePaneProperty().getHistogramPane().getProfileLineChart().update(getActivePaneProperty().getImage());
+//        });
     }
 
 }
