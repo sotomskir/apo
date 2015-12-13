@@ -1,5 +1,6 @@
 package pl.sotomski.apoz.nodes;
 
+import com.sun.javafx.geom.Rectangle;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -7,11 +8,15 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.ImageUtils;
@@ -25,6 +30,7 @@ import java.io.File;
  */
 public class ImagePane extends BorderPane {
 
+    ImageStack imageStack = new ImageStack();
     private ImageView imageView;
     private BufferedImage bufferedImage;
     private IntegerProperty imageVersion;
@@ -34,6 +40,7 @@ public class ImagePane extends BorderPane {
     private File file;
     private ScrollPane scrollPane;
     private boolean tabbed;
+    ProfileLine profileLine;
 
     private ImagePane() {
         super();
@@ -43,11 +50,11 @@ public class ImagePane extends BorderPane {
         this.imageVersion = new SimpleIntegerProperty(0);
         this.imageView = new ImageView();
         imageView.setStyle("-fx-background-color: BLACK");
-        VBox p = new VBox(imageView);
+        imageStack.getChildren().add(imageView);
         scrollPane = new ScrollPane();
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        Group groupWrapper = new Group(p);
+        Group groupWrapper = new Group(imageStack);
         groupWrapper.setStyle("-fx-background-color: BLACK");
         scrollPane.setContent(groupWrapper);
         scrollPane.setPickOnBounds(true);
@@ -81,6 +88,10 @@ public class ImagePane extends BorderPane {
         refresh();
     }
 
+    public ImageStack getImageStack() {
+        return imageStack;
+    }
+
     public ScrollPane getScrollPane() {
         return scrollPane;
     }
@@ -100,6 +111,10 @@ public class ImagePane extends BorderPane {
 
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    public ProfileLine getProfileLine() {
+        return profileLine;
     }
 
     public void setFitHeight(double fitHeight) {
@@ -188,5 +203,107 @@ public class ImagePane extends BorderPane {
 
     public void setTabbed(boolean tabbed) {
         this.tabbed = tabbed;
+    }
+
+    public void mouseDraggedLine(MouseEvent mouseEvent, ProfileLine l) {
+        if (!l.isPressed()) {
+            double newX = mouseEvent.getX();
+            double newY = mouseEvent.getY();
+            double maxX = getWidth();
+            double maxY = getHeight();
+            if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
+                l.setEndPoint(newX, newY);
+            }
+        }
+    }
+
+    public void enableProfileLineSelection() {
+        profileLine = new ProfileLine();
+        histogramPane.updateProfileLineChart(getImage(), profileLine);
+        System.out.println("Enable mouse events on:"+hashCode());
+
+        setOnMousePressed(mouseEvent -> {
+            if (!profileLine.isHoverEndpoint()) {
+                if (!getImageStack().contains(profileLine)) getImageStack().push(profileLine);
+                profileLine.setStartPoint(mouseEvent.getX(), mouseEvent.getY());
+                profileLine.setEndPoint(mouseEvent.getX(), mouseEvent.getY());
+                System.out.println("Mouse pressed X:" + profileLine.getStartX() + " Y:" + profileLine.getStartY() + " source:" + mouseEvent.getSource().getClass().getName());
+            }
+        });
+
+        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, profileLine));
+
+        setOnMouseReleased(mouseEvent -> histogramPane.updateProfileLineChart(getImage(), profileLine));
+    }
+
+    public void enablePointerSelection() {
+        setOnMousePressed(event -> {});
+        setOnMouseReleased(event -> {});
+        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
+        getImageStack().clear();
+    }
+
+    private void mouseDraggedRect(MouseEvent mouseEvent, Canvas canvas, Rectangle r) {
+        double newX = mouseEvent.getX();
+        double newY = mouseEvent.getY();
+        double maxX = getScene().getWidth();
+        double maxY = getScene().getHeight();
+        if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            gc.clearRect(r.x, r.y, r.width, r.height);
+            r.width = (int) (newX);
+            r.height = (int) (newY);
+            gc.clearRect(0,0,canvas.getWidth(), canvas.getHeight());
+            drawRect(gc, r.x, r.y, r.width, r.height);
+        }
+    }
+
+    public void enableCropSelection() {
+        final Rectangle r = new Rectangle();
+        Canvas canvas = new Canvas(getWidth(), getHeight());
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        System.out.println("Enable mouse events on:"+hashCode());
+
+        setOnMousePressed(mouseEvent -> {
+            getImageStack().push(canvas);
+            r.x = (int) mouseEvent.getX();
+            r.y = (int) mouseEvent.getY();
+            r.width = (int) mouseEvent.getX();;
+            r.height = (int) mouseEvent.getY();;
+            System.out.println("Mouse pressed X:"+ r.x+" Y:"+r.y+" source:"+mouseEvent.getSource().hashCode());
+        });
+
+        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedRect(event, canvas, r));
+
+        setOnMouseReleased(mouseEvent -> {
+            gc.clearRect(0,0,canvas.getWidth(), canvas.getHeight());
+            getImageStack().clear();
+        });
+    }
+
+    private void drawRect(GraphicsContext gc, int x1, int y1, int x2, int y2) {
+        int xMin, xMax, yMin, yMax;
+        if (x1 < x2) { xMin = x1; xMax = x2; } else { xMin = x2; xMax = x1; }
+        if (y1 < y2) { yMin = y1; yMax = y2; } else { yMin = y2; yMax = y1; }
+        gc.strokeRect(xMin, yMin, xMax-xMin, yMax-yMin);
+    }
+
+    public class ImageStack extends AnchorPane {
+        public ImageStack() {
+            super();
+        }
+
+        public void push(Node node) {
+            getChildren().add(node);
+        }
+
+        public void clear() {
+            getChildren().clear();
+            getChildren().add(imageView);
+        }
+
+        public boolean contains(Node node) {
+            return getChildren().contains(node);
+        }
     }
 }

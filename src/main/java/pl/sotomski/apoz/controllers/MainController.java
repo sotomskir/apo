@@ -10,6 +10,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -65,6 +66,9 @@ public class MainController implements Initializable, ToolController {
     @FXML private BorderPane rootLayout;
     @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
     @FXML TabPane tabPane;
+    @FXML private ToggleButton pointerButton;
+    @FXML private ToggleButton cropButton;
+    @FXML private ToggleButton profileLineButton;
     private final BooleanProperty needsImage = new SimpleBooleanProperty(true);
     private final BooleanProperty undoUnavailable = new SimpleBooleanProperty(true);
     private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
@@ -176,6 +180,12 @@ public class MainController implements Initializable, ToolController {
         labels.setMinHeight(Control.USE_PREF_SIZE);
         histogramPaneContainer.setMinHeight(Control.USE_PREF_SIZE);
         toolboxScrollPane.setFitToHeight(true);
+
+        ToggleGroup pointersToggleGroup = new ToggleGroup();
+        pointerButton.setToggleGroup(pointersToggleGroup);
+        cropButton.setToggleGroup(pointersToggleGroup);
+        profileLineButton.setToggleGroup(pointersToggleGroup);
+        pointerButton.setSelected(true);
     }
 
     private void updateLabels(ImagePane pane) {
@@ -456,4 +466,23 @@ public class MainController implements Initializable, ToolController {
     public void handleTwoStepFilterTool(ActionEvent actionEvent) {
         addToToolbox(TwoStepFilterTool.getInstance(this));
     }
+
+    public void handleCropTool(ActionEvent actionEvent) {
+        rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
+        getActivePaneProperty().enableCropSelection();
+    }
+
+    public void handlePointerTool(ActionEvent actionEvent) {
+        rootLayout.getScene().setCursor(Cursor.DEFAULT);
+        getActivePaneProperty().enablePointerSelection();
+    }
+
+    public void handleProfileLineTool(ActionEvent actionEvent) {
+        rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
+        getActivePaneProperty().enableProfileLineSelection();
+//        getActivePaneProperty().getProfileLine().changedProperty().addListener(observable -> {
+//            getActivePaneProperty().getHistogramPane().getProfileLineChart().update(getActivePaneProperty().getImage());
+//        });
+    }
+
 }

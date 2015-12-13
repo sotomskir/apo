@@ -1,6 +1,7 @@
 package pl.sotomski.apoz.utils;
 
 import pl.sotomski.apoz.nodes.ImagePane;
+import pl.sotomski.apoz.nodes.ProfileLine;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -8,13 +9,20 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 import java.util.Arrays;
 
-/**
- * Created by sotomski on 01/10/15.
- */
 public class ImageUtils {
     private static final double rPerc = 0.2;
     private static final double gPerc = 0.6;
     private static final double bPerc = 0.2;
+
+    public static int[][] getLineProfilePixels(BufferedImage image, ProfileLine line) {
+        int channels = image.getColorModel().getNumComponents();
+        int[][] points = line.getLinePoints();
+        int[][] pixels = new int[points.length][channels];
+        for (int i = 0; i < points.length; ++i) {
+            pixels[i] = getPixel(image, points[i][0], points[i][1]);
+        }
+        return pixels;
+    }
 
     public static BufferedImage rgbToGrayscale(BufferedImage bufferedImage){
         int channels = bufferedImage.getColorModel().getNumComponents();
@@ -247,14 +255,14 @@ public class ImageUtils {
         return ret;
     }
 
-    private static void setPixel(BufferedImage image, int x, int y, int[] pixel) {
+    public static void setPixel(BufferedImage image, int x, int y, int[] pixel) {
         byte[] data = getImageData(image);
         int channels = getImageChannels(image);
         int i = xyToI(x, y, image.getWidth(), channels);
         for (int c = 0; c < channels; ++c) data[i + c] = (byte) pixel[c];
     }
 
-    private static void setPixel(BufferedImage image, int x, int y, int value) {
+    public static void setPixel(BufferedImage image, int x, int y, int value) {
         int[] pixel = new int[image.getColorModel().getNumComponents()];
         Arrays.fill(pixel, value);
         byte[] data = getImageData(image);
@@ -289,7 +297,7 @@ public class ImageUtils {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi)
                     ret[i++] = getPixel(image, xi+x, yi+y);
-        // 3 use existing pixels
+            // 3 use existing pixels
         } else if (bordersMethod == 3) {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi) {
@@ -301,7 +309,7 @@ public class ImageUtils {
                         ret[i++] = getPixel(image, xx, yy);
                     }
                 }
-        // 4 don't change extreme pixels
+            // 4 don't change extreme pixels
         } else if (bordersMethod == 4) {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi) {
@@ -313,12 +321,12 @@ public class ImageUtils {
                         ret[ret.length/2] = getPixel(image, x, y);
                         for (int iii = 0; iii < 9; ++iii) debug[iii] = String.valueOf(ret[iii][0]);
 
-                            System.out.println("X:"+x+" Y:"+y);
-                            for (int xz = 0; xz < 9; ++xz) {
-                                System.out.print(debug[xz] + "; ");
-                                if(xz % 3 == 2) System.out.println();
-                            }
-                            System.out.println();
+                        System.out.println("X:"+x+" Y:"+y);
+                        for (int xz = 0; xz < 9; ++xz) {
+                            System.out.print(debug[xz] + "; ");
+                            if(xz % 3 == 2) System.out.println();
+                        }
+                        System.out.println();
                         return ret;
                     } else {
                         debug[i] = "X:"+xx+" Y:"+yy+"V:" + getPixel(image, xx, yy)[0];
@@ -329,8 +337,8 @@ public class ImageUtils {
         if (flag) {
             System.out.println("X:"+x+" Y:"+y);
             for (int xz = 0; xz < 9; ++xz) {
-                    System.out.print(debug[xz] + "; ");
-                    if(xz % 3 == 2) System.out.println();
+                System.out.print(debug[xz] + "; ");
+                if(xz % 3 == 2) System.out.println();
             }
             System.out.println();
         }

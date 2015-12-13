@@ -1,7 +1,9 @@
 package pl.sotomski.apoz.commands;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.Cursor;
 import pl.sotomski.apoz.nodes.ImagePane;
 
 import java.util.Stack;
@@ -25,17 +27,22 @@ public class CommandManager {
     }
 
     public void executeCommand(Command command) {
-        long startTime = System.currentTimeMillis();
-        command.execute();
-        long stopTime = System.currentTimeMillis();
-        System.out.println(command.getClass() + ": " + (stopTime-startTime));
-        undoStack.push(command);
-        undoAvailable.setValue(true);
-        if (redoStack.size()>0) {
-            redoStack.clear();
-            redoAvailable.setValue(false);
-        }
-        imagePane.refresh();
+        imagePane.getScene().setCursor(Cursor.WAIT);
+        Platform.runLater(() -> {
+            imagePane.getScene().setCursor(Cursor.WAIT);
+            long startTime = System.currentTimeMillis();
+            command.execute();
+            long stopTime = System.currentTimeMillis();
+            System.out.println(command.getClass() + ": " + (stopTime-startTime));
+            undoStack.push(command);
+            undoAvailable.setValue(true);
+            if (redoStack.size()>0) {
+                redoStack.clear();
+                redoAvailable.setValue(false);
+            }
+            imagePane.refresh();
+        });
+        imagePane.getScene().setCursor(Cursor.DEFAULT);
     }
 
     public void undo() {

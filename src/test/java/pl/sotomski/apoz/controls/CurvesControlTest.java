@@ -3,8 +3,7 @@ package pl.sotomski.apoz.controls;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
+import pl.sotomski.apoz.nodes.CurvesControl;
 
 /**
  * Created by sotomski on 11/5/15.

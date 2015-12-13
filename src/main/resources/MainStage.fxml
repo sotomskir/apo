@@ -24,6 +24,7 @@
                 <Menu text="%Edit">
                     <MenuItem disable="${controller.undoUnavailable}" onAction="#handleUndo" text="%Undo"/>
                     <MenuItem disable="${controller.redoUnavailable}" onAction="#handleRedo" text="%Redo"/>
+                    <MenuItem disable="${controller.needsImage}" onAction="#handleCropTool" text="%Crop"/>
                 </Menu>
                 <Menu text="%PointOperations">
                     <MenuItem disable="${controller.needsImage}" onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale"/>
@@ -140,6 +141,39 @@
                         </ImageView>
                     </graphic>
                 </Button>
+
+                <ToggleButton disable="${controller.needsImage}" fx:id="pointerButton" mnemonicParsing="false" onAction="#handlePointerTool">
+                    <tooltip>
+                        <Tooltip text="%Pointer"/>
+                    </tooltip>
+                    <graphic>
+                        <!--<ImageView fitWidth="24" preserveRatio="true">-->
+                            <!--<Image url="@icons/Stock_Index_Up.png"/>-->
+                        <!--</ImageView>-->
+                    </graphic>
+                </ToggleButton>
+
+                <ToggleButton disable="${controller.needsImage}" fx:id="cropButton" mnemonicParsing="false" onAction="#handleCropTool">
+                    <tooltip>
+                        <Tooltip text="%Crop"/>
+                    </tooltip>
+                    <graphic>
+                        <!--<ImageView fitWidth="24" preserveRatio="true">-->
+                            <!--<Image url="@icons/Stock_Index_Up.png"/>-->
+                        <!--</ImageView>-->
+                    </graphic>
+                </ToggleButton>
+
+                <ToggleButton disable="${controller.needsImage}" fx:id="profileLineButton" mnemonicParsing="false" onAction="#handleProfileLineTool">
+                    <tooltip>
+                        <Tooltip text="%ProfileLine"/>
+                    </tooltip>
+                    <graphic>
+                        <!--<ImageView fitWidth="24" preserveRatio="true">-->
+                            <!--<Image url="@icons/Stock_Index_Up.png"/>-->
+                        <!--</ImageView>-->
+                    </graphic>
+                </ToggleButton>
 
             </ToolBar>
         </VBox>

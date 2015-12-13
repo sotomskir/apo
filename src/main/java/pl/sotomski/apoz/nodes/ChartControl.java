@@ -1,7 +1,6 @@
-package pl.sotomski.apoz.controls;
+package pl.sotomski.apoz.nodes;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;

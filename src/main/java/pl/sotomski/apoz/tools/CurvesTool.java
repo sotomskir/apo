@@ -10,7 +10,7 @@ import javafx.scene.layout.HBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.controllers.ToolController;
-import pl.sotomski.apoz.controls.CurvesControl;
+import pl.sotomski.apoz.nodes.CurvesControl;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.ImageUtils;
 
