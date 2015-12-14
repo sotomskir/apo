@@ -129,7 +129,6 @@ public class ProfileLine extends Group {
                 System.out.println("Released " + this.getClass().getName());
                 getScene().setCursor(Cursor.DEFAULT);
                 changed.set(getChanged()+1);
-
             });
 
             setOnMouseDragged(mouseEvent -> {
