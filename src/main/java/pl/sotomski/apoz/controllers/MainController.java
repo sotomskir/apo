@@ -186,6 +186,9 @@ public class MainController implements Initializable, ToolController {
         cropButton.setToggleGroup(pointersToggleGroup);
         profileLineButton.setToggleGroup(pointersToggleGroup);
         pointerButton.setSelected(true);
+        final String os = System.getProperty ("os.name");
+        if (os != null && os.startsWith ("Mac"))
+            menuBar.useSystemMenuBarProperty ().set (true);
     }
 
     private void updateLabels(ImagePane pane) {
