@@ -1,5 +1,6 @@
 package pl.sotomski.apoz.utils;
 
+import pl.sotomski.apoz.nodes.CropRectangle;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.nodes.ProfileLine;
 
@@ -708,6 +709,14 @@ public class ImageUtils {
                 ret.setRGB(x, y, rgb);
             }
         return ret;
+    }
+
+    public static BufferedImage crop(BufferedImage image, CropRectangle cropRectangle) {
+        int width = (int) cropRectangle.getWidth();
+        int height = (int) cropRectangle.getHeight();
+        int x = (int) cropRectangle.getX();
+        int y = (int) cropRectangle.getY();
+        return image.getSubimage(x, y, width, height);
     }
 
     private static class ExtendedBordersImage extends BufferedImage {
