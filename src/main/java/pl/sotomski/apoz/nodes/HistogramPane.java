@@ -42,7 +42,6 @@ public class HistogramPane extends TabPane {
         tab2.setContent(rgbHistogramPane);
         tab3.setContent(cumulativeHistogramPane);
         tab4.setContent(lineProfilePane);
-
     }
 
     public void update(BufferedImage image) {
