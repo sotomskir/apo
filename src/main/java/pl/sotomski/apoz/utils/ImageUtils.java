@@ -7,7 +7,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ImageUtils {
     private static final double rPerc = 0.2;
@@ -271,7 +273,7 @@ public class ImageUtils {
         for (int c = 0; c < channels; ++c) data[i + c] = (byte) pixel[c];
     }
 
-    private static int getImageChannels(BufferedImage image) {
+    public static int getImageChannels(BufferedImage image) {
         return image.getColorModel().getNumComponents();
     }
 
@@ -709,6 +711,96 @@ public class ImageUtils {
             }
         return ret;
     }
+
+
+    public static int turtleAlgorithm(BufferedImage image) {
+        int objectColor = getPixel(image, 0, 0)[0] < 128 ? 255 : 0;
+        // Subroutine to perform chain coding
+        int xStart = -1, yStart = -1;
+        List<Integer> chainCode = new ArrayList<>();
+        final int TMAX = 20000;
+        int N1 = 0;
+        int M1 = 0;
+        int N2 = image.getWidth();
+        int M2 = image.getHeight();
+
+        int x,y,c;
+        int d=0;
+
+        //find starting point
+        outerloop:
+        for(y=M1;y<M2;++y)
+            for(x=N1;x<N2;++x)
+                if (getPixel(image, x, y)[0] == objectColor) {
+                    xStart = x; yStart = y;
+                    break outerloop;
+                }
+
+        // Initialization
+        x = xStart; y = yStart;
+        //create chain head and tail
+
+
+        //Main loop. Border is followed.
+        c = 0;
+        do { //Follow border
+            if (getPixel(image, x, y)[0] == objectColor) d=(modulus((d+1), 4)); else d=(modulus((d-1), 4));
+            switch (d) { //translate direction to pixel
+                case 0: x++; break;
+                case 1: y--; break;
+                case 2: x--; break;
+                case 3: y++; break;
+            }
+            //Borders of ROI have been violated
+            if (x<N1 || x>N2 || y<M1 || y>M2) return -93;
+            //Add direction to end of chain
+            if(d>-1)chainCode.add(d);
+//            printChainCode(chainCode);
+            //check if turtle follower is running wild
+            if (c++ > TMAX) return -94;
+            // while not back at start point, continue
+        } while (x != xStart || y != yStart);
+        drawLine(image, xStart, yStart, chainCode);
+        return 0;
+    }
+
+    private static void printChainCode(List<Integer> chainCode) {
+        for (Integer d : chainCode) {
+            System.out.print((int)d + ":");
+        }
+        System.out.println();
+
+    }
+
+    private static void drawLine(BufferedImage image, int xStart, int yStart, List<Integer> chainCode) {
+        int x = xStart, y = yStart;
+        for (Integer d : chainCode) {
+            setPixel(image, x, y, new int[] {0,0,255});
+            switch (d) { //translate direction to pixel
+                case 0: x++; break;
+                case 1: y--; break;
+                case 2: x--; break;
+                case 3: y++; break;
+            }
+        }
+    }
+
+    public static void printImage(BufferedImage image) {
+        byte[] a = getImageData(image);
+        int width = image.getWidth();
+        for (int i = 0; i < a.length; ++i) {
+            int value = a[i] & 0xFF;
+            System.out.print(value);
+            if (i % width == width-1) {
+                System.out.println();
+            } else System.out.print(":");
+        }
+    }
+
+    public static int modulus(int a, int b) {
+        return (a % b + b) % b;
+    }
+
 
     private static class ExtendedBordersImage extends BufferedImage {
         public ExtendedBordersImage(BufferedImage image, int bordersWidth, int borderFillMethod) {

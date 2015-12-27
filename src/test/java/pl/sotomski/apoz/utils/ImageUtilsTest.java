@@ -130,7 +130,7 @@ public class ImageUtilsTest {
 //    }
 
     @Test
-    public void testIToXY() throws Exception {
+    public void IToXYTest() throws Exception {
         final int width = 10;
         int[] xy;
         xy = ImageUtils.iToXY(101, width, 1);
@@ -150,7 +150,7 @@ public class ImageUtilsTest {
     }
 
     @Test
-    public void testXyToI() throws Exception {
+    public void XyToITest() throws Exception {
         final int width = 10;
         int i;
         i = ImageUtils.xyToI(0, 0, width, 1);
@@ -176,7 +176,7 @@ public class ImageUtilsTest {
     }
 
     @Test
-    public void testI1ToI2() throws Exception {
+    public void I1ToI2Test() throws Exception {
         final int width1 = 10;
         final int width2 = 15;
         int i2;
@@ -199,7 +199,7 @@ public class ImageUtilsTest {
 
 
     @Test
-    public void testBitwise_not() throws Exception {
+    public void Bitwise_notTest() throws Exception {
         byte[] c = new byte[2];
         byte[] e = new byte[2];
         c[0] = (byte)0;
@@ -214,7 +214,7 @@ public class ImageUtilsTest {
     }
 
     @Test
-    public void testBitwise_and() throws Exception {
+    public void Bitwise_andTest() throws Exception {
         byte[] c = new byte[4];
         byte[] d = new byte[4];
         c[0] = (byte)0;
@@ -240,7 +240,7 @@ public class ImageUtilsTest {
     }
 
     @Test
-    public void testBitwise_or() throws Exception {
+    public void Bitwise_orTest() throws Exception {
         byte[] c = new byte[4];
         byte[] d = new byte[4];
         c[0] = (byte)0;
@@ -266,7 +266,7 @@ public class ImageUtilsTest {
     }
 
     @Test
-    public void testMax() throws Exception {
+    public void MaxTest() throws Exception {
         byte[] c = new byte[4];
         c[0] = (byte)255;
         c[1] = (byte)0;
@@ -280,7 +280,7 @@ public class ImageUtilsTest {
     }
 
     @Test
-    public void testMin() throws Exception {
+    public void MinTest() throws Exception {
         byte[] c = new byte[4];
         c[0] = (byte)255;
         c[1] = (byte)0;
@@ -326,5 +326,29 @@ public class ImageUtilsTest {
         expecteds = new int[][] {{4}, {4}, {3}, {3}, {2}, {2}, {1}, {1}, {0}, {0}};
         for (int i = 0; i < actuals.length; ++i)
             assertArrayEquals(expecteds[i], actuals[i]);
+    }
+
+    @Test
+    public void turtleAlgorithmTest() throws Exception {
+        BufferedImage image = new BufferedImage(9, 9, BufferedImage.TYPE_BYTE_GRAY);
+        byte[] a = getImageData(image);
+        Arrays.fill(a, (byte) 0);
+        ImageUtils.setPixel(image, 3, 3, 255);
+        ImageUtils.setPixel(image, 4, 3, 255);
+        ImageUtils.setPixel(image, 5, 3, 255);
+        ImageUtils.setPixel(image, 3, 4, 255);
+        ImageUtils.setPixel(image, 4, 4, 255);
+        ImageUtils.setPixel(image, 5, 4, 255);
+        ImageUtils.setPixel(image, 3, 5, 255);
+        ImageUtils.setPixel(image, 4, 5, 255);
+        ImageUtils.setPixel(image, 5, 5, 255);
+        printImage(image);
+
+        turtleAlgorithm(image, 255);
+
+        printImage(image);
+        assertEquals(3, (-1 % 4 + 4) % 4);
+        assertEquals(3, modulus(-1, 4));
+
     }
 }

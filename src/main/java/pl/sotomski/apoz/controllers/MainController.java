@@ -28,6 +28,7 @@ import pl.sotomski.apoz.Main;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.ConvertToGrayCommand;
 import pl.sotomski.apoz.commands.NegativeCommand;
+import pl.sotomski.apoz.commands.TurtleAlgorithmCommand;
 import pl.sotomski.apoz.nodes.HistogramPane;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.nodes.ImageTab;
@@ -485,4 +486,9 @@ public class MainController implements Initializable, ToolController {
         getActivePaneProperty().enableProfileLineSelection();
     }
 
+
+    public void handleTurtleAlgorithm(ActionEvent actionEvent) {
+        CommandManager manager = getActivePaneProperty().getCommandManager();
+        manager.executeCommand(new TurtleAlgorithmCommand(getActivePaneProperty()));
+    }
 }
