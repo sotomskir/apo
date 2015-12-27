@@ -8,17 +8,15 @@ import pl.sotomski.apoz.utils.ImageUtils;
  */
 public class TurtleAlgorithmCommand extends UndoableCommand implements Command {
     private ImagePane imagePane;
-    int objectColor;
 
-    public TurtleAlgorithmCommand(ImagePane imagePane, int objectColor) {
+    public TurtleAlgorithmCommand(ImagePane imagePane) {
         super(imagePane);
         this.imagePane = imagePane;
-        this.objectColor = objectColor;
     }
 
     @Override
     public void execute() {
-        ImageUtils.turtleAlgorithm(imagePane.getImage(), objectColor);
+        ImageUtils.turtleAlgorithm(imagePane.getImage());
     }
 
 }

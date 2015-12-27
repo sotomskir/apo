@@ -249,14 +249,14 @@ public class ImageUtils {
         return ret;
     }
 
-    private static void setPixel(BufferedImage image, int x, int y, int[] pixel) {
+    public static void setPixel(BufferedImage image, int x, int y, int[] pixel) {
         byte[] data = getImageData(image);
         int channels = getImageChannels(image);
         int i = xyToI(x, y, image.getWidth(), channels);
         for (int c = 0; c < channels; ++c) data[i + c] = (byte) pixel[c];
     }
 
-    private static void setPixel(BufferedImage image, int x, int y, int value) {
+    public static void setPixel(BufferedImage image, int x, int y, int value) {
         int[] pixel = new int[image.getColorModel().getNumComponents()];
         Arrays.fill(pixel, value);
         byte[] data = getImageData(image);
@@ -265,7 +265,7 @@ public class ImageUtils {
         for (int c = 0; c < channels; ++c) data[i + c] = (byte) pixel[c];
     }
 
-    private static int getImageChannels(BufferedImage image) {
+    public static int getImageChannels(BufferedImage image) {
         return image.getColorModel().getNumComponents();
     }
 
@@ -291,7 +291,7 @@ public class ImageUtils {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi)
                     ret[i++] = getPixel(image, xi+x, yi+y);
-        // 3 use existing pixels
+            // 3 use existing pixels
         } else if (bordersMethod == 3) {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi) {
@@ -303,7 +303,7 @@ public class ImageUtils {
                         ret[i++] = getPixel(image, xx, yy);
                     }
                 }
-        // 4 don't change extreme pixels
+            // 4 don't change extreme pixels
         } else if (bordersMethod == 4) {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi) {
@@ -315,12 +315,12 @@ public class ImageUtils {
                         ret[ret.length/2] = getPixel(image, x, y);
                         for (int iii = 0; iii < 9; ++iii) debug[iii] = String.valueOf(ret[iii][0]);
 
-                            System.out.println("X:"+x+" Y:"+y);
-                            for (int xz = 0; xz < 9; ++xz) {
-                                System.out.print(debug[xz] + "; ");
-                                if(xz % 3 == 2) System.out.println();
-                            }
-                            System.out.println();
+                        System.out.println("X:"+x+" Y:"+y);
+                        for (int xz = 0; xz < 9; ++xz) {
+                            System.out.print(debug[xz] + "; ");
+                            if(xz % 3 == 2) System.out.println();
+                        }
+                        System.out.println();
                         return ret;
                     } else {
                         debug[i] = "X:"+xx+" Y:"+yy+"V:" + getPixel(image, xx, yy)[0];
@@ -331,8 +331,8 @@ public class ImageUtils {
         if (flag) {
             System.out.println("X:"+x+" Y:"+y);
             for (int xz = 0; xz < 9; ++xz) {
-                    System.out.print(debug[xz] + "; ");
-                    if(xz % 3 == 2) System.out.println();
+                System.out.print(debug[xz] + "; ");
+                if(xz % 3 == 2) System.out.println();
             }
             System.out.println();
         }
@@ -705,7 +705,8 @@ public class ImageUtils {
     }
 
 
-    public static int turtleAlgorithm(BufferedImage image, int objectColor) {
+    public static int turtleAlgorithm(BufferedImage image) {
+        int objectColor = getPixel(image, 0, 0)[0] < 128 ? 255 : 0;
         // Subroutine to perform chain coding
         int xStart = -1, yStart = -1;
         List<Integer> chainCode = new ArrayList<>();
@@ -719,9 +720,13 @@ public class ImageUtils {
         int d=0;
 
         //find starting point
-        for(x=N1;x<N2;++x)
-            for(y=M1;y<M2;++y)
-                if (getPixel(image, x, y)[0] == objectColor) { xStart = x; yStart = y; }
+        outerloop:
+        for(y=M1;y<M2;++y)
+            for(x=N1;x<N2;++x)
+                if (getPixel(image, x, y)[0] == objectColor) {
+                    xStart = x; yStart = y;
+                    break outerloop;
+                }
 
         // Initialization
         x = xStart; y = yStart;
@@ -730,8 +735,8 @@ public class ImageUtils {
 
         //Main loop. Border is followed.
         c = 0;
-        do { //Follor border
-            if (getPixel(image, x, y)[0] == objectColor) d=((d+1)%4); else d=((d-1)%4);
+        do { //Follow border
+            if (getPixel(image, x, y)[0] == objectColor) d=(modulus((d+1), 4)); else d=(modulus((d-1), 4));
             switch (d) { //translate direction to pixel
                 case 0: x++; break;
                 case 1: y--; break;
@@ -742,7 +747,7 @@ public class ImageUtils {
             if (x<N1 || x>N2 || y<M1 || y>M2) return -93;
             //Add direction to end of chain
             if(d>-1)chainCode.add(d);
-            printChainCode(chainCode);
+//            printChainCode(chainCode);
             //check if turtle follower is running wild
             if (c++ > TMAX) return -94;
             // while not back at start point, continue
@@ -762,7 +767,7 @@ public class ImageUtils {
     private static void drawLine(BufferedImage image, int xStart, int yStart, List<Integer> chainCode) {
         int x = xStart, y = yStart;
         for (Integer d : chainCode) {
-            setPixel(image, x, y, new int[]{0,0,255});
+            setPixel(image, x, y, new int[] {0,0,255});
             switch (d) { //translate direction to pixel
                 case 0: x++; break;
                 case 1: y--; break;
@@ -771,6 +776,23 @@ public class ImageUtils {
             }
         }
     }
+
+    public static void printImage(BufferedImage image) {
+        byte[] a = getImageData(image);
+        int width = image.getWidth();
+        for (int i = 0; i < a.length; ++i) {
+            int value = a[i] & 0xFF;
+            System.out.print(value);
+            if (i % width == width-1) {
+                System.out.println();
+            } else System.out.print(":");
+        }
+    }
+
+    public static int modulus(int a, int b) {
+        return (a % b + b) % b;
+    }
+
 
     private static class ExtendedBordersImage extends BufferedImage {
         public ExtendedBordersImage(BufferedImage image, int bordersWidth, int borderFillMethod) {
