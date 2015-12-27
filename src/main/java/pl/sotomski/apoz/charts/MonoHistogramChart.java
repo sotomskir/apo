@@ -1,5 +1,6 @@
 package pl.sotomski.apoz.charts;
 
+import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -20,11 +21,28 @@ public class MonoHistogramChart extends BarChart<String, Number> {
 //        series.getNode().getStyleClass().add("series-mono");
         this.getData().add(series);
         applyStyle();
+        setupHover(series);
     }
 
     public void update(Histogram histogram) {
 //        xAxis.setUpperBound(levels-1);
         for (int i=0;i<histogram.getLevels();++i) data[i].setYValue(histogram.getMono()[i]);
+    }
+
+    private void setupHover(Series<String, Number> series) {
+        for (Data<String, Number> data : series.getData()) {
+            Node n = data.getNode();
+            n.setOnMouseEntered(e -> {
+                n.setStyle("-fx-bar-fill: blue;");
+            });
+            n.setOnMouseExited(e -> {
+                n.setStyle("-fx-bar-fill: red;");
+            });
+            n.setOnMouseClicked(e -> {
+                System.out.println("openDetailsScreen(<selected Bar>)");
+                System.out.println(data.getXValue() + " : " + data.getYValue());
+            });
+        }
     }
 
     private void applyStyle() {

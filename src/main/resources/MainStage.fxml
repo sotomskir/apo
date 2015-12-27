@@ -148,7 +148,7 @@
                     </tooltip>
                     <graphic>
                         <!--<ImageView fitWidth="24" preserveRatio="true">-->
-                            <!--<Image url="@icons/Stock_Index_Up.png"/>-->
+                        <!--<Image url="@icons/Stock_Index_Up.png"/>-->
                         <!--</ImageView>-->
                     </graphic>
                 </ToggleButton>
@@ -159,7 +159,7 @@
                     </tooltip>
                     <graphic>
                         <!--<ImageView fitWidth="24" preserveRatio="true">-->
-                            <!--<Image url="@icons/Stock_Index_Up.png"/>-->
+                        <!--<Image url="@icons/Stock_Index_Up.png"/>-->
                         <!--</ImageView>-->
                     </graphic>
                 </ToggleButton>
@@ -170,7 +170,7 @@
                     </tooltip>
                     <graphic>
                         <!--<ImageView fitWidth="24" preserveRatio="true">-->
-                            <!--<Image url="@icons/Stock_Index_Up.png"/>-->
+                        <!--<Image url="@icons/Stock_Index_Up.png"/>-->
                         <!--</ImageView>-->
                     </graphic>
                 </ToggleButton>
@@ -197,11 +197,11 @@
                     </padding>
 
                     <VBox fx:id="histogramPaneContainer">
-                    <padding>
-                        <Insets bottom="10.0" left="0.0" right ="10.0" top="0.0"/>
-                    </padding>
-
+                        <padding>
+                            <Insets bottom="10.0" left="0.0" right ="10.0" top="0.0"/>
+                        </padding>
                     </VBox>
+
                     <HBox fx:id="labels">
                         <VBox>
                             <Label fx:id="labelDepth" text="%Depth"/>

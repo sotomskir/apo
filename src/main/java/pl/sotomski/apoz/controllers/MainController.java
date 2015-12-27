@@ -478,6 +478,7 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleProfileLineTool(ActionEvent actionEvent) {
+        histogramPane.selectProfileLineChart();
         rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
         getActivePaneProperty().enableProfileLineSelection();
 //        getActivePaneProperty().getProfileLine().changedProperty().addListener(observable -> {

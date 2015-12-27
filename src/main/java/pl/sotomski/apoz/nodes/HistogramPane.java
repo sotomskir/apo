@@ -22,14 +22,15 @@ public class HistogramPane extends TabPane {
     private MonoHistogramChart monoHistogramChart;
     private CumulativeHistogramChart cumulativeHistogramChart;
     private ProfileLineChart profileLineChart;
+    Tab profileLineTab;
 
     public HistogramPane(ResourceBundle bundle) {
         super();
         Tab tab1 = new Tab(bundle.getString("monoHistogram"));
         Tab tab2 = new Tab(bundle.getString("rgbHistogram"));
         Tab tab3 = new Tab(bundle.getString("cumulativeHistogram"));
-        Tab tab4 = new Tab(bundle.getString("lineProfile"));
-        this.getTabs().addAll(tab1, tab2, tab3, tab4);
+        profileLineTab = new Tab(bundle.getString("lineProfile"));
+        this.getTabs().addAll(tab1, tab2, tab3, profileLineTab);
         rgbHistogramChart = new RGBHistogramChart();
         monoHistogramChart = new MonoHistogramChart();
         cumulativeHistogramChart = new CumulativeHistogramChart();
@@ -41,8 +42,7 @@ public class HistogramPane extends TabPane {
         tab1.setContent(histogramPane);
         tab2.setContent(rgbHistogramPane);
         tab3.setContent(cumulativeHistogramPane);
-        tab4.setContent(lineProfilePane);
-
+        profileLineTab.setContent(lineProfilePane);
     }
 
     public void update(BufferedImage image) {
@@ -58,5 +58,9 @@ public class HistogramPane extends TabPane {
 
     public ProfileLineChart getProfileLineChart() {
         return profileLineChart;
+    }
+
+    public void selectProfileLineChart() {
+        getSelectionModel().select(profileLineTab);
     }
 }
