@@ -8,4 +8,5 @@ addons:
       - oracle-java8-installer
 install: mvn clean compile
 script:
+  - mvn test
   - mvn clean compile assembly:single

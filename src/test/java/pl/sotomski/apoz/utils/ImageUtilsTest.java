@@ -294,7 +294,7 @@ public class ImageUtilsTest {
     }
 
     @Test
-    public void testGetLineProfilePixels() throws Exception {
+    public void GetLineProfilePixelsTest() throws Exception {
         // Create 10x10 gradient image
         BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_BYTE_GRAY);
         for (int x = 0; x < 10; ++x)
@@ -344,7 +344,7 @@ public class ImageUtilsTest {
         ImageUtils.setPixel(image, 5, 5, 255);
         printImage(image);
 
-        turtleAlgorithm(image, 255);
+        turtleAlgorithm(image);
 
         printImage(image);
         assertEquals(3, (-1 % 4 + 4) % 4);

@@ -20,7 +20,7 @@ public class LUTCommand extends UndoableCommand implements Command {
     @Override
     public void execute() {
         BufferedImage image = imagePane.getImage();
-        if (image.getColorModel().getNumComponents() > 1) ImageUtils.rgbToGrayscale(image);
+        if (image.getColorModel().getNumComponents() > 1) image = ImageUtils.rgbToGrayscale(image);
         int width = image.getWidth();
         int height = image.getHeight();
         BufferedImage binaryImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);

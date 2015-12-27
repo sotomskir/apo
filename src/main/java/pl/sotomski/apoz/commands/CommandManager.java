@@ -3,7 +3,6 @@ package pl.sotomski.apoz.commands;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.Cursor;
 import pl.sotomski.apoz.nodes.ImagePane;
 
 import java.util.Stack;
@@ -27,9 +26,9 @@ public class CommandManager {
     }
 
     public void executeCommand(Command command) {
-        imagePane.getScene().setCursor(Cursor.WAIT);
+//        imagePane.getScene().setCursor(Cursor.WAIT);
         Platform.runLater(() -> {
-            imagePane.getScene().setCursor(Cursor.WAIT);
+//            imagePane.getScene().setCursor(Cursor.WAIT);
             long startTime = System.currentTimeMillis();
             command.execute();
             long stopTime = System.currentTimeMillis();
@@ -42,7 +41,7 @@ public class CommandManager {
             }
             imagePane.refresh();
         });
-        imagePane.getScene().setCursor(Cursor.DEFAULT);
+//        imagePane.getScene().setCursor(Cursor.DEFAULT);
     }
 
     public void undo() {
