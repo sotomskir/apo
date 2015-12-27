@@ -63,4 +63,8 @@ public class HistogramPane extends TabPane {
     public void selectProfileLineChart() {
         getSelectionModel().select(profileLineTab);
     }
+
+    public MonoHistogramChart getMonoHistogramChart() {
+        return monoHistogramChart;
+    }
 }

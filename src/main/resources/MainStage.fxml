@@ -53,209 +53,215 @@
         </MenuBar>
     </top>
     <center>
-        <BorderPane>
-            <top>
-                <ToolBar prefHeight="40.0" prefWidth="240.0">
-                    <Button contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#handleOpen">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%Open"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/file/drawable-mdpi/ic_folder_open_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
+        <SplitPane orientation="HORIZONTAL" dividerPositions="0.8">
+            <BorderPane>
+                <top>
+                    <ToolBar prefHeight="40.0" prefWidth="240.0">
+                        <Button contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#handleOpen">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%Open"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/file/drawable-mdpi/ic_folder_open_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-                    <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleRevert" prefHeight="24.0" prefWidth="24.0">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%Revert"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/action/drawable-mdpi/ic_settings_backup_restore_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
+                        <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleRevert" prefHeight="24.0" prefWidth="24.0">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%Revert"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/action/drawable-mdpi/ic_settings_backup_restore_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-                    <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleSaveAs">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%Save"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/content/drawable-mdpi/ic_save_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
+                        <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleSaveAs">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%Save"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/content/drawable-mdpi/ic_save_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-                    <Button disable="${controller.undoUnavailable}" mnemonicParsing="false" onAction="#handleUndo">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%Undo"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/content/drawable-mdpi/ic_undo_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
+                        <Button disable="${controller.undoUnavailable}" mnemonicParsing="false" onAction="#handleUndo">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%Undo"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/content/drawable-mdpi/ic_undo_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-                    <Button disable="${controller.redoUnavailable}" mnemonicParsing="false" onAction="#handleRedo">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%Redo"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/content/drawable-mdpi/ic_redo_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
+                        <Button disable="${controller.redoUnavailable}" mnemonicParsing="false" onAction="#handleRedo">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%Redo"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/content/drawable-mdpi/ic_redo_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-                    <Button disable="${controller.needsImage}"  mnemonicParsing="false" onAction="#handleDuplicate">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%Duplicate"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/image/drawable-mdpi/ic_photo_library_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
+                        <Button disable="${controller.needsImage}"  mnemonicParsing="false" onAction="#handleDuplicate">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%Duplicate"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/image/drawable-mdpi/ic_photo_library_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-                    <Button mnemonicParsing="false" onAction="#handleScreenShot">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%ScreenShot"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/image/drawable-mdpi/ic_camera_alt_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
+                        <Button mnemonicParsing="false" onAction="#handleScreenShot">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%ScreenShot"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/image/drawable-mdpi/ic_camera_alt_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-                    <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleUnpinTab">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%Detach"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/action/drawable-mdpi/ic_tab_unselected_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
+                        <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleUnpinTab">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%Detach"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/action/drawable-mdpi/ic_tab_unselected_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-                    <Separator orientation="VERTICAL"/>
-
-                    <ToggleButton disable="${controller.needsImage}" fx:id="pointerButton" mnemonicParsing="false" onAction="#handlePointerTool">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%Pointer"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@icons/arrow_cursor.png"/>
-                            </ImageView>
-                        </graphic>
-                    </ToggleButton>
-
-                    <ToggleButton disable="${controller.needsImage}" fx:id="cropButton" mnemonicParsing="false" onAction="#handleCropTool">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%Crop"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/image/drawable-mdpi/ic_crop_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </ToggleButton>
-
-                    <ToggleButton disable="${controller.needsImage}" fx:id="profileLineButton" mnemonicParsing="false" onAction="#handleProfileLineTool">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%ProfileLine"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/action/drawable-mdpi/ic_timeline_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </ToggleButton>
-                </ToolBar>
-            </top>
-            <center><TabPane fx:id="tabPane"/></center>
-            <bottom>
-                <ToolBar>
-                    <Label fx:id="zoomLabel" prefWidth="55" text="100%"/>
-                    <Button disable="${controller.needsImage}" onMouseClicked="#handleZoomOut">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%ZoomOut"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/action/drawable-mdpi/ic_zoom_out_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-                    <Button disable="${controller.needsImage}" onMouseClicked="#handleZoomIn">
-                        <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                        <tooltip>
-                            <Tooltip text="%ZoomIn"/>
-                        </tooltip>
-                        <graphic>
-                            <ImageView fitWidth="24" preserveRatio="true">
-                                <Image url="@material-design-icons/action/drawable-mdpi/ic_zoom_in_black_24dp.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-                </ToolBar>
-            </bottom>
-        </BorderPane>
-    </center>
-    <right>
-        <BorderPane>
-            <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
-            <top>
-                <VBox>
-                    <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
-                    <VBox fx:id="histogramPaneContainer">
-                        <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
-                    </VBox>
-                    <HBox fx:id="labels">
-                        <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
-                        <VBox>
-                            <Label fx:id="labelDepth" text="%Depth"/>
-                            <Label fx:id="labelR" text="R: -"/>
-                            <Label fx:id="labelG" text="G: -"/>
-                            <Label fx:id="labelB" text="B: -"/>
-                        </VBox>
                         <Separator orientation="VERTICAL"/>
-                        <VBox>
-                            <Label fx:id="labelWidth" text="%Width"/>
-                            <Label fx:id="labelHeight" text="%Heigth"/>
-                            <Label fx:id="labelX" text="x: -"/>
-                            <Label fx:id="labelY" text="y: -"/>
+
+                        <ToggleButton disable="${controller.needsImage}" fx:id="pointerButton" mnemonicParsing="false" onAction="#handlePointerTool">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%Pointer"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@icons/arrow_cursor.png"/>
+                                </ImageView>
+                            </graphic>
+                        </ToggleButton>
+
+                        <ToggleButton disable="${controller.needsImage}" fx:id="cropButton" mnemonicParsing="false" onAction="#handleCropTool">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%Crop"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/image/drawable-mdpi/ic_crop_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </ToggleButton>
+
+                        <ToggleButton disable="${controller.needsImage}" fx:id="profileLineButton" mnemonicParsing="false" onAction="#handleProfileLineTool">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%ProfileLine"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/action/drawable-mdpi/ic_timeline_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </ToggleButton>
+                    </ToolBar>
+                </top>
+                <center><TabPane fx:id="tabPane"/></center>
+                <bottom>
+                    <ToolBar>
+                        <Label fx:id="zoomLabel" prefWidth="55" text="100%"/>
+                        <Button disable="${controller.needsImage}" onMouseClicked="#handleZoomOut">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%ZoomOut"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/action/drawable-mdpi/ic_zoom_out_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button disable="${controller.needsImage}" onMouseClicked="#handleZoomIn">
+                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                            <tooltip>
+                                <Tooltip text="%ZoomIn"/>
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitWidth="24" preserveRatio="true">
+                                    <Image url="@material-design-icons/action/drawable-mdpi/ic_zoom_in_black_24dp.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </ToolBar>
+                </bottom>
+            </BorderPane>
+
+
+            <BorderPane>
+                <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
+                <top>
+                    <VBox>
+                        <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
+                        <VBox fx:id="histogramPaneContainer">
+                            <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
                         </VBox>
-                    </HBox>
-                </VBox>
-            </top>
-            <center>
-                <ScrollPane fx:id="toolboxScrollPane" vbarPolicy="NEVER" hbarPolicy="AS_NEEDED">
-                    <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
-                    <VBox fx:id="toolbox" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
-                        <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
+                        <HBox fx:id="labels">
+                            <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
+                            <VBox>
+                                <Label fx:id="labelDepth" text="%Depth"/>
+                                <Label fx:id="labelR" text="R: -"/>
+                                <Label fx:id="labelG" text="G: -"/>
+                                <Label fx:id="labelB" text="B: -"/>
+                            </VBox>
+                            <Separator orientation="VERTICAL"/>
+                            <VBox>
+                                <Label fx:id="labelWidth" text="%Width"/>
+                                <Label fx:id="labelHeight" text="%Heigth"/>
+                                <Label fx:id="labelX" text="x: -"/>
+                                <Label fx:id="labelY" text="y: -"/>
+                            </VBox>
+                            <Separator orientation="VERTICAL"/>
+                            <VBox>
+                                <Label fx:id="histogramValueLabel" text="X: - Y: -"/>
+                            </VBox>
+                        </HBox>
                     </VBox>
-                </ScrollPane>
-            </center>
-        </BorderPane>
-    </right>
+                </top>
+                <center>
+                    <ScrollPane fx:id="toolboxScrollPane" vbarPolicy="NEVER" hbarPolicy="AS_NEEDED">
+                        <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
+                        <VBox fx:id="toolbox" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
+                            <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
+                        </VBox>
+                    </ScrollPane>
+                </center>
+            </BorderPane>
+        </SplitPane>
+    </center>
 </BorderPane>

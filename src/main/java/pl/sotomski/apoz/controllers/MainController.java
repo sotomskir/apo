@@ -69,6 +69,7 @@ public class MainController implements Initializable, ToolController {
     @FXML private ToggleButton pointerButton;
     @FXML private ToggleButton cropButton;
     @FXML private ToggleButton profileLineButton;
+    @FXML private Label histogramValueLabel;
     private final BooleanProperty needsImage = new SimpleBooleanProperty(true);
     private final BooleanProperty undoUnavailable = new SimpleBooleanProperty(true);
     private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
@@ -189,6 +190,7 @@ public class MainController implements Initializable, ToolController {
         final String os = System.getProperty ("os.name");
         if (os != null && os.startsWith ("Mac"))
             menuBar.useSystemMenuBarProperty ().set (true);
+        histogramPane.getMonoHistogramChart().setValueLabel(histogramValueLabel);
     }
 
     private void updateLabels(ImagePane pane) {
