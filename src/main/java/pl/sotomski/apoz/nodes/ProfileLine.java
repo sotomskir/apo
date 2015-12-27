@@ -80,7 +80,7 @@ public class ProfileLine extends Group {
         double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
         for (int x = minX; x < maxX; ++x) {
             points[x-minX][0] = x;
-            points[x-minX][1] = (int) (slope * ((double) x - getEndX()) + getEndY());
+            points[x-minX][1] = (int) Math.round(slope * ((double) x - getEndX()) + getEndY());
         }
         return points;
     }
