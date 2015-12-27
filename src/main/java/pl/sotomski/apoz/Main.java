@@ -31,6 +31,8 @@ public class Main extends Application {
             ResourceBundle bundle = ResourceBundle.getBundle("bundles.ApozBundle", locale, new UTF8Control());
             loader.setResources(bundle);
             root = loader.load(getClass().getClassLoader().getResource("MainStage.fxml").openStream());
+//            root = FXMLLoader.load(getClass().getResource("MainStage.fxml"));
+//            root = loader.load(getClass().getResource("MainStage.fxml").openStream());
             primaryStage.setTitle("APOZ");
             Scene scene = new Scene(root);
             scene.getStylesheets().add(String.valueOf(getClass().getClassLoader().getResource("style.css")));

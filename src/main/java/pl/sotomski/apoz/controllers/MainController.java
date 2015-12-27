@@ -186,6 +186,9 @@ public class MainController implements Initializable, ToolController {
         cropButton.setToggleGroup(pointersToggleGroup);
         profileLineButton.setToggleGroup(pointersToggleGroup);
         pointerButton.setSelected(true);
+        final String os = System.getProperty ("os.name");
+        if (os != null && os.startsWith ("Mac"))
+            menuBar.useSystemMenuBarProperty ().set (true);
     }
 
     private void updateLabels(ImagePane pane) {
@@ -481,9 +484,6 @@ public class MainController implements Initializable, ToolController {
         histogramPane.selectProfileLineChart();
         rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
         getActivePaneProperty().enableProfileLineSelection();
-//        getActivePaneProperty().getProfileLine().changedProperty().addListener(observable -> {
-//            getActivePaneProperty().getHistogramPane().getProfileLineChart().update(getActivePaneProperty().getImage());
-//        });
     }
 
 }
