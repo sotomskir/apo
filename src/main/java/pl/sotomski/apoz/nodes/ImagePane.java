@@ -38,6 +38,7 @@ public class ImagePane extends BorderPane {
     private ScrollPane scrollPane;
     private boolean tabbed;
     ProfileLine profileLine;
+    CropRectangle cropRectangle;
 
     private ImagePane() {
         super();
@@ -69,7 +70,7 @@ public class ImagePane extends BorderPane {
         refresh();
     }
 
-    public ImagePane(HistogramPane histogramPane, BufferedImage image, String name) {
+    public ImagePane(HistogramPane histogramPane, BufferedImage image) {
         this();
         this.histogramPane = histogramPane;
         this.bufferedImage = image;
@@ -83,6 +84,10 @@ public class ImagePane extends BorderPane {
         this.histogramPane = histogramPane;
         this.bufferedImage = image;
         refresh();
+    }
+
+    public CropRectangle getCropRectangle() {
+        return cropRectangle;
     }
 
     public ImageStack getImageStack() {
@@ -215,6 +220,7 @@ public class ImagePane extends BorderPane {
     }
 
     public void enableProfileLineSelection() {
+        getImageStack().clear();
         profileLine = new ProfileLine();
         histogramPane.updateProfileLineChart(getImage(), profileLine);
         System.out.println("Enable mouse events on:"+hashCode());
@@ -251,21 +257,29 @@ public class ImagePane extends BorderPane {
     }
 
     public void enableCropSelection() {
-        CropRectangle r = new CropRectangle();
-        System.out.println("Enable mouse events on:" + hashCode());
+        getImageStack().clear();
+        setOnMousePressed(event -> {});
+        setOnMouseReleased(event -> {});
+        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
+        cropRectangle = new CropRectangle();
+        getImageStack().push(cropRectangle);
+        int width = getImage().getWidth();
+        int height = getImage().getHeight();
+        cropRectangle.setStart(width*0.25, height*0.25);
+        cropRectangle.setEnd(width*0.75, height*0.75);
 
-        setOnMousePressed(mouseEvent -> {
-            getImageStack().push(r);
-            r.setStart(mouseEvent.getX(), mouseEvent.getY());
-            r.setEnd(mouseEvent.getX(), mouseEvent.getY());
-//            System.out.println("Mouse pressed X:" + r.x + " Y:" + r.y + " source:" + mouseEvent.getSource().hashCode());
-        });
+//        setOnMousePressed(mouseEvent -> {
+//            getImageStack().clear();
+//            cropRectangle.setStart(mouseEvent.getX(), mouseEvent.getY());
+//            cropRectangle.setEnd(mouseEvent.getX(), mouseEvent.getY());
+//            System.out.println("Mouse pressed X:" + cropRectangle.x + " Y:" + cropRectangle.y + " source:" + mouseEvent.getSource().hashCode());
+//        });
 
-        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedRect(event, r));
+//        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedRect(event, cropRectangle));
 
-        setOnMouseReleased(mouseEvent -> {
-            getImageStack().clear();
-        });
+//        setOnMouseReleased(mouseEvent -> {
+//            getImageStack().clear();
+//        });
     }
 
     public class ImageStack extends AnchorPane {

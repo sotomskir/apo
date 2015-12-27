@@ -211,7 +211,7 @@ public class MainController implements Initializable, ToolController {
         alert.showAndWait();
     }
 
-    private void attachTab(ImageTab imageTab) {
+    public void attachTab(ImageTab imageTab) {
         tabPane.getTabs().add(imageTab);
         imageTab.getPane().getImageView().addEventHandler(MouseEvent.MOUSE_MOVED, this::handleMouseMoved);
         tabPane.getSelectionModel().select(imageTab);
@@ -474,7 +474,8 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleCropTool(ActionEvent actionEvent) {
-        rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
+        addToToolbox(CropTool.getInstance(this));
+        rootLayout.getScene().setCursor(Cursor.DEFAULT);
         getActivePaneProperty().enableCropSelection();
     }
 

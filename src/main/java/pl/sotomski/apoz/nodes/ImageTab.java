@@ -2,10 +2,6 @@ package pl.sotomski.apoz.nodes;
 
 import javafx.scene.control.Tab;
 
-
-/**
- * Created by sotomski on 10/10/15.
- */
 public class ImageTab extends Tab {
 
     ImagePane pane;
@@ -18,6 +14,13 @@ public class ImageTab extends Tab {
         this.pane = imagePane;
         this.setContent(imagePane);
         this.setText(imagePane.getFile().getName());
+    }
+
+    public ImageTab(ImagePane imagePane, String name) {
+        super();
+        this.pane = imagePane;
+        this.setContent(imagePane);
+        this.setText(name);
     }
 
     public ImagePane getPane() {
