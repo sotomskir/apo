@@ -43,6 +43,7 @@
                 <MenuItem disable="${controller.needsImage}" onAction="#handleLogicalFilterTool" text="%LogicalFilterTool"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleGradientMaskTool" text="%GradientMaskTool"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleMorphTool" text="%MorphTool"/>
+                <MenuItem disable="${controller.needsImage}" onAction="#handleTurtleAlgorithm" text="%TurtleAlgorithm"/>
             </Menu>
             <Menu text="%Help">
                 <MenuItem disable="true" text="%Search"/>
