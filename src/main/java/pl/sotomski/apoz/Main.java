@@ -4,11 +4,13 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import pl.sotomski.apoz.controllers.PrefsController;
 import pl.sotomski.apoz.utils.ExceptionDialog;
 import pl.sotomski.apoz.utils.UTF8Control;
 
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
@@ -36,7 +38,10 @@ public class Main extends Application {
             primaryStage.setTitle("APOZ");
             Scene scene = new Scene(root);
             scene.getStylesheets().add(String.valueOf(getClass().getClassLoader().getResource("style.css")));
-//            scene.getStylesheets().add(String.valueOf(getClass().getClassLoader().getResource("style.css")));
+//            scene.getStylesheets().add(String.valueOf(getClass().getClassLoader().getResource("mdi.css")));
+            InputStream is = getClass().getClassLoader().getResource("MaterialDesign-Webfont-master/fonts/materialdesignicons-webfont.ttf").openStream();
+            Font font = Font.loadFont(is, 24);
+            System.out.println(font.getName());
             primaryStage.setMaximized(true);
             primaryStage.setScene(scene);
             primaryStage.show();
