@@ -8,7 +8,7 @@ import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LinearFilterCommand;
 import pl.sotomski.apoz.controllers.ToolController;
-import pl.sotomski.apoz.nodes.BordersComboBox;
+import pl.sotomski.apoz.nodes.BordersMethodToggles;
 import pl.sotomski.apoz.nodes.ImagePane;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class LinearFilterTool extends VBox {
     private String[] masks;
     private int[] mask = new int[9];
     private List<Spinner> spinners;
-    private BordersComboBox bordersComboBox;
+    private BordersMethodToggles bordersMethodToggles;
     private static int[][] maskTemplates = {
             {1, 1, 1, 1, 1, 1, 1, 1, 1},
             {1, 1, 1, 1, 8, 1, 1, 1, 1},
@@ -78,7 +78,7 @@ public class LinearFilterTool extends VBox {
         });
 
         // add other controls
-        bordersComboBox = new BordersComboBox(bundle);
+        bordersMethodToggles = new BordersMethodToggles(bundle);
         Button button = new Button(bundle.getString("Apply"));
         button.setOnAction((actionEvent) -> {
             try {
@@ -87,7 +87,7 @@ public class LinearFilterTool extends VBox {
                 e.printStackTrace();
             }
         });
-        getChildren().addAll(separator, label, tilePane, choiceBox, bordersComboBox, button);
+        getChildren().addAll(separator, label, tilePane, choiceBox, bordersMethodToggles, button);
     }
 
     public static VBox getInstance(ToolController controller) {
@@ -99,7 +99,7 @@ public class LinearFilterTool extends VBox {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         for (int i = 0; i < 9; ++i) mask[i] = (int) spinners.get(i).getValue();
-        manager.executeCommand(new LinearFilterCommand(imagePane, mask, bordersComboBox.getMethod()));
+        manager.executeCommand(new LinearFilterCommand(imagePane, mask, bordersMethodToggles.getMethod()));
         imagePane.setImage(imagePane.getImage());
     }
 

@@ -2,6 +2,7 @@ package pl.sotomski.apoz.utils;
 
 import com.sun.media.jai.codec.FileSeekableStream;
 import com.sun.media.jai.codec.TIFFDecodeParam;
+import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
@@ -13,13 +14,8 @@ import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 
-/**
- * Created by sotomski on 25/09/15.
- */
 public class FileMenuUtils {
 
     public static File saveAsDialog(BorderPane layoutRoot, BufferedImage image) {
@@ -33,6 +29,38 @@ public class FileMenuUtils {
         } catch (IOException e) {
             new ExceptionDialog(e, "Wystąpił błąd podczas zapisu pliku");
             e.printStackTrace();
+        }
+        return file;
+    }
+
+    public static File saveAsCSVDialog(Parent layoutRoot, BufferedImage image) {
+        Window window = layoutRoot.getScene().getWindow();
+        final FileChooser fileChooser = new FileChooser();
+        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("CSV", "csv"));
+        File file = fileChooser.showSaveDialog(window);
+
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new FileWriter(file));
+            byte[] a = ImageUtils.getImageData(image);
+            int width = image.getWidth();
+            for (int i = 0; i < a.length; ++i) {
+                int value = a[i] & 0xFF;
+                bw.write(String.valueOf(value));
+                if (i % width == width-1) {
+                    bw.write('\n');
+                } else bw.write(";");
+            }
+        } catch (IOException e) {
+            new ExceptionDialog(e, "Wystąpił błąd podczas zapisu pliku");
+            e.printStackTrace();
+        } finally {
+            if (bw != null) try {
+                bw.close();
+            } catch (IOException e) {
+                new ExceptionDialog(e, "Wystąpił błąd podczas zapisu pliku");
+                e.printStackTrace();
+            }
         }
         return file;
     }
