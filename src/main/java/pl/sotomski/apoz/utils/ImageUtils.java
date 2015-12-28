@@ -794,7 +794,7 @@ public class ImageUtils {
             System.out.print(value);
             if (i % width == width-1) {
                 System.out.println();
-            } else System.out.print(":");
+            } else System.out.print(";");
         }
     }
 
@@ -809,6 +809,18 @@ public class ImageUtils {
         int x = (int) cropRectangle.getX();
         int y = (int) cropRectangle.getY();
         return image.getSubimage(x, y, width, height);
+    }
+
+    public static Integer[][] asArray(BufferedImage image) {
+        if (image.getColorModel().getNumComponents() > 1) image = rgbToGrayscale(image);
+        int width = image.getWidth();
+        int height = image.getHeight();
+        Integer[][] array = new Integer[height][width];
+        for (int y = 0; y < height; ++y)
+            for (int x = 0; x < width; ++x)
+                array[y][x] = getPixel(image, x, y)[0];
+        return array;
+
     }
 
     private static class ExtendedBordersImage extends BufferedImage {

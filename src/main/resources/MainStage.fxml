@@ -23,7 +23,10 @@
             <Menu text="%Edit">
                 <MenuItem disable="${controller.undoUnavailable}" onAction="#handleUndo" text="%Undo"/>
                 <MenuItem disable="${controller.redoUnavailable}" onAction="#handleRedo" text="%Redo"/>
+            </Menu>
+            <Menu text="%Tools">
                 <MenuItem disable="${controller.needsImage}" onAction="#handleCropTool" text="%Crop"/>
+                <MenuItem disable="${controller.needsImage}" onAction="#handleNumberTable" text="%GenerateNumberTable"/>
             </Menu>
             <Menu text="%PointOperations">
                 <MenuItem disable="${controller.needsImage}" onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale"/>
@@ -255,7 +258,7 @@
                     </VBox>
                 </top>
                 <center>
-                    <ScrollPane fx:id="toolboxScrollPane" vbarPolicy="NEVER" hbarPolicy="AS_NEEDED">
+                    <ScrollPane fx:id="toolboxScrollPane" vbarPolicy="AS_NEEDED" hbarPolicy="AS_NEEDED">
                         <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
                         <VBox fx:id="toolbox" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
                             <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>

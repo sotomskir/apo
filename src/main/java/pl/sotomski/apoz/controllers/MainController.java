@@ -29,10 +29,7 @@ import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.ConvertToGrayCommand;
 import pl.sotomski.apoz.commands.NegativeCommand;
 import pl.sotomski.apoz.commands.TurtleAlgorithmCommand;
-import pl.sotomski.apoz.nodes.HistogramPane;
-import pl.sotomski.apoz.nodes.ImagePane;
-import pl.sotomski.apoz.nodes.ImageTab;
-import pl.sotomski.apoz.nodes.ImageWindow;
+import pl.sotomski.apoz.nodes.*;
 import pl.sotomski.apoz.tools.*;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.ImageUtils;
@@ -494,5 +491,12 @@ public class MainController implements Initializable, ToolController {
     public void handleTurtleAlgorithm(ActionEvent actionEvent) {
         CommandManager manager = getActivePaneProperty().getCommandManager();
         manager.executeCommand(new TurtleAlgorithmCommand(getActivePaneProperty()));
+    }
+
+    public void handleNumberTable(ActionEvent actionEvent) {
+        Window parent = rootLayout.getScene().getWindow();
+        ImageTab imageTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
+        String title = imageTab.getText() + " " + bundle.getString("NumberTable");
+        TableWindow tableWindow = new TableWindow(parent, getActivePaneProperty().getImage(), title);
     }
 }
