@@ -6,11 +6,12 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LinearFilterCommand;
 import pl.sotomski.apoz.controllers.ToolController;
-import pl.sotomski.apoz.nodes.BordersComboBox;
+import pl.sotomski.apoz.nodes.BordersMethodToggles;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.Mask;
 
@@ -31,7 +32,7 @@ public class TwoStepFilterTool extends VBox {
     private Mask maskG = new Mask(3);
     private RadioButton oneStepRadio;
     private RadioButton twoStepRadio;
-    private BordersComboBox bordersMethodCombo;
+    private BordersMethodToggles bordersMethodCombo;
 
 
     protected TwoStepFilterTool(ToolController controller) {
@@ -68,7 +69,7 @@ public class TwoStepFilterTool extends VBox {
         twoStepRadio.setToggleGroup(toggleGroup);
         oneStepRadio.setSelected(true);
 
-        bordersMethodCombo = new BordersComboBox(bundle);
+        bordersMethodCombo = new BordersMethodToggles(bundle);
 
         Button button = new Button(bundle.getString("Apply"));
         button.setOnAction((actionEvent) -> {
@@ -82,14 +83,17 @@ public class TwoStepFilterTool extends VBox {
         getChildren().addAll(
                 separator,
                 label,
-                new Label("mask F"),
-                gridPane1,
-                new Label("mask G"),
-                gridPane2,
+                new HBox(
+                        new VBox(new Label("mask F"), gridPane1),
+                        new Separator(Orientation.VERTICAL),
+                        new VBox(new Label("mask G"), gridPane2)
+                ),
                 new Label("mask M"),
                 gridPane3,
+                new Separator(Orientation.HORIZONTAL),
                 oneStepRadio,
                 twoStepRadio,
+                new Separator(Orientation.HORIZONTAL),
                 new Label(bundle.getString("extremePixelsMethod")),
                 bordersMethodCombo,
                 button
