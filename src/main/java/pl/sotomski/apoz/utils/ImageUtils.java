@@ -178,7 +178,99 @@ public class ImageUtils {
         return pixels;
     }
 
+    public static void robertsMaskFilter(BufferedImage bi, int[][] masks, int bordersMethod) {
+        int width = bi.getWidth();
+        int height = bi.getHeight();
+        int channels = bi.getColorModel().getNumComponents();
+        byte[] a = getImageData(bi);
+        final int bordersWidth = (int) (Math.sqrt(masks.length));
+
+        //create temporary image with extended borders
+        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
+
+        //calculate masks multiplier
+        int multiplier = arraySum(masks[0]);
+        boolean sharpening = false;
+        if (multiplier == 0) {
+            sharpening = true;
+            multiplier = 1;
+        }
+
+        //filter image
+        int[] Gx = filterImage(bi, masks[0], bordersMethod);
+        int[] Gy = filterImage(bi, masks[1], bordersMethod);
+        int[] b = arrayAbsSum(Gx, Gy);
+        //scale image levels
+        scaleImage(a, b, sharpening);
+    }
+
+    private static int[] arrayAbsSum(int[] gx, int[] gy) {
+        int[] r = new int[gx.length];
+        for (int i = 0; i < gx.length; ++i) {
+            r[i] = Math.round(Math.abs(gx[i]) + Math.abs(gy[i]));
+        }
+        return r;    }
+
     public static void linearFilter(BufferedImage bi, int[] mask, int bordersMethod) {
+        int width = bi.getWidth();
+        int height = bi.getHeight();
+        int channels = bi.getColorModel().getNumComponents();
+        byte[] a = getImageData(bi);
+        final int bordersWidth = (int) (Math.sqrt(mask.length));
+
+        //create temporary image with extended borders
+        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
+
+        //calculate mask multiplier
+        int multiplier = arraySum(mask);
+        boolean sharpening = false;
+        if (multiplier == 0) {
+            sharpening = true;
+            multiplier = 1;
+        }
+
+        //filter image
+        int[] b = filterImage(bi, mask, bordersMethod);
+
+        //scale image levels
+        scaleImage(a, b, sharpening);
+    }
+
+    public static void gradientSharpening(BufferedImage bi, int[][] masks, int bordersMethod) {
+        int width = bi.getWidth();
+        int height = bi.getHeight();
+        int channels = bi.getColorModel().getNumComponents();
+        byte[] a = getImageData(bi);
+        final int bordersWidth = (int) (Math.sqrt(masks.length));
+
+        //create temporary image with extended borders
+        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
+
+        //calculate masks multiplier
+        int multiplier = arraySum(masks[0]);
+        boolean sharpening = false;
+        if (multiplier == 0) {
+            sharpening = true;
+            multiplier = 1;
+        }
+
+        //filter image
+        int[] Gx = filterImage(bi, masks[0], bordersMethod);
+        int[] Gy = filterImage(bi, masks[1], bordersMethod);
+        int[] b = arraySqrtSumOfSquares(Gx, Gy);
+        //scale image levels
+        scaleImage(a, b, sharpening);
+    }
+
+    private static int[] arraySqrtSumOfSquares(int[] gx, int[] gy) {
+        int[] r = new int[gx.length];
+        for (int i = 0; i < gx.length; ++i) {
+            r[i] = (int) Math.round(Math.sqrt(Math.pow(gx[i], 2) + Math.pow(gy[i], 2)));
+        }
+        return r;
+    }
+
+    private static int[] filterImage(BufferedImage bi, int[] mask, int bordersMethod) {
         int width = bi.getWidth();
         int height = bi.getHeight();
         int channels = bi.getColorModel().getNumComponents();
@@ -194,15 +286,15 @@ public class ImageUtils {
         Arrays.fill(min, 255);
         Arrays.fill(max, 0);
         int multiplier = arraySum(mask);
-        boolean sharpening = false;
 
         if (multiplier == 0) {
-            sharpening = true;
             multiplier = 1;
         }
 
         //filter image
         int[] b = new int[a.length];
+        int[] Gx = new int[a.length];
+        int[] Gy = new int[a.length];
         for (int y = 0; y < bi.getHeight(); ++y)
             for (int x = 0; x < bi.getWidth(); ++x) {
                 int[][] pixels;
@@ -227,20 +319,25 @@ public class ImageUtils {
                 }
 
             }
+        return b;
+    }
 
+    //TODO add scaling method
+    private static byte[] scaleImage(byte[] imageData, int[] inputArray, boolean sharpening) {
         //scale image levels
         if (sharpening) {
-            for (int i = 0; i < a.length; ++i) {
-                b[i] = (b[i] < 0 ? 0 : b[i] > 255 ? 255 : b[i]); // skalowanie przez obcinanie
-                b[i] += a[i] & 0xFF;
-                a[i] = (byte) (b[i] < 0 ? 0 : b[i] > 255 ? 255 : b[i]); // skalowanie przez obcinanie
-//                a[i] = (byte) (((b[i] - min) / (max - min)) * 255); // skalowanie proporcjonalne
+            for (int i = 0; i < imageData.length; ++i) {
+                inputArray[i] = (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
+                inputArray[i] += imageData[i] & 0xFF;
+                imageData[i] = (byte) (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
+//                imageData[i] = (byte) (((inputArray[i] - min) / (max - min)) * 255); // skalowanie proporcjonalne
             }
         } else {
-            for (int i = 0; i < a.length; ++i) {
-                a[i] = (byte) (b[i] < 0 ? 0 : b[i] > 255 ? 255 : b[i]); // skalowanie przez obcinanie
+            for (int i = 0; i < imageData.length; ++i) {
+                imageData[i] = (byte) (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
             }
         }
+        return imageData;
     }
 
     private static int arraySum(int[] mask) {

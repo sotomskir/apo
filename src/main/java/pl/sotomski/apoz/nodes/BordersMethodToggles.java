@@ -1,5 +1,6 @@
 package pl.sotomski.apoz.nodes;
 
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
@@ -8,9 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-/**
- * Created by sotomski on 10/12/15.
- */
 public class BordersMethodToggles extends VBox {
     ToggleGroup toggleGroup = new ToggleGroup();
     List<RadioButton> toggles = new ArrayList<>();
@@ -22,6 +20,7 @@ public class BordersMethodToggles extends VBox {
         toggles.add(new RadioButton(bundle.getString("useExistingPixels")));
         toggles.add(new RadioButton(bundle.getString("dontChangeExtremePixels")));
         for (RadioButton r : toggles) r.setToggleGroup(toggleGroup);
+        getChildren().add(new Label(bundle.getString("BordersMethod")));
         getChildren().addAll(toggles);
         toggleGroup.selectToggle(toggles.get(2));
     }

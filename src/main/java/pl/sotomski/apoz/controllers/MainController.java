@@ -462,10 +462,6 @@ public class MainController implements Initializable, ToolController {
         addToToolbox(LogicalFilterTool.getInstance(this));
     }
 
-    public void handleGradientMaskTool(ActionEvent actionEvent) {
-        addToToolbox(GradientMaskTool.getInstance(this));
-    }
-
     public void handleTwoStepFilterTool(ActionEvent actionEvent) {
         addToToolbox(TwoStepFilterTool.getInstance(this));
     }
@@ -498,5 +494,13 @@ public class MainController implements Initializable, ToolController {
         ImageTab imageTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
         String title = imageTab.getText() + " " + bundle.getString("NumberTable");
         TableWindow tableWindow = new TableWindow(parent, getActivePaneProperty().getImage(), title);
+    }
+
+    public void handleGradientSharpening(ActionEvent actionEvent) {
+        addToToolbox(GradientSharpeningTool.getInstance(this));
+    }
+
+    public void handleEdgeDetection(ActionEvent actionEvent) {
+        addToToolbox(GradientEdgeDetectionTool.getInstance(this));
     }
 }
