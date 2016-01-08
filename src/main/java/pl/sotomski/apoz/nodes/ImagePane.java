@@ -39,6 +39,7 @@ public class ImagePane extends BorderPane {
     private boolean tabbed;
     ProfileLine profileLine;
     CropRectangle cropRectangle;
+    private String name = "";
 
     private ImagePane() {
         super();
@@ -67,22 +68,39 @@ public class ImagePane extends BorderPane {
         this.histogramPane = histogramPane;
         setImage(bi);
         this.file = file;
+        name = file.getName();
         refresh();
     }
 
-    public ImagePane(HistogramPane histogramPane, BufferedImage image) {
+    public ImagePane(HistogramPane histogramPane, BufferedImage image, String name) {
         this();
         this.histogramPane = histogramPane;
         this.bufferedImage = image;
+        this.name = name;
         refresh();
     }
 
     public ImagePane(HistogramPane histogramPane, ImagePane imagePane) {
         this();
-        setFile(new File(imagePane.getFile().getPath()));
+        if(imagePane.getFile() != null) setFile(new File(imagePane.getFile().getPath()));
         BufferedImage image = ImageUtils.deepCopy(imagePane.getImage());
         this.histogramPane = histogramPane;
         this.bufferedImage = image;
+        String oldName = imagePane.getName();
+        String copyStr = histogramPane.getBundle().getString("copy");
+        int copyLength = copyStr.length();
+        int indexOfCopy = oldName.indexOf(copyStr);
+        if (indexOfCopy < 0) name = oldName + " " + copyStr;
+        else {
+            int copyNumber;
+            try {
+                copyNumber = Integer.valueOf(oldName.substring(indexOfCopy + copyLength + 1));
+                ++copyNumber;
+            } catch (NumberFormatException|StringIndexOutOfBoundsException e) {
+                copyNumber = 1;
+            }
+            name = oldName.substring(0, indexOfCopy-1) + " " + copyStr + " " + copyNumber;
+        }
         refresh();
     }
 
@@ -132,6 +150,10 @@ public class ImagePane extends BorderPane {
         refresh();
     }
 
+    public String getName() {
+        return name;
+    }
+
     private enum ZoomLevel {
 
     }
@@ -176,6 +198,7 @@ public class ImagePane extends BorderPane {
 
     public void setFile(File file) {
         this.file = file;
+        name = file.getName();
     }
 
     public File getFile() {

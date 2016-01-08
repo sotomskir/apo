@@ -955,7 +955,25 @@ public class ImageUtils {
         int height = (int) cropRectangle.getHeight();
         int x = (int) cropRectangle.getX();
         int y = (int) cropRectangle.getY();
-        return image.getSubimage(x, y, width, height);
+        BufferedImage croppedImage = getSubimage(image, x, y, width, height);
+        System.out.println("cropped image WxH: " + croppedImage.getWidth() + "x" + croppedImage.getHeight());
+        return croppedImage;
+    }
+
+    private static BufferedImage getSubimage(BufferedImage image, int x, int y, int width, int height) {
+        byte[] a = getImageData(image);
+        int channels = image.getColorModel().getNumComponents();
+        BufferedImage croppedImage = new BufferedImage(width, height, image.getType());
+        byte[] b = getImageData(croppedImage);
+        int imageWidth = image.getWidth();
+        int srcPos, destPos;
+        int rowLength = width * channels;
+        for(int yi = 0; yi < height; ++yi) {
+            srcPos = xyToI(x, y + yi, imageWidth, channels);
+            destPos = yi * rowLength;
+            System.arraycopy(a, srcPos, b, destPos, rowLength);
+        }
+        return croppedImage;
     }
 
     public static Integer[][] asArray(BufferedImage image) {

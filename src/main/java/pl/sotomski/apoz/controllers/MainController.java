@@ -288,7 +288,7 @@ public class MainController implements Initializable, ToolController {
 
     public void handleSaveAs(ActionEvent actionEvent) {
         BufferedImage image = activePaneProperty.getValue().getImage();
-        activePaneProperty.getValue().setFile(FileMenuUtils.saveAsDialog(rootLayout, image));
+        activePaneProperty.getValue().setFile(FileMenuUtils.saveAsDialog(rootLayout, image));;
     }
 
     public void handleSave(ActionEvent actionEvent) {

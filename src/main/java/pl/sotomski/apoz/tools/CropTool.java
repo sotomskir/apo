@@ -50,9 +50,24 @@ public class CropTool extends VBox {
         CropRectangle cropRectangle = toolController.getActivePaneProperty().getCropRectangle();
         BufferedImage croppedImage = ImageUtils.crop(image, cropRectangle);
         HistogramPane histogramPane = toolController.getActivePaneProperty().getHistogramPane();
-        String tabName = imagePane.getFile().getName() + " " + bundle.getString("cropped");
-        ImagePane newImagePane = new ImagePane(histogramPane, croppedImage);
-        ((MainController)toolController).attachTab(new ImageTab(newImagePane, tabName));
+        String oldName = imagePane.getName();
+        String cropStr = histogramPane.getBundle().getString("cropped");
+        String tabName;
+        int cropLength = cropStr.length();
+        int indexOfCrop = oldName.indexOf(cropStr);
+        if (indexOfCrop < 0) tabName = oldName + " " + cropStr;
+        else {
+            int cropNumber;
+            try {
+                cropNumber = Integer.valueOf(oldName.substring(indexOfCrop + cropLength + 1));
+                ++cropNumber;
+            } catch (NumberFormatException|StringIndexOutOfBoundsException e) {
+                cropNumber = 1;
+            }
+            tabName = oldName.substring(0, indexOfCrop-1) + " " + cropStr + " " + cropNumber;
+        }
+        ImagePane newImagePane = new ImagePane(histogramPane, croppedImage, tabName);
+        ((MainController)toolController).attachTab(new ImageTab(newImagePane));
     }
 
 }

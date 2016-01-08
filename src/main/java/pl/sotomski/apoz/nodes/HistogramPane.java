@@ -23,9 +23,11 @@ public class HistogramPane extends TabPane {
     private CumulativeHistogramChart cumulativeHistogramChart;
     private ProfileLineChart profileLineChart;
     Tab profileLineTab;
+    ResourceBundle bundle;
 
     public HistogramPane(ResourceBundle bundle) {
         super();
+        this.bundle = bundle;
         Tab tab1 = new Tab(bundle.getString("monoHistogram"));
         Tab tab2 = new Tab(bundle.getString("rgbHistogram"));
         Tab tab3 = new Tab(bundle.getString("cumulativeHistogram"));
@@ -62,6 +64,10 @@ public class HistogramPane extends TabPane {
 
     public void selectProfileLineChart() {
         getSelectionModel().select(profileLineTab);
+    }
+
+    public ResourceBundle getBundle() {
+        return bundle;
     }
 
     public MonoHistogramChart getMonoHistogramChart() {

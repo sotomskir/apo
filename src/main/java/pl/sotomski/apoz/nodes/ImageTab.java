@@ -13,14 +13,7 @@ public class ImageTab extends Tab {
         super();
         this.pane = imagePane;
         this.setContent(imagePane);
-        this.setText(imagePane.getFile().getName());
-    }
-
-    public ImageTab(ImagePane imagePane, String name) {
-        super();
-        this.pane = imagePane;
-        this.setContent(imagePane);
-        this.setText(name);
+        this.setText(imagePane.getName());
     }
 
     public ImagePane getPane() {
