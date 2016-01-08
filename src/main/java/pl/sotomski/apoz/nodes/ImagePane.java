@@ -51,7 +51,7 @@ public class ImagePane extends BorderPane {
     private static HashSet<String> names = new HashSet<>();
     Group groupWrapper;
 
-    private ImagePane() {
+    public ImagePane() {
         super();
         this.tabbed = true;
         this.commandManager = new CommandManager(this);

@@ -2,7 +2,9 @@ package pl.sotomski.apoz.utils;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.nodes.ProfileLine;
 
 import java.awt.image.BufferedImage;
@@ -16,6 +18,11 @@ import static pl.sotomski.apoz.utils.ImageUtils.*;
  * Created by sotomski on 03/11/15.
  */
 public class ImageUtilsTest {
+
+    ImagePane imagePane = new ImagePane();
+
+    @Rule
+    public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();
 
     @Before
     public void setUp() throws Exception {
@@ -344,9 +351,10 @@ public class ImageUtilsTest {
         ImageUtils.setPixel(image, 5, 5, 255);
         printImage(image);
 
-        turtleAlgorithm(image);
+        imagePane.setImage(image);
+        turtleAlgorithm(imagePane);
 
-        printImage(image);
+        printImage(imagePane.getImage());
         assertEquals(3, (-1 % 4 + 4) % 4);
         assertEquals(3, modulus(-1, 4));
 
