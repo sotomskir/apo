@@ -17,11 +17,17 @@ import java.util.List;
 
 public class CropRectangle extends Group {
 
+    private DoubleProperty zoomLevel = new SimpleDoubleProperty();
     Rectangle r = new Rectangle();
     final double handleRadius = 3;
     Color handleColor = new Color(0,0,0,0);
     List<Shape> resizeHandles = new ArrayList<>();
     int x1, y1, x2, y2;
+
+    public CropRectangle(DoubleProperty zoomLevel) {
+        this();
+        this.zoomLevel.bind(zoomLevel);
+    }
 
     private void update() {
         int xMin, xMax, yMin, yMax;
@@ -197,8 +203,8 @@ public class CropRectangle extends Group {
 
         resizeHandleNE.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = event.getSceneX() - mouseLocation.value.getX();
-                double deltaY = event.getSceneY() - mouseLocation.value.getY();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
                 double newMaxX = r.getX() + r.getWidth() + deltaX ;
                 if (newMaxX >= r.getX() && newMaxX <= getParent().getBoundsInLocal().getWidth() - handleRadius) {
                     r.setWidth(r.getWidth() + deltaX);
@@ -214,8 +220,8 @@ public class CropRectangle extends Group {
 
         resizeHandleNW.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = event.getSceneX() - mouseLocation.value.getX();
-                double deltaY = event.getSceneY() - mouseLocation.value.getY();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
                 double newX = r.getX() + deltaX ;
                 if (newX >= handleRadius && newX <= r.getX() + r.getWidth() - handleRadius) {
                     r.setX(newX);
@@ -232,8 +238,8 @@ public class CropRectangle extends Group {
 
         resizeHandleSE.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = event.getSceneX() - mouseLocation.value.getX();
-                double deltaY = event.getSceneY() - mouseLocation.value.getY();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
                 double newMaxX = r.getX() + r.getWidth() + deltaX ;
                 if (newMaxX >= r.getX() && newMaxX <= getParent().getBoundsInLocal().getWidth() - handleRadius) {
                     r.setWidth(r.getWidth() + deltaX);
@@ -248,8 +254,8 @@ public class CropRectangle extends Group {
 
         resizeHandleSW.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = event.getSceneX() - mouseLocation.value.getX();
-                double deltaY = event.getSceneY() - mouseLocation.value.getY();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
                 double newX = r.getX() + deltaX ;
                 if (newX >= handleRadius && newX <= r.getX() + r.getWidth() - handleRadius) {
                     r.setX(newX);
@@ -265,8 +271,8 @@ public class CropRectangle extends Group {
 
         moveHandle.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = event.getSceneX() - mouseLocation.value.getX();
-                double deltaY = event.getSceneY() - mouseLocation.value.getY();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
                 double newX = r.getX() + deltaX ;
                 double newMaxX = newX + r.getWidth();
                 if (newX >= handleRadius && newMaxX <= getParent().getBoundsInLocal().getWidth() - handleRadius) {
@@ -284,7 +290,7 @@ public class CropRectangle extends Group {
 
         resizeHandleE.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = event.getSceneX() - mouseLocation.value.getX();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
                 double newMaxX = r.getX() + r.getWidth() + deltaX;
                 if (newMaxX >= r.getX() && newMaxX <= getParent().getBoundsInLocal().getWidth() - handleRadius) {
                     r.setWidth(r.getWidth() + deltaX);
@@ -295,7 +301,7 @@ public class CropRectangle extends Group {
 
         resizeHandleW.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = event.getSceneX() - mouseLocation.value.getX();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
                 double newX = r.getX() + deltaX;
                 if (newX >= handleRadius && newX <= r.getX() + r.getWidth() - handleRadius) {
                     r.setX(newX);
@@ -307,7 +313,7 @@ public class CropRectangle extends Group {
 
         resizeHandleN.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaY = event.getSceneY() - mouseLocation.value.getY();
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
                 double newY = r.getY() + deltaY;
                 if (newY >= handleRadius && newY <= r.getY() + r.getHeight() - handleRadius) {
                     r.setY(newY);
@@ -319,7 +325,7 @@ public class CropRectangle extends Group {
 
         resizeHandleS.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaY = event.getSceneY() - mouseLocation.value.getY();
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
                 double newMaxY = r.getY() + r.getHeight() + deltaY;
                 if (newMaxY >= r.getY() && newMaxY <= getParent().getBoundsInLocal().getHeight() - handleRadius) {
                     r.setHeight(r.getHeight() + deltaY);

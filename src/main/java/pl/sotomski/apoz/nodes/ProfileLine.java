@@ -75,12 +75,26 @@ public class ProfileLine extends Group {
         int minX, maxX;
         if (getEndX() > getStartX()) { minX = (int) getStartX(); maxX = (int) getEndX(); }
         else { minX = (int) getEndX(); maxX = (int) getStartX(); }
-        int size = maxX - minX;
-        int[][] points = new int [size][2];
-        double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
-        for (int x = minX; x < maxX; ++x) {
-            points[x-minX][0] = x;
-            points[x-minX][1] = (int) Math.round(slope * ((double) x - getEndX()) + getEndY());
+        int sizeX = maxX - minX + 1;
+        int minY, maxY;
+        if (getEndY() > getStartY()) { minY = (int) getStartY(); maxY = (int) getEndY(); }
+        else { minY = (int) getEndY(); maxY = (int) getStartY(); }
+        int sizeY = maxY - minY + 1;
+        int[][] points;
+        if(sizeX > sizeY) {
+            points = new int[sizeX][2];
+            double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
+            for (int x = minX; x <= maxX; ++x) {
+                points[x - minX][0] = x;
+                points[x - minX][1] = (int) Math.round(slope * ((double) x - getEndX()) + getEndY());
+            }
+        } else {
+            points = new int[sizeY][2];
+            double slope = (getEndX() - getStartX()) / (getEndY() - getStartY());
+            for (int y = minY; y <= maxY; ++y) {
+                points[y - minY][0] = y;
+                points[y - minY][1] = (int) Math.round(slope * ((double) y - getEndY()) + getEndX());
+            }
         }
         return points;
     }

@@ -313,8 +313,8 @@ public class MainController implements Initializable, ToolController {
     public void handleMouseMoved(MouseEvent event) {
         int x = (int)event.getX();
         int y = (int)event.getY();
-        x/= activePaneProperty.getValue().getZoomProperty().getValue();
-        y/= activePaneProperty.getValue().getZoomProperty().getValue();
+        x *= activePaneProperty.getValue().getZoomLevel() / 100;
+        y *= activePaneProperty.getValue().getZoomLevel() / 100;
         labelX.setText("X: " + x);
         labelY.setText("Y: " + y);
         try {

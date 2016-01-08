@@ -1,6 +1,8 @@
 package pl.sotomski.apoz.nodes;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -31,7 +33,8 @@ public class ImagePane extends BorderPane {
     private ImageView imageView;
     private BufferedImage bufferedImage;
     private IntegerProperty imageVersion;
-    private IntegerProperty zoomProperty;
+    private IntegerProperty zoomIndex;
+    private DoubleProperty zoomLevel = new SimpleDoubleProperty();
     private HistogramPane histogramPane;
     private CommandManager commandManager;
     private static final double[] zoomLevels = new double[]{.05, .125, .25, .50, .75, 1, 1.25, 1.5, 2, 3, 4};
@@ -54,7 +57,7 @@ public class ImagePane extends BorderPane {
         this.commandManager = new CommandManager(this);
         this.imageVersion = new SimpleIntegerProperty(0);
         int indexOfOne = 5;
-        this.zoomProperty = new SimpleIntegerProperty(indexOfOne);
+        this.zoomIndex = new SimpleIntegerProperty(indexOfOne);
         this.imageView = new ImageView();
         imageView.setStyle("-fx-background-color: BLACK");
         imageStack.getChildren().add(imageView);
@@ -68,6 +71,10 @@ public class ImagePane extends BorderPane {
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
         this.setCenter(scrollPane);
+        zoomIndex.addListener((observable, oldValue, newValue) -> {
+            zoomLevel.setValue(zoomLevels[zoomIndex.get()]);
+        });
+        zoomLevel.setValue(zoomLevels[zoomIndex.get()]);
 
     }
 
@@ -129,6 +136,10 @@ public class ImagePane extends BorderPane {
 
     public Window getWindow() {
         return window;
+    }
+
+    public DoubleProperty zoomLevelProperty() {
+        return zoomLevel;
     }
 
     public void setWindow(Window window) {
@@ -194,16 +205,16 @@ public class ImagePane extends BorderPane {
     }
 
     public double getZoomLevel() {
-        return zoomLevels[zoomProperty.getValue()] * 100;
+        return zoomLevels[zoomIndex.getValue()] * 100;
     }
 
     public void handleZoomIn(Label textField) {
-        zoomProperty.setValue(zoomProperty.getValue()+1);
-        if(zoomProperty.getValue()>=zoomLevels.length) zoomProperty.setValue(zoomLevels.length-1);
-        imageStack.setScaleX(zoomLevels[zoomProperty.getValue()]);
-        imageStack.setScaleY(zoomLevels[zoomProperty.getValue()]);
-//        setFitWidth(zoomProperty.getValue() * imageView.getImage().getWidth());
-//        setFitHeight(zoomProperty.getValue() * imageView.getImage().getHeight());
+        zoomIndex.setValue(zoomIndex.getValue()+1);
+        if(zoomIndex.getValue()>=zoomLevels.length) zoomIndex.setValue(zoomLevels.length-1);
+        imageStack.setScaleX(zoomLevels[zoomIndex.getValue()]);
+        imageStack.setScaleY(zoomLevels[zoomIndex.getValue()]);
+//        setFitWidth(zoomIndex.getValue() * imageView.getImage().getWidth());
+//        setFitHeight(zoomIndex.getValue() * imageView.getImage().getHeight());
 //        if(getZoomLevel() > 100) {
 //            scrollPane.setHvalue(scrollPane.getHvalue() + scrollPane.getWidth() / 1.75);
 //            scrollPane.setVvalue(scrollPane.getVvalue() + scrollPane.getHeight() / 1.75);
@@ -212,17 +223,17 @@ public class ImagePane extends BorderPane {
     }
 
     public void handleZoomOut(Label textField) {
-        zoomProperty.setValue(zoomProperty.getValue()-1);
-        if(zoomProperty.getValue()<0) zoomProperty.setValue(0);
-        imageStack.setScaleX(zoomLevels[zoomProperty.getValue()]);
-        imageStack.setScaleY(zoomLevels[zoomProperty.getValue()]);
-//        setFitWidth(zoomProperty.getValue() * imageView.getImage().getWidth());
-//        setFitHeight(zoomProperty.getValue() * imageView.getImage().getHeight());
+        zoomIndex.setValue(zoomIndex.getValue()-1);
+        if(zoomIndex.getValue()<0) zoomIndex.setValue(0);
+        imageStack.setScaleX(zoomLevels[zoomIndex.getValue()]);
+        imageStack.setScaleY(zoomLevels[zoomIndex.getValue()]);
+//        setFitWidth(zoomIndex.getValue() * imageView.getImage().getWidth());
+//        setFitHeight(zoomIndex.getValue() * imageView.getImage().getHeight());
         textField.setText(String.format("%.0f%%", getZoomLevel()));
     }
 
-    public IntegerProperty getZoomProperty() {
-        return zoomProperty;
+    public IntegerProperty getZoomIndex() {
+        return zoomIndex;
     }
 
     public int getImageVersion() {
@@ -288,7 +299,7 @@ public class ImagePane extends BorderPane {
         histogramPane.updateProfileLineChart(getImage(), profileLine);
         System.out.println("Enable mouse events on:"+hashCode());
 
-        setOnMousePressed(mouseEvent -> {
+        imageView.setOnMousePressed(mouseEvent -> {
             if (!profileLine.isHoverEndpoint()) {
                 if (!getImageStack().contains(profileLine)) getImageStack().push(profileLine);
                 profileLine.setStartPoint(mouseEvent.getX(), mouseEvent.getY());
@@ -297,9 +308,9 @@ public class ImagePane extends BorderPane {
             }
         });
 
-        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, profileLine));
+        imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, profileLine));
 
-        setOnMouseReleased(mouseEvent -> histogramPane.updateProfileLineChart(getImage(), profileLine));
+        imageView.setOnMouseReleased(mouseEvent -> histogramPane.updateProfileLineChart(getImage(), profileLine));
     }
 
     public void enablePointerSelection() {
@@ -321,10 +332,10 @@ public class ImagePane extends BorderPane {
 
     public void enableCropSelection() {
         getImageStack().clear();
-        setOnMousePressed(event -> {});
-        setOnMouseReleased(event -> {});
-        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
-        cropRectangle = new CropRectangle();
+        imageView.setOnMousePressed(event -> {});
+        imageView.setOnMouseReleased(event -> {});
+        imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
+        cropRectangle = new CropRectangle(zoomLevel);
         getImageStack().push(cropRectangle);
         int width = getImage().getWidth();
         int height = getImage().getHeight();
