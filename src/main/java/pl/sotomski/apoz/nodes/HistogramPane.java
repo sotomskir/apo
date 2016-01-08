@@ -54,6 +54,12 @@ public class HistogramPane extends TabPane {
         cumulativeHistogramChart.update(histogram);
     }
 
+    public void clear() {
+        rgbHistogramChart.getData().clear();
+        monoHistogramChart.getData().clear();
+        cumulativeHistogramChart.getData().clear();
+    }
+
     public void updateProfileLineChart(BufferedImage image, ProfileLine line) {
         profileLineChart.update(ImageUtils.getLineProfilePixels(image, line));
     }

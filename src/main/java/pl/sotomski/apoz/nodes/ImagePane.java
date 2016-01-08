@@ -14,6 +14,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Window;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.utils.FileMenuUtils;
 import pl.sotomski.apoz.utils.ImageUtils;
@@ -40,6 +41,7 @@ public class ImagePane extends BorderPane {
     ProfileLine profileLine;
     CropRectangle cropRectangle;
     private String name = "";
+    Window window;
 
     private ImagePane() {
         super();
@@ -102,6 +104,14 @@ public class ImagePane extends BorderPane {
             name = oldName.substring(0, indexOfCopy-1) + " " + copyStr + " " + copyNumber;
         }
         refresh();
+    }
+
+    public Window getWindow() {
+        return window;
+    }
+
+    public void setWindow(Window window) {
+        this.window = window;
     }
 
     public CropRectangle getCropRectangle() {

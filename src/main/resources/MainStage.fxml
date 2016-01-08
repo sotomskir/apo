@@ -115,7 +115,7 @@
                             </tooltip>
                         </Button>
 
-                        <Button text="%mdi-pin-off" styleClass="mdi" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleUnpinTab">
+                        <Button fx:id="pinButton" text="%mdi-pin-off" styleClass="mdi" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleUnpinTab">
                             <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
                             <tooltip>
                                 <Tooltip text="%Detach"/>
