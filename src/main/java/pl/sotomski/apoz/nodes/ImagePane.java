@@ -132,6 +132,10 @@ public class ImagePane extends BorderPane {
         refresh();
     }
 
+    private enum ZoomLevel {
+
+    }
+
     public void handleZoomIn(Label textField) {
         zoomProperty.setValue(zoomProperty.multiply(2).getValue());
         if(zoomProperty.getValue()>4) zoomProperty.setValue(4);

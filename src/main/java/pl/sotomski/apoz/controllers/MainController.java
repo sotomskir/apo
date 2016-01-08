@@ -355,7 +355,7 @@ public class MainController implements Initializable, ToolController {
                 String snumber = lastSnapshot.substring(8, 11);
                 currentSnapshotNumber = Integer.valueOf(snumber)+1;
             } else currentSnapshotNumber = 1;
-            File file = new File(path + "snapshot" + String.format("%03d", currentSnapshotNumber) + ".png");
+            File file = new File(path + "/snapshot" + String.format("%03d", currentSnapshotNumber) + ".png");
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
         } catch (Exception e) {
             e.printStackTrace();

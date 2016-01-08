@@ -72,8 +72,8 @@ public class ImageUtils {
         int width = grayBI.getWidth();
         int height = grayBI.getHeight();
         BufferedImage binaryImage = new BufferedImage(grayBI.getWidth(), grayBI.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        final byte[] a = ((DataBufferByte) grayBI.getRaster().getDataBuffer()).getData();
-        final byte[] b = ((DataBufferByte) binaryImage.getRaster().getDataBuffer()).getData();
+        final byte[] a = getImageData(grayBI);
+        final byte[] b = getImageData(binaryImage);
         for (int p = width*height-1; p>=0; p-- ) b[p] = (byte) (lut[a[p] & 0xFF]);
         return binaryImage;
     }
@@ -98,42 +98,55 @@ public class ImageUtils {
     /**
      * @deprecated
      */
+    /**
+     * @deprecated
+     */
     public static int[] get3x3Pixels(byte[] imageData, int i, int channels, int width, int height, int bordersMethod, int neighborhood) {
         if (neighborhood == 0) { // square neighborhood
             int[] pixels = new int[9];
-            int wdth = channels * width;
-            int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
-            if (i < wdth) n = wdth;
-            if (i > imageData.length - wdth - channels) s = -wdth;
-            if (x <= channels) w = channels;
-            if (x >= wdth - channels) e = -channels;
-            pixels[0] = imageData[i + n + w - width * channels - channels] & 0xFF;
-            pixels[1] = imageData[i + n - width * channels] & 0xFF;
-            pixels[2] = imageData[i + n + e - width * channels + channels] & 0xFF;
-            pixels[3] = imageData[i + w - channels] & 0xFF;
-            pixels[4] = imageData[i] & 0xFF;
-            pixels[5] = imageData[i + e + channels] & 0xFF;
-            pixels[6] = imageData[i + s + w + width * channels - channels] & 0xFF;
-            pixels[7] = imageData[i + s + width * channels] & 0xFF;
-            pixels[8] = imageData[i + s + e + width * channels + channels] & 0xFF;
-            return pixels;
+            try {
+                int wdth = channels * width;
+                int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
+                if (i < wdth) n = wdth;
+                if (i > imageData.length - wdth - channels) s = -wdth;
+                if (x <= channels) w = channels;
+                if (x >= wdth - channels) e = -channels;
+                pixels[0] = imageData[i + n + w - width * channels - channels] & 0xFF;
+                pixels[1] = imageData[i + n - width * channels] & 0xFF;
+                pixels[2] = imageData[i + n + e - width * channels + channels] & 0xFF;
+                pixels[3] = imageData[i + w - channels] & 0xFF;
+                pixels[4] = imageData[i] & 0xFF;
+                pixels[5] = imageData[i + e + channels] & 0xFF;
+                pixels[6] = imageData[i + s + w + width * channels - channels] & 0xFF;
+                pixels[7] = imageData[i + s + width * channels] & 0xFF;
+                pixels[8] = imageData[i + s + e + width * channels + channels] & 0xFF;
+                return pixels;
+            } catch (IndexOutOfBoundsException e) {
+                return pixels;
+            }
 
         } else if (neighborhood == 1) { // diamond neighborhood
             int[] pixels = new int[5];
-            int wdth = channels * width;
-            int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
-            if (i < wdth) n = wdth;
-            if (i > imageData.length - wdth) s = -wdth;
-            if (x <= channels) w = channels;
-            if (x >= wdth - channels) e = -channels;
-            pixels[0] = imageData[i + n - width * channels] & 0xFF;
-            pixels[1] = imageData[i + e - channels] & 0xFF;
-            pixels[2] = imageData[i] & 0xFF;
-            pixels[3] = imageData[i + w + channels] & 0xFF;
-            pixels[4] = imageData[i + s + width * channels] & 0xFF;
-            return pixels;
+            try {
+                int wdth = channels * width;
+                int n = 0, w = 0, s = 0, e = 0, x = i % wdth;
+                if (i < wdth) n = wdth;
+                if (i > imageData.length - wdth) s = -wdth;
+                if (x <= channels) w = channels;
+                if (x >= wdth - channels) e = -channels;
+                pixels[0] = imageData[i + n - width * channels] & 0xFF;
+                pixels[1] = imageData[i + e - channels] & 0xFF;
+                pixels[2] = imageData[i] & 0xFF;
+                pixels[3] = imageData[i + w + channels] & 0xFF;
+                pixels[4] = imageData[i + s + width * channels] & 0xFF;
+                return pixels;
+            } catch (IndexOutOfBoundsException e) {
+                return pixels;
+            }
         } else throw new IllegalArgumentException("Illegal neighborhood argument value");
+
     }
+
 
     /**
      * @deprecated
@@ -299,7 +312,7 @@ public class ImageUtils {
             for (int x = 0; x < bi.getWidth(); ++x) {
                 int[][] pixels;
                 int diameter = (int) Math.sqrt(mask.length);
-                pixels = getPixels(tmpImage, diameter, x+diameter/2, y+diameter/2, bordersMethod);
+                pixels = getPixels(tmpImage, diameter, x, y, bordersMethod);
                 double[] sum = new double[channels];
                 int tmpMultiplier = multiplier;
                 for (int p = 0; p < mask.length; ++p) {
@@ -389,6 +402,8 @@ public class ImageUtils {
      * @return
      */
     private static int[][] getPixels(ExtendedBordersImage image, int diameter, int x, int y, int bordersMethod) {
+        x+=diameter/2;
+        y+=diameter/2;
         int[][] ret = new int[diameter*diameter][image.getColorModel().getNumComponents()];
         int i = 0;
         boolean flag = false;
@@ -477,7 +492,7 @@ public class ImageUtils {
     }
 
     public static void erode(BufferedImage image, int neighborhood) {
-        byte[] a = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+        byte[] a = getImageData(image);
         int channels = image.getColorModel().getNumComponents();
         int width    = image.getWidth();
         int height   = image.getHeight();
@@ -486,7 +501,7 @@ public class ImageUtils {
     }
 
     public static void dilate(BufferedImage image, int neighborhood) {
-        byte[] a = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
+        byte[] a = getImageData(image);
         int channels = image.getColorModel().getNumComponents();
         int width    = image.getWidth();
         int height   = image.getHeight();
@@ -510,7 +525,10 @@ public class ImageUtils {
     public static void outline(BufferedImage image, int neighborhood) {
         BufferedImage before = deepCopy(image);
         erode(image, neighborhood);
-        substract(image, before);
+        byte[] a = getImageData(image);
+        byte[] b = getImageData(before);
+        b = substract(b, a);
+        System.arraycopy(b, 0, a, 0, b.length);
     }
 
     public static void close(BufferedImage image, int neighborhood) {
@@ -576,14 +594,51 @@ public class ImageUtils {
         for (byte anA : a) if((anA & 0xFF) > 0) ++c;
         return c;
     }
+    /*
+        public static void skeleton(ImagePane imagePane, int neighborhood) {
+            //http://felix.abecassis.me/2011/09/opencv-morphological-skeleton/
+            BufferedImage image = imagePane.getImage();
+            byte[] img = getImageData(deepCopy(image));
+            byte[] temp;
+            byte[] eroded;
+            byte[] ret = new byte[0];
+            byte[] skel = new byte[img.length];
+            int channels = image.getColorModel().getNumComponents();
+            int width = image.getWidth();
+            int height = image.getHeight();
 
+            int maxLoopCount = 100;
+            int nonZero;
+            do {
+                eroded = erode(img, channels, width, height, 0);
+                temp = dilate(eroded, channels, width, height, 0);
+    //            eroded = dilate(img, channels, width, height, 0);
+    //            temp = erode(eroded, channels, width, height, 0);
+                temp = substract(img, temp);
+                skel = bitwise_or(skel, temp);
+                System.arraycopy(eroded, 0, img, 0, img.length);
+                nonZero = countNonZero(img);
+                System.out.println(nonZero);
+    //            ret = appendVertical(ret, temp);
+    //            ret = appendVertical(ret, temp);
+    //            System.arraycopy(skel, 0, temp, 0, skel.length);
+                --maxLoopCount;
+            } while (nonZero != 0 && maxLoopCount > 0);
+    //        BufferedImage r = new BufferedImage(image.getWidth(), ret.length / image.getWidth(), image.getType());
+    //        byte[] a = getImageData(r);
+    //        System.arraycopy(ret, 0, a, 0, ret.length);
+            byte[] a = getImageData(image);
+            System.arraycopy(skel, 0, a, 0, ret.length);
+    //        imagePane.setImage(r);
+            imagePane.refresh();
+        }
+        */
     public static void skeleton(ImagePane imagePane, int neighborhood) {
         //http://felix.abecassis.me/2011/09/opencv-morphological-skeleton/
         BufferedImage image = imagePane.getImage();
-        byte[] img = getImageData(deepCopy(image));
+        byte[] img = getImageData(image);
         byte[] temp;
         byte[] eroded;
-        byte[] ret = new byte[0];
         byte[] skel = new byte[img.length];
         int channels = image.getColorModel().getNumComponents();
         int width = image.getWidth();
@@ -592,22 +647,17 @@ public class ImageUtils {
         int nonZero;
         do
         {
-            eroded = erode(img, channels, width, height, 1);
-            temp = dilate(eroded, channels, width, height, 1);
+            eroded = erode(img, channels, width, height, neighborhood);
+            temp = dilate(eroded, channels, width, height, neighborhood);
             temp = substract(img, temp);
             skel = bitwise_or(skel, temp);
             System.arraycopy(eroded, 0, img, 0, img.length);
             nonZero = countNonZero(img);
             System.out.println(nonZero);
-            ret = appendVertical(ret, temp);
         } while (nonZero != 0);
-        BufferedImage r = new BufferedImage(image.getWidth(), ret.length / image.getWidth(), image.getType());
-        byte[] a = getImageData(r);
-        System.arraycopy(ret, 0, a, 0, ret.length);
-        imagePane.setImage(r);
-        imagePane.refresh();
+        byte[] a = getImageData(image);
+        System.arraycopy(skel, 0, a, 0, img.length);
     }
-
     public static byte[] appendVertical(byte[] base, byte[] image) {
         byte[] tmp = new byte[base.length + image.length];
         System.arraycopy(base, 0, tmp, 0, base.length);
@@ -767,7 +817,7 @@ public class ImageUtils {
         byte[] b = new byte[a.length];
         int width = image.getWidth();
         int channels = image.getColorModel().getNumComponents();
-        int offset =width * channels + channels;
+        int offset = width * channels + channels;
         switch (direction) {
             case 0:
                 for (int i = offset; i < a.length - offset; ++i) {

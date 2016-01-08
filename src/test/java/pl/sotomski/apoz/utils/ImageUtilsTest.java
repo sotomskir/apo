@@ -351,4 +351,26 @@ public class ImageUtilsTest {
         assertEquals(3, modulus(-1, 4));
 
     }
+
+    @Test
+    public void applyLUTTest() {
+        BufferedImage image = new BufferedImage(256, 1, BufferedImage.TYPE_BYTE_GRAY);
+        byte[] a = getImageData(image);
+        int[] expecteds = new int[256];
+        Arrays.fill(a, (byte) 0);
+        int[] lut = new int[256];
+        for (int i = 0; i < 256; i++) {
+            ImageUtils.setPixel(image, i, 0, i);
+            expecteds[i] = 255 - i;
+            lut[i] = 255 - i;
+            System.out.print(lut[i] + ";");
+        }
+        System.out.println();
+        image = applyLUT(image, lut);
+        a = getImageData(image);
+        int[] actuals = new int[256];
+        for (int i = 0; i < 256; i++) actuals[i] = a[i] & 0xFF;
+
+        assertArrayEquals(expecteds, actuals);
+    }
 }
