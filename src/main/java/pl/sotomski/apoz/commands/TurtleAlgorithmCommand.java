@@ -16,7 +16,7 @@ public class TurtleAlgorithmCommand extends UndoableCommand implements Command {
 
     @Override
     public void execute() {
-        ImageUtils.turtleAlgorithm(imagePane.getImage());
+        ImageUtils.turtleAlgorithm(imagePane);
     }
 
 }

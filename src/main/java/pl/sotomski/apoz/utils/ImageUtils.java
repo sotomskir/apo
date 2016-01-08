@@ -861,7 +861,20 @@ public class ImageUtils {
     }
 
 
-    public static int turtleAlgorithm(BufferedImage image) {
+    public static BufferedImage grayToRGB(BufferedImage image) {
+        BufferedImage ret = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+        int[] rgb;
+        for (int x = 0; x < ret.getWidth(); ++x)
+            for (int y = 0; y < ret.getHeight(); ++y) {
+                rgb = getPixel(image, x, y);
+                setPixel(ret, x, y, rgb[0]);
+            }
+        return ret;
+    }
+
+
+    public static int turtleAlgorithm(ImagePane imagePane) {
+        BufferedImage image = imagePane.getImage();
         int objectColor = getPixel(image, 0, 0)[0] < 128 ? 255 : 0;
         // Subroutine to perform chain coding
         int xStart = -1, yStart = -1;
@@ -908,7 +921,7 @@ public class ImageUtils {
             if (c++ > TMAX) return -94;
             // while not back at start point, continue
         } while (x != xStart || y != yStart);
-        drawLine(image, xStart, yStart, chainCode);
+        drawLine(image, xStart, yStart, chainCode, imagePane);
         return 0;
     }
 
@@ -920,8 +933,9 @@ public class ImageUtils {
 
     }
 
-    private static void drawLine(BufferedImage image, int xStart, int yStart, List<Integer> chainCode) {
+    private static void drawLine(BufferedImage image, int xStart, int yStart, List<Integer> chainCode, ImagePane imagePane) {
         int x = xStart, y = yStart;
+        if (image.getColorModel().getNumComponents() < 3) image = grayToRGB(image);
         for (Integer d : chainCode) {
             setPixel(image, x, y, new int[] {0,0,255});
             switch (d) { //translate direction to pixel
@@ -931,6 +945,7 @@ public class ImageUtils {
                 case 3: y++; break;
             }
         }
+        imagePane.setImage(image);
     }
 
     public static void printImage(BufferedImage image) {
