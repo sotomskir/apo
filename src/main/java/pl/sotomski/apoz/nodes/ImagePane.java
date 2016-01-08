@@ -21,6 +21,7 @@ import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.HashSet;
 
 
 /**
@@ -42,6 +43,7 @@ public class ImagePane extends BorderPane {
     CropRectangle cropRectangle;
     private String name = "";
     Window window;
+    private static HashSet<String> names = new HashSet<>();
 
     private ImagePane() {
         super();
@@ -70,7 +72,7 @@ public class ImagePane extends BorderPane {
         this.histogramPane = histogramPane;
         setImage(bi);
         this.file = file;
-        name = file.getName();
+        name = incrementNameIfNotDistinct(file.getName());
         refresh();
     }
 
@@ -78,32 +80,46 @@ public class ImagePane extends BorderPane {
         this();
         this.histogramPane = histogramPane;
         this.bufferedImage = image;
-        this.name = name;
+        this.name = incrementNameIfNotDistinct(name);
         refresh();
     }
 
     public ImagePane(HistogramPane histogramPane, ImagePane imagePane) {
         this();
         if(imagePane.getFile() != null) setFile(new File(imagePane.getFile().getPath()));
+        name = imagePane.getName();
         BufferedImage image = ImageUtils.deepCopy(imagePane.getImage());
         this.histogramPane = histogramPane;
         this.bufferedImage = image;
-        String oldName = imagePane.getName();
         String copyStr = histogramPane.getBundle().getString("copy");
-        int copyLength = copyStr.length();
-        int indexOfCopy = oldName.indexOf(copyStr);
-        if (indexOfCopy < 0) name = oldName + " " + copyStr;
-        else {
-            int copyNumber;
-            try {
-                copyNumber = Integer.valueOf(oldName.substring(indexOfCopy + copyLength + 1));
-                ++copyNumber;
-            } catch (NumberFormatException|StringIndexOutOfBoundsException e) {
-                copyNumber = 1;
-            }
-            name = oldName.substring(0, indexOfCopy-1) + " " + copyStr + " " + copyNumber;
-        }
+        int indexOfCopy = name.indexOf(copyStr);
+        if (indexOfCopy < 0) name = name + " " + copyStr;
+        this.name = incrementNameIfNotDistinct(this.name);
         refresh();
+    }
+
+    public String incrementNameIfNotDistinct(String name) {
+        System.out.println("Name: " + name);
+        while(names.contains(name)) {
+            int indexOfLastSpace = name.lastIndexOf(' ');
+            if (indexOfLastSpace < 0) name = name + " 1";
+            else {
+                int copyNumber;
+                try {
+                    copyNumber = Integer.valueOf(name.substring(indexOfLastSpace + 1));
+                    if (copyNumber == 0) throw new NumberFormatException();
+                    ++copyNumber;
+                    name = name.substring(0, indexOfLastSpace+1) + copyNumber;
+                } catch (NumberFormatException|StringIndexOutOfBoundsException e) {
+                    copyNumber = 1;
+                    name = name + " " + copyNumber;
+                }
+            }
+            System.out.println("Incremented name: " + name);
+        }
+        System.out.println(names);
+        names.add(name);
+        return name;
     }
 
     public Window getWindow() {
@@ -164,6 +180,14 @@ public class ImagePane extends BorderPane {
         return name;
     }
 
+    public void onClose() {
+        names.remove(name);
+    }
+
+    public void setName(String name) {
+        this.name = incrementNameIfNotDistinct(name);
+    }
+
     private enum ZoomLevel {
 
     }
@@ -208,7 +232,6 @@ public class ImagePane extends BorderPane {
 
     public void setFile(File file) {
         this.file = file;
-        name = file.getName();
     }
 
     public File getFile() {

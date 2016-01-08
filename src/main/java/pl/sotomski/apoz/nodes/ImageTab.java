@@ -14,6 +14,7 @@ public class ImageTab extends Tab {
         this.pane = imagePane;
         this.setContent(imagePane);
         this.setText(imagePane.getName());
+        setOnClosed(event -> imagePane.onClose());
     }
 
     public ImagePane getPane() {
@@ -25,4 +26,5 @@ public class ImageTab extends Tab {
         this.setContent(imagePane);
         this.setText(imagePane.getFile().getName());
     }
+
 }

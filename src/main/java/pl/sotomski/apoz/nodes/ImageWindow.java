@@ -21,7 +21,7 @@ public class ImageWindow extends Stage {
         borderPane.setRight(histogramPane);
         Scene newScene = new Scene(borderPane);
         this.setScene(newScene);
-        this.setTitle(imagePane.getFile().getName());
+        this.setTitle(imagePane.getName());
         this.setAlwaysOnTop(false);
         this.initOwner(owner);
         this.show();

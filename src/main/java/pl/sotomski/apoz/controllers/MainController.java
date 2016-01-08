@@ -73,6 +73,7 @@ public class MainController implements Initializable, ToolController {
     private final BooleanProperty undoUnavailable = new SimpleBooleanProperty(true);
     private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
 
+
     /***************************************************************************
      *                                                                         *
      *                          GETTERS & SETTERS                              *
@@ -149,6 +150,7 @@ public class MainController implements Initializable, ToolController {
                 zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
             }
             needsImage.setValue(activePaneProperty.getValue() == null);
+            System.out.println("Selected: " + activePaneProperty.getValue().getName());
         });
 
         menuBar.setFocusTraversable(false);
@@ -294,7 +296,9 @@ public class MainController implements Initializable, ToolController {
 
     public void handleSaveAs(ActionEvent actionEvent) {
         BufferedImage image = activePaneProperty.getValue().getImage();
-        activePaneProperty.getValue().setFile(FileMenuUtils.saveAsDialog(rootLayout, image));;
+        File file = FileMenuUtils.saveAsDialog(rootLayout, image);
+        activePaneProperty.getValue().setFile(file);
+        activePaneProperty.getValue().setName(file.getName());
     }
 
     public void handleSave(ActionEvent actionEvent) {
@@ -400,6 +404,7 @@ public class MainController implements Initializable, ToolController {
             pane.setWindow(null);
             attachTab(new ImageTab(pane));
             pinButton.setText(bundle.getString("mdi-pin-off"));
+            pane.onClose();
             stage.close();
         }
     }
