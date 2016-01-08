@@ -36,22 +36,23 @@ public class LevelsReductionControl extends ChartControl {
         double intervalLength = 255.0 /intervals;
 
         // create new intervals
-        for (int i = 0; i<=intervals; ++i) {
+        for (int i = 0; i<intervals; ++i) {
             double startX = intervalLength * i;
             double startY = startX - intervalLength;
             IntervalData d = new IntervalData(startX, startY, startX);
             this.getPlotChildren().add(d.getLine());
             intervalDatas.add(d);
         }
+        intervalDatas.add(new IntervalData(255, 255-intervalLength, 255));
 
         // create new levelLines
         for (int i = 0; i<intervals; ++i) {
             IntervalData left  = intervalDatas.get(i);
             IntervalData right = intervalDatas.get(i+1);
-            DoubleProperty leftStartX = left.getLine().startXProperty();
-            DoubleProperty rightStartX   = right.getLine().startXProperty();
-            DoubleProperty leftEndY = left.getLine().endYProperty();
-            DoubleProperty rightStartY   = right.getLine().startYProperty();
+            DoubleProperty leftStartX  =  left.getLine().startXProperty();
+            DoubleProperty rightStartX = right.getLine().startXProperty();
+            DoubleProperty leftEndY    =  left.getLine().endYProperty();
+            DoubleProperty rightStartY = right.getLine().startYProperty();
             LevelLine levelLine = new LevelLine(leftStartX.getValue(), (leftEndY.getValue()), (rightStartX.getValue()), (rightStartY.getValue()));
             levelLine.startYProperty().addListener(observable1 -> {
                 left.setEndY(yValue(levelLine.getStartY()));

@@ -162,12 +162,17 @@ public class ChartControl extends LineChart {
 
     protected void updateLUT() {
         for(LevelLine l : levelLines) {
+            System.out.println("start: "+xValue(l.getStartX()));
+            System.out.println("end: "+xValue(l.getEndX()));
             double slope = (yValue(l.getEndY()) - yValue(l.getStartY())) / (xValue(l.getEndX()) - xValue(l.getStartX()));
-            for (int x = (int) xValue(l.getStartX()); x<xValue(l.getEndX()); ++x) {
+            for (int x = (int) xValue(l.getStartX()); x<=Math.round(xValue(l.getEndX())); ++x) {
                 LUT[x] = (int) (slope * (x - xValue(l.getStartX())) + yValue(l.getStartY()));
-                LUT[x] = LUT[x]>255 ? 255 : LUT[x]<0 ? 0 : LUT[x];
+                LUT[x] = LUT[x] > 255 ? 255 : LUT[x] < 0 ? 0 : LUT[x];
+                System.out.print(x + ";");
             }
         }
+        System.out.println();
+
         changed.setValue(changed.get() + 1);
     }
 
@@ -434,15 +439,15 @@ public class ChartControl extends LineChart {
             setOnMouseEntered(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.V_RESIZE);
-                    menuItem.setText("Y:" + yValue(this.startYProperty().intValue()));
-                    menu.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
+//                    menuItem.setText("Y:" + yValue(this.startYProperty().intValue()));
+//                    menu.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
                 }
             });
 
             setOnMouseExited(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.DEFAULT);
-                    menu.hide();
+//                    menu.hide();
                 }
             });
 

@@ -64,6 +64,7 @@ public class MainController implements Initializable, ToolController {
     @FXML private BorderPane rootLayout;
     @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
     @FXML TabPane tabPane;
+    @FXML Button pinButton;
     @FXML private ToggleButton pointerButton;
     @FXML private ToggleButton cropButton;
     @FXML private ToggleButton profileLineButton;
@@ -72,9 +73,10 @@ public class MainController implements Initializable, ToolController {
     private final BooleanProperty undoUnavailable = new SimpleBooleanProperty(true);
     private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
 
+
     /***************************************************************************
      *                                                                         *
-     *                               GETTERS                                   *
+     *                          GETTERS & SETTERS                              *
      *                                                                         *
      **************************************************************************/
     public ResourceBundle getBundle() {
@@ -137,16 +139,21 @@ public class MainController implements Initializable, ToolController {
         histogramPaneContainer.getChildren().add(histogramPane);
         activePaneProperty.addListener(e -> {
             if (activePaneProperty.getValue() != null) {
-                if (activePaneProperty.getValue().isTabbed()) {
-                    histogramPane.update(activePaneProperty.getValue().getImage());
+                if (activePaneProperty.getValue().getWindow() == null) {
+                    pinButton.setText(bundle.getString("mdi-pin-off"));
+                } else {
+                    pinButton.setText(bundle.getString("mdi-pin"));
+//                    histogramPane.clear();
                 }
-                zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
+                if(activePaneProperty.getValue().isTabbed())
+                    histogramPane.update(activePaneProperty.getValue().getImage());
+                zoomLabel.setText(String.format("%.0f%%", activePaneProperty.getValue().getZoomLevel()));
             }
             needsImage.setValue(activePaneProperty.getValue() == null);
+            System.out.println("Selected: " + activePaneProperty.getValue().getName());
         });
 
         menuBar.setFocusTraversable(false);
-        zoomLabel.setOnInputMethodTextChanged(e -> activePaneProperty.getValue().handleZoomChange(zoomLabel.getText()));
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             ImageTab oldActiveTab = (ImageTab) oldValue;
@@ -165,7 +172,7 @@ public class MainController implements Initializable, ToolController {
                 undoUnavailable.bind(newActiveTab.getPane().getCommandManager().undoAvailableProperty().not());
                 redoUnavailable.bind(newActiveTab.getPane().getCommandManager().redoAvailableProperty().not());
             } else {
-                activePaneProperty.setValue(null);
+//                activePaneProperty.setValue(null);
                 undoUnavailable.setValue(true);
                 redoUnavailable.setValue(true);
             }
@@ -288,7 +295,9 @@ public class MainController implements Initializable, ToolController {
 
     public void handleSaveAs(ActionEvent actionEvent) {
         BufferedImage image = activePaneProperty.getValue().getImage();
-        activePaneProperty.getValue().setFile(FileMenuUtils.saveAsDialog(rootLayout, image));
+        File file = FileMenuUtils.saveAsDialog(rootLayout, image);
+        activePaneProperty.getValue().setFile(file);
+        activePaneProperty.getValue().setName(file.getName());
     }
 
     public void handleSave(ActionEvent actionEvent) {
@@ -304,19 +313,23 @@ public class MainController implements Initializable, ToolController {
     public void handleMouseMoved(MouseEvent event) {
         int x = (int)event.getX();
         int y = (int)event.getY();
-        x/= activePaneProperty.getValue().getZoomProperty().getValue();
-        y/= activePaneProperty.getValue().getZoomProperty().getValue();
+        x *= activePaneProperty.getValue().getZoomLevel() / 100;
+        y *= activePaneProperty.getValue().getZoomLevel() / 100;
         labelX.setText("X: " + x);
         labelY.setText("Y: " + y);
-        int rgb = activePaneProperty.getValue().getImage().getRGB(x, y);
-        if(activePaneProperty.getValue().getChannels() == 3) {
-            labelR.setText("R: " + ImageUtils.getR(rgb));
-            labelG.setText("G: " + ImageUtils.getG(rgb));
-            labelB.setText("B: " + ImageUtils.getB(rgb));
-        } else {
-            labelR.setText("K: " + ImageUtils.getB(rgb));
-            labelG.setText("");
-            labelB.setText("");
+        try {
+            int rgb = activePaneProperty.getValue().getImage().getRGB(x, y);
+            if(activePaneProperty.getValue().getChannels() == 3) {
+                labelR.setText("R: " + ImageUtils.getR(rgb));
+                labelG.setText("G: " + ImageUtils.getG(rgb));
+                labelB.setText("B: " + ImageUtils.getB(rgb));
+            } else {
+                labelR.setText("K: " + ImageUtils.getB(rgb));
+                labelG.setText("");
+                labelB.setText("");
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
         }
     }
 
@@ -355,7 +368,7 @@ public class MainController implements Initializable, ToolController {
                 String snumber = lastSnapshot.substring(8, 11);
                 currentSnapshotNumber = Integer.valueOf(snumber)+1;
             } else currentSnapshotNumber = 1;
-            File file = new File(path + "snapshot" + String.format("%03d", currentSnapshotNumber) + ".png");
+            File file = new File(path + "/snapshot" + String.format("%03d", currentSnapshotNumber) + ".png");
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
         } catch (Exception e) {
             e.printStackTrace();
@@ -363,24 +376,36 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleUnpinTab(ActionEvent actionEvent) {
-        ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
-        selectedTab.getPane().setTabbed(false);
-        tabPane.getTabs().remove(selectedTab);
-        Window parent = rootLayout.getScene().getWindow();
-        ImagePane imagePane = selectedTab.getPane();
-        ImageWindow window = new ImageWindow(parent, imagePane, new HistogramPane(bundle));
-        window.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
-            if (newPropertyValue)
-            {
-                activePaneProperty.setValue(window.getImagePane());
-                window.toFront();
-                System.out.println("Window on focus: "+window.getTitle());
-            }
-            else
-            {
-                System.out.println("Window out focus: "+window.getTitle());
-            }
-        });
+        Window window = getActivePaneProperty().getWindow();
+        if(window == null) {
+            ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
+            selectedTab.getPane().setTabbed(false);
+            tabPane.getTabs().remove(selectedTab);
+            Window parent = rootLayout.getScene().getWindow();
+            ImagePane imagePane = selectedTab.getPane();
+            ImageWindow imageWindow = new ImageWindow(parent, imagePane, new HistogramPane(bundle));
+            imagePane.setWindow(imageWindow);
+            imageWindow.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
+                if (newPropertyValue) {
+                    activePaneProperty.setValue(imageWindow.getImagePane());
+                    imageWindow.toFront();
+                    System.out.println("Window on focus: " + imageWindow.getTitle());
+                } else {
+                    System.out.println("Window out focus: " + imageWindow.getTitle());
+                }
+            });
+            activePaneProperty.setValue(imagePane);
+
+        } else {
+            ImagePane pane = activePaneProperty.getValue();
+            Stage stage = (Stage) pane.getWindow();
+            pane.setHistogramPane(histogramPane);
+            pane.setWindow(null);
+            attachTab(new ImageTab(pane));
+            pinButton.setText(bundle.getString("mdi-pin-off"));
+            pane.onClose();
+            stage.close();
+        }
     }
 
     public void handleUndo(ActionEvent actionEvent) {

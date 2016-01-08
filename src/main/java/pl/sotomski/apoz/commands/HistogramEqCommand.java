@@ -22,7 +22,7 @@ public class HistogramEqCommand extends UndoableCommand implements Command {
 
     @Override
     public void execute() {
-        if (method==1) method1(imagePane.getImage());
+        if (method == 1) method1(imagePane.getImage());
         else if (method==2) method2(imagePane.getImage());
         else if (method == 3) method3(imagePane.getImage());
         else if (method == 4) method4(imagePane.getImage());

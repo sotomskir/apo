@@ -125,7 +125,7 @@ public class BrightnessContrastTool extends VBox {
 
     private BufferedImage calculateImage() {
         BufferedImage grayBI, image = this.toolController.getBufferedImage();
-        if(image.getColorModel().getNumComponents()>1) ImageUtils.rgbToGrayscale(image);
+        if(image.getColorModel().getNumComponents()>1) image = ImageUtils.rgbToGrayscale(image);
         grayBI = ImageUtils.deepCopy(image);
         int width = grayBI.getWidth();
         int height = grayBI.getHeight();

@@ -2,7 +2,9 @@ package pl.sotomski.apoz.utils;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.nodes.ProfileLine;
 
 import java.awt.image.BufferedImage;
@@ -16,6 +18,11 @@ import static pl.sotomski.apoz.utils.ImageUtils.*;
  * Created by sotomski on 03/11/15.
  */
 public class ImageUtilsTest {
+
+    ImagePane imagePane = new ImagePane();
+
+    @Rule
+    public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();
 
     @Before
     public void setUp() throws Exception {
@@ -344,11 +351,34 @@ public class ImageUtilsTest {
         ImageUtils.setPixel(image, 5, 5, 255);
         printImage(image);
 
-        turtleAlgorithm(image);
+        imagePane.setImage(image);
+        turtleAlgorithm(imagePane);
 
-        printImage(image);
+        printImage(imagePane.getImage());
         assertEquals(3, (-1 % 4 + 4) % 4);
         assertEquals(3, modulus(-1, 4));
 
+    }
+
+    @Test
+    public void applyLUTTest() {
+        BufferedImage image = new BufferedImage(256, 1, BufferedImage.TYPE_BYTE_GRAY);
+        byte[] a = getImageData(image);
+        int[] expecteds = new int[256];
+        Arrays.fill(a, (byte) 0);
+        int[] lut = new int[256];
+        for (int i = 0; i < 256; i++) {
+            ImageUtils.setPixel(image, i, 0, i);
+            expecteds[i] = 255 - i;
+            lut[i] = 255 - i;
+            System.out.print(lut[i] + ";");
+        }
+        System.out.println();
+        image = applyLUT(image, lut);
+        a = getImageData(image);
+        int[] actuals = new int[256];
+        for (int i = 0; i < 256; i++) actuals[i] = a[i] & 0xFF;
+
+        assertArrayEquals(expecteds, actuals);
     }
 }
