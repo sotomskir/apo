@@ -147,14 +147,13 @@ public class MainController implements Initializable, ToolController {
                 }
                 if(activePaneProperty.getValue().isTabbed())
                     histogramPane.update(activePaneProperty.getValue().getImage());
-                zoomLabel.setText(activePaneProperty.getValue().getZoomProperty().multiply(100).getValue().intValue() + "%");
+                zoomLabel.setText(String.format("%.0f%%", activePaneProperty.getValue().getZoomLevel()));
             }
             needsImage.setValue(activePaneProperty.getValue() == null);
             System.out.println("Selected: " + activePaneProperty.getValue().getName());
         });
 
         menuBar.setFocusTraversable(false);
-        zoomLabel.setOnInputMethodTextChanged(e -> activePaneProperty.getValue().handleZoomChange(zoomLabel.getText()));
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             ImageTab oldActiveTab = (ImageTab) oldValue;
