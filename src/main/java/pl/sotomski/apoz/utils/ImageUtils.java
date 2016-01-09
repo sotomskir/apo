@@ -24,6 +24,7 @@ public class ImageUtils {
         int[][] pixels = new int[points.length][channels];
         for (int i = 0; i < points.length; ++i) {
             pixels[i] = getPixel(image, points[i][0], points[i][1]);
+            setPixel(image, points[i][0], points[i][1], new int[] {0, 0, 255});
         }
 
         System.out.println("Profile line start: " + line.getStartX() + ":" + line.getStartY());

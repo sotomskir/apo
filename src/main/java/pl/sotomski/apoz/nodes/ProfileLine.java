@@ -90,10 +90,10 @@ public class ProfileLine extends Group {
             }
         } else {
             points = new int[sizeY][2];
-            double slope = (getEndX() - getStartX()) / (getEndY() - getStartY());
+            double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
             for (int y = minY; y <= maxY; ++y) {
-                points[y - minY][0] = y;
-                points[y - minY][1] = (int) Math.round(slope * ((double) y - getEndY()) + getEndX());
+                points[y - minY][0] = (int) Math.round(( ((double) y - getEndY()) / slope) + getEndX());
+                points[y - minY][1] = y;
             }
 
             //Reverse array

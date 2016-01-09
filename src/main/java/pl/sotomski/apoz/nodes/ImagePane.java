@@ -300,10 +300,16 @@ public class ImagePane extends BorderPane {
             }
         });
 
-        profileLine.changedProperty().addListener(observable -> histogramPane.updateProfileLineChart(getImage(), profileLine));
+        profileLine.changedProperty().addListener(observable -> {
+            histogramPane.updateProfileLineChart(getImage(), profileLine);
+            refresh();
+        });
         imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, profileLine));
 
-        imageView.setOnMouseReleased(mouseEvent -> histogramPane.updateProfileLineChart(getImage(), profileLine));
+        imageView.setOnMouseReleased(mouseEvent -> {
+            histogramPane.updateProfileLineChart(getImage(), profileLine);
+            refresh();
+        });
     }
 
     public void enablePointerSelection() {
