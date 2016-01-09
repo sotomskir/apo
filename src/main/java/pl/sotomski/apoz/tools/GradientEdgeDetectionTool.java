@@ -21,6 +21,9 @@ public class GradientEdgeDetectionTool extends VBox {
     private String[] masks;
     Label masksLabel = new Label();
     ComboBox<String> directionComboBox;
+    ComboBox<String> scalingComboBox = new ComboBox<>();
+    ComboBox<String> calcMethodComboBox = new ComboBox<>();
+
     BordersMethodToggles bordersMethodToggles;
     String[] maskLabels = new String[]{" 1  0 |  0 -1\n 0 -1 |  1  0", "-1  0  1 |-1 -2 -1\n-2  0  2 | 0  0  0\n-1  0  1 | 1  2  1"};
     private String[] prewittMask = {
@@ -71,6 +74,16 @@ public class GradientEdgeDetectionTool extends VBox {
         });
         directionLabel.setVisible(false);
 
+        scalingComboBox.getItems().addAll(
+                bundle.getString("scalingMethod0"),
+                bundle.getString("scalingMethod1"),
+                bundle.getString("scalingMethod2"),
+                bundle.getString("scalingMethod3")
+                );
+        scalingComboBox.getSelectionModel().selectFirst();
+        calcMethodComboBox.getItems().addAll(bundle.getString("calcMethod1"), bundle.getString("calcMethod2"));
+        calcMethodComboBox.getSelectionModel().selectFirst();
+
         choiceBox.getItems().addAll(masks);
         choiceBox.getSelectionModel().selectFirst();
         choiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -110,6 +123,10 @@ public class GradientEdgeDetectionTool extends VBox {
                 masksLabel,
                 directionLabel,
                 directionComboBox,
+                new Label(bundle.getString("calcMethod")),
+                calcMethodComboBox,
+                new Label(bundle.getString("scalingMethod")),
+                scalingComboBox,
                 bordersMethodToggles,
                 button
         );
@@ -142,7 +159,9 @@ public class GradientEdgeDetectionTool extends VBox {
         }
         int direction = directionComboBox.getSelectionModel().getSelectedIndex();
         int bordersMethod = bordersMethodToggles.getMethod();
-        manager.executeCommand(new GradientEdgeDetectionCommand(imagePane, maskName, direction, bordersMethod));
+        int scalingMethod = scalingComboBox.getSelectionModel().getSelectedIndex();
+        int calcMethod = calcMethodComboBox.getSelectionModel().getSelectedIndex();
+        manager.executeCommand(new GradientEdgeDetectionCommand(imagePane, maskName, direction, bordersMethod, scalingMethod, calcMethod));
         imagePane.setImage(imagePane.getImage());
     }
 

@@ -18,7 +18,7 @@ public class GradientSharpeningCommand extends UndoableCommand implements Comman
 
     @Override
     public void execute() {
-        ImageUtils.gradientSharpening(imagePane.getImage(), masks, bordersMethod);
+        ImageUtils.gradientFilter(imagePane.getImage(), masks, bordersMethod, 3, 0);
     }
 
 }

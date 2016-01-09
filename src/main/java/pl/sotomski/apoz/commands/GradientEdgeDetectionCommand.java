@@ -5,6 +5,8 @@ import pl.sotomski.apoz.utils.ImageUtils;
 
 public class GradientEdgeDetectionCommand extends UndoableCommand implements Command {
 
+    private final int scalingMethod;
+    private final int calcMethod;
     private int bordersMethod;
     private String maskName;
     private int edgeDirection;
@@ -42,11 +44,13 @@ public class GradientEdgeDetectionCommand extends UndoableCommand implements Com
             { 3, 3, 3, 3, 0,-5, 3,-5,-5} //NW
     };
 
-    public GradientEdgeDetectionCommand(ImagePane image, String maskName, int edgeDirection, int bordersMethod) throws Exception {
+    public GradientEdgeDetectionCommand(ImagePane image, String maskName, int edgeDirection, int bordersMethod, int scalingMethod, int calcMethod) throws Exception {
         super(image);
         this.bordersMethod = bordersMethod;
         this.maskName = maskName;
         this.edgeDirection = edgeDirection;
+        this.scalingMethod = scalingMethod;
+        this.calcMethod = calcMethod;
     }
 
     @Override
@@ -56,19 +60,19 @@ public class GradientEdgeDetectionCommand extends UndoableCommand implements Com
         switch (maskName) {
             case "Roberts":
                 mask = robertsMask;
-                ImageUtils.robertsMaskFilter(imagePane.getImage(), mask, bordersMethod);
+                ImageUtils.gradientFilter(imagePane.getImage(), mask, bordersMethod, scalingMethod, calcMethod);
                 break;
             case "Sobel":
                 mask = sobelMask;
-                ImageUtils.gradientSharpening(imagePane.getImage(), mask, bordersMethod);
+                ImageUtils.gradientFilter(imagePane.getImage(), mask, bordersMethod, scalingMethod, calcMethod);
                 break;
             case "Prewitt":
                 mask1 = prewittMask[edgeDirection];
-                ImageUtils.linearFilter(imagePane.getImage(), mask1, bordersMethod);
+                ImageUtils.linearFilterWithScaling(imagePane.getImage(), mask1, bordersMethod, scalingMethod);
                 break;
             case "Kirsh":
                 mask1 = kirshMask[edgeDirection];
-                ImageUtils.linearFilter(imagePane.getImage(), mask1, bordersMethod);
+                ImageUtils.linearFilterWithScaling(imagePane.getImage(), mask1, bordersMethod, scalingMethod);
                 break;
             default:
         }

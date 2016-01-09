@@ -52,6 +52,11 @@
             <artifactId>tango-icon-theme</artifactId>
             <version>0.8.90</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
         <!--<dependency>-->
         <!--<groupId>log4j</groupId>-->
         <!--<artifactId>log4j</artifactId>-->

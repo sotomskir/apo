@@ -1,5 +1,6 @@
 package pl.sotomski.apoz.utils;
 
+import com.google.common.primitives.Ints;
 import pl.sotomski.apoz.nodes.CropRectangle;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.nodes.ProfileLine;
@@ -191,32 +192,6 @@ public class ImageUtils {
         return pixels;
     }
 
-    public static void robertsMaskFilter(BufferedImage bi, int[][] masks, int bordersMethod) {
-        int width = bi.getWidth();
-        int height = bi.getHeight();
-        int channels = bi.getColorModel().getNumComponents();
-        byte[] a = getImageData(bi);
-        final int bordersWidth = (int) (Math.sqrt(masks.length));
-
-        //create temporary image with extended borders
-        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
-
-        //calculate masks multiplier
-        int multiplier = arraySum(masks[0]);
-        boolean sharpening = false;
-        if (multiplier == 0) {
-            sharpening = true;
-            multiplier = 1;
-        }
-
-        //filter image
-        int[] Gx = filterImage(bi, masks[0], bordersMethod);
-        int[] Gy = filterImage(bi, masks[1], bordersMethod);
-        int[] b = arrayAbsSum(Gx, Gy);
-        //scale image levels
-        scaleImage(a, b, sharpening);
-    }
-
     private static int[] arrayAbsSum(int[] gx, int[] gy) {
         int[] r = new int[gx.length];
         for (int i = 0; i < gx.length; ++i) {
@@ -266,7 +241,7 @@ public class ImageUtils {
         scaleImage(a, b, scaleMethod);
     }
 
-    public static void gradientSharpening(BufferedImage bi, int[][] masks, int bordersMethod) {
+    public static void gradientFilter(BufferedImage bi, int[][] masks, int bordersMethod, int scalingMethod, int calcMethod) {
         int width = bi.getWidth();
         int height = bi.getHeight();
         int channels = bi.getColorModel().getNumComponents();
@@ -276,20 +251,12 @@ public class ImageUtils {
         //create temporary image with extended borders
         ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
 
-        //calculate masks multiplier
-        int multiplier = arraySum(masks[0]);
-        boolean sharpening = false;
-        if (multiplier == 0) {
-            sharpening = true;
-            multiplier = 1;
-        }
-
         //filter image
         int[] Gx = filterImage(bi, masks[0], bordersMethod);
         int[] Gy = filterImage(bi, masks[1], bordersMethod);
-        int[] b = arraySqrtSumOfSquares(Gx, Gy);
+        int[] b = calcMethod == 1 ? arrayAbsSum(Gx, Gy) : arraySqrtSumOfSquares(Gx, Gy);
         //scale image levels
-        scaleImage(a, b, sharpening);
+        scaleImage(a, b, scalingMethod);
     }
 
     private static int[] arraySqrtSumOfSquares(int[] gx, int[] gy) {
@@ -365,19 +332,35 @@ public class ImageUtils {
     }
 
 
+    /**
+     * scale image levels
+     * @param imageData
+     * @param inputArray
+     * @param scaleMethod 0 - bez skalowania, 3 - obcinanie, 1 - skalowanie proporcjonalne
+     * @return
+     */
     private static byte[] scaleImage(byte[] imageData, int[] inputArray, int scaleMethod) {
-        //scale image levels
-        if (scaleMethod == 0) {
+        int min = Ints.min(inputArray);
+        int max = Ints.max(inputArray);
+
+        if (scaleMethod == 3) { // cut scaling
             for (int i = 0; i < imageData.length; ++i) {
                 inputArray[i] = (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
                 inputArray[i] += imageData[i] & 0xFF;
                 imageData[i] = (byte) (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
-//                imageData[i] = (byte) (((inputArray[i] - min) / (max - min)) * 255); // skalowanie proporcjonalne
             }
-        } else {
-            for (int i = 0; i < imageData.length; ++i) {
-                imageData[i] = (byte) (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
-            }
+
+        } else if (scaleMethod == 1) { // proportional scaling
+            for (int i = 0; i < imageData.length; ++i)
+                imageData[i] = (byte) (((inputArray[i] - min) / (max - min)) * 255); // skalowanie proporcjonalne
+
+        } else if (scaleMethod == 2) { // scaling
+            for (int i = 0; i < imageData.length; ++i)
+                imageData[i] = (byte)(inputArray[i] < 0 ? 0 : inputArray[i] == 0 ? 128 : 255);
+
+        } else if(scaleMethod == 0){ // no scaling
+            for (int i = 0; i < imageData.length; ++i)
+                imageData[i] = (byte)inputArray[i];
         }
         return imageData;
     }
