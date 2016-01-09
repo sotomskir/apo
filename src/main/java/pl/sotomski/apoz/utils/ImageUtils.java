@@ -249,6 +249,23 @@ public class ImageUtils {
         scaleImage(a, b, sharpening);
     }
 
+    public static void linearFilterWithScaling(BufferedImage bi, int[] mask, int bordersMethod, int scaleMethod) {
+        int width = bi.getWidth();
+        int height = bi.getHeight();
+        int channels = bi.getColorModel().getNumComponents();
+        byte[] a = getImageData(bi);
+        final int bordersWidth = (int) (Math.sqrt(mask.length));
+
+        //create temporary image with extended borders
+        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
+
+        //filter image
+        int[] b = filterImage(bi, mask, bordersMethod);
+
+        //scale image levels
+        scaleImage(a, b, scaleMethod);
+    }
+
     public static void gradientSharpening(BufferedImage bi, int[][] masks, int bordersMethod) {
         int width = bi.getWidth();
         int height = bi.getHeight();
@@ -299,15 +316,10 @@ public class ImageUtils {
         Arrays.fill(min, 255);
         Arrays.fill(max, 0);
         int multiplier = arraySum(mask);
-
-        if (multiplier == 0) {
-            multiplier = 1;
-        }
+        if (multiplier == 0) multiplier = 1;
 
         //filter image
         int[] b = new int[a.length];
-        int[] Gx = new int[a.length];
-        int[] Gy = new int[a.length];
         for (int y = 0; y < bi.getHeight(); ++y)
             for (int x = 0; x < bi.getWidth(); ++x) {
                 int[][] pixels;
@@ -335,10 +347,27 @@ public class ImageUtils {
         return b;
     }
 
-    //TODO add scaling method
     private static byte[] scaleImage(byte[] imageData, int[] inputArray, boolean sharpening) {
         //scale image levels
         if (sharpening) {
+            for (int i = 0; i < imageData.length; ++i) {
+                inputArray[i] = (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
+                inputArray[i] += imageData[i] & 0xFF;
+                imageData[i] = (byte) (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
+//                imageData[i] = (byte) (((inputArray[i] - min) / (max - min)) * 255); // skalowanie proporcjonalne
+            }
+        } else {
+            for (int i = 0; i < imageData.length; ++i) {
+                imageData[i] = (byte) (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
+            }
+        }
+        return imageData;
+    }
+
+
+    private static byte[] scaleImage(byte[] imageData, int[] inputArray, int scaleMethod) {
+        //scale image levels
+        if (scaleMethod == 0) {
             for (int i = 0; i < imageData.length; ++i) {
                 inputArray[i] = (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
                 inputArray[i] += imageData[i] & 0xFF;

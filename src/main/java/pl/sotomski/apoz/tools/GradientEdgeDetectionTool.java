@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.GradientEdgeDetectionCommand;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -18,10 +19,31 @@ public class GradientEdgeDetectionTool extends VBox {
     private ToolController toolController;
     private ChoiceBox<String> choiceBox;
     private String[] masks;
+    Label masksLabel = new Label();
     ComboBox<String> directionComboBox;
     BordersMethodToggles bordersMethodToggles;
+    String[] maskLabels = new String[]{" 1  0 |  0 -1\n 0 -1 |  1  0", "-1  0  1 |-1 -2 -1\n-2  0  2 | 0  0  0\n-1  0  1 | 1  2  1"};
+    private String[] prewittMask = {
+            "  1  1  1\n  1 -2  1\n -1 -1 -1",//N
+            "  1  1  1\n -1 -2  1\n -1 -1  1",//NE
+            " -1  1  1\n -1 -2  1\n -1  1  1",//E
+            " -1 -1  1\n -1 -2  1\n  1  1  1",//SE
+            " -1 -1 -1\n  1 -1  1\n  1  1  1",//S
+            "  1 -1 -1\n  1 -2 -1\n  1  1  1",//SW
+            "  1  1 -1\n  1 -2 -1\n  1  1 -1",//W
+            "  1  1  1\n  1 -2 -1\n  1 -1 -1" //NW
+    };
 
-
+    private String[] kirshMask = {
+            "  3  3  3\n  3  0  3\n -5 -5 -5",//N
+            "  3  3  3\n -5  0  3\n -5 -5  3",//NE
+            " -5  3  3\n -5  0  3\n -5  3  3",//E
+            " -5 -5  3\n -5  0  3\n  3  3  3",//SE
+            " -5 -5 -5\n  3  0  3\n  3  3  3",//S
+            "  3 -5 -5\n  3  0 -5\n  3  3  3",//SW
+            "  3  3 -5\n  3  0 -5\n  3  3 -5",//W
+            "  3  3  3\n  3  0 -5\n  3 -5 -5" //NW
+    };
     protected GradientEdgeDetectionTool(ToolController controller) {
         ResourceBundle bundle = controller.getBundle();
         masks = new String[4];
@@ -34,16 +56,33 @@ public class GradientEdgeDetectionTool extends VBox {
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("EdgeDetection"));
         Label directionLabel = new Label(bundle.getString("EdgeDirection"));
+        masksLabel.setText(maskLabels[0]);
+        masksLabel.setFont(Font.font("monospace"));
 
         directionComboBox = new ComboBox<>();
         directionComboBox.getItems().addAll("N", "NE", "E", "SE", "S", "SW", "W", "NW");
         directionComboBox.getSelectionModel().selectFirst();
         directionComboBox.setVisible(false);
+        directionComboBox.getSelectionModel().selectedItemProperty().addListener((observable1, oldValue1, newValue1) -> {
+            if(masks[2].equals(choiceBox.getSelectionModel().getSelectedItem()))
+                masksLabel.setText(prewittMask[directionComboBox.getSelectionModel().getSelectedIndex()]);
+            else
+                masksLabel.setText(kirshMask[directionComboBox.getSelectionModel().getSelectedIndex()]);
+        });
         directionLabel.setVisible(false);
 
         choiceBox.getItems().addAll(masks);
         choiceBox.getSelectionModel().selectFirst();
         choiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(masks[0].equals(newValue)) {
+                masksLabel.setText(maskLabels[0]);
+            } else if(masks[1].equals(newValue)) {
+                masksLabel.setText(maskLabels[1]);
+            } else if(masks[2].equals(newValue)) {
+                masksLabel.setText(prewittMask[0]);
+            } else if(masks[3].equals(newValue)) {
+                masksLabel.setText(kirshMask[0]);
+            }
             if (masks[2].equals(newValue) || masks[3].equals(newValue)) {
                 directionComboBox.setVisible(true);
                 directionLabel.setVisible(true);
@@ -68,6 +107,7 @@ public class GradientEdgeDetectionTool extends VBox {
                 separator,
                 new Label(bundle.getString("Mask")),
                 choiceBox,
+                masksLabel,
                 directionLabel,
                 directionComboBox,
                 bordersMethodToggles,
