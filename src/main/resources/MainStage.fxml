@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+            minWidth="-Infinity" prefHeight="800.0" prefWidth="600.0"
             xmlns="http://javafx.com/javafx/null" fx:controller="pl.sotomski.apoz.controllers.MainController"
             onKeyPressed="#handleKeyInput">
     <top>
@@ -27,8 +27,10 @@
                 <MenuItem disable="${controller.redoUnavailable}" onAction="#handleRedo" text="%Redo"/>
             </Menu>
             <Menu text="%Tools">
+                <MenuItem disable="${controller.needsImage}" onAction="#handleProfileLineTool" text="%ProfileLine"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleCropTool" text="%Crop"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleNumberTable" text="%GenerateNumberTable"/>
+                <MenuItem onAction="#handleToggleHistogramView" text="Histogram"/>
             </Menu>
             <Menu text="%PointOperations">
                 <MenuItem disable="${controller.needsImage}" onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale"/>
@@ -148,14 +150,14 @@
                     <ToolBar>
                         <Label fx:id="zoomLabel" prefWidth="55" text="100%"/>
 
-                        <Button text="%mdi-magnify-minus" styleClass="mdi" disable="${controller.needsImage}" onMouseClicked="#handleZoomOut">
+                        <Button text="%mdi-magnify-minus" styleClass="mdi" disable="${controller.needsImage}" onAction="#handleZoomOut">
                             <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
                             <tooltip>
                                 <Tooltip text="%ZoomOut"/>
                             </tooltip>
                         </Button>
 
-                        <Button text="%mdi-magnify-plus" styleClass="mdi" disable="${controller.needsImage}" onMouseClicked="#handleZoomIn">
+                        <Button text="%mdi-magnify-plus" styleClass="mdi" disable="${controller.needsImage}" onAction="#handleZoomIn">
                             <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
                             <tooltip>
                                 <Tooltip text="%ZoomIn"/>
@@ -171,9 +173,11 @@
                 <top>
                     <VBox>
                         <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
-                        <VBox fx:id="histogramPaneContainer">
+                        <VBox fx:id="histogramPaneContainer" maxHeight="0">
                             <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
                         </VBox>
+                        <Button fx:id="toggleHistogramViewBtn" text="%mdi-3arrow-down" maxHeight="10" prefWidth="Infinity" styleClass="mdi" mnemonicParsing="false"  onAction="#handleToggleHistogramView"/>
+                        <Separator orientation="HORIZONTAL"/>
                         <HBox fx:id="labels">
                             <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
                             <VBox>
@@ -191,7 +195,8 @@
                             </VBox>
                             <Separator orientation="VERTICAL"/>
                             <VBox>
-                                <Label fx:id="histogramValueLabel" text="X: - Y: -"/>
+                                <Label fx:id="histogramLabel" text="Histogram:"/>
+                                <Label fx:id="histogramValueLabel" text="%PoziomWartość"/>
                             </VBox>
                         </HBox>
                     </VBox>

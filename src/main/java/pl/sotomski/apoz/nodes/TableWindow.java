@@ -46,11 +46,19 @@ public class TableWindow extends Stage {
         Integer[][] imageArray = ImageUtils.asArray(image);
         ObservableList<Integer[]> data = FXCollections.observableArrayList();
         data.addAll(Arrays.asList(imageArray));
-        for (int i = 0; i < imageArray[0].length; i++) {
-            TableColumn<Integer[], String> tc = new TableColumn<>(String.valueOf(i));
+        for (int i = 0; i <= imageArray[0].length; i++) {
             final int colNo = i;
-            tc.setCellValueFactory(p -> new SimpleStringProperty((p.getValue()[colNo]).toString()));
+            TableColumn<Integer[], String> tc;
+            if(colNo == 0) {
+                tc = new TableColumn<>("#");
+                tc.setCellValueFactory(p -> new SimpleStringProperty(String.valueOf(data.indexOf(p.getValue())+1)));
+            }
+            else {
+                tc = new TableColumn<>(String.valueOf(colNo));
+                tc.setCellValueFactory(p -> new SimpleStringProperty((p.getValue()[colNo-1]).toString()));
+            }
             tc.setPrefWidth(35);
+            tc.setSortable(false);
             table.getColumns().add(tc);
         }
         table.setItems(data);

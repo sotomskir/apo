@@ -22,6 +22,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import pl.sotomski.apoz.Main;
@@ -68,9 +69,11 @@ public class MainController implements Initializable, ToolController {
     @FXML private ToggleButton cropButton;
     @FXML private ToggleButton profileLineButton;
     @FXML private Label histogramValueLabel;
+    @FXML public Label histogramLabel;
     private final BooleanProperty needsImage = new SimpleBooleanProperty(true);
     private final BooleanProperty undoUnavailable = new SimpleBooleanProperty(true);
     private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
+    @FXML private Button toggleHistogramViewBtn;
 
 
 
@@ -196,6 +199,20 @@ public class MainController implements Initializable, ToolController {
         if (os != null && os.startsWith ("Mac"))
             menuBar.useSystemMenuBarProperty ().set (true);
         histogramPane.getMonoHistogramChart().setValueLabel(histogramValueLabel);
+
+        labelR.setFont(Font.font("monospace"));
+        labelG.setFont(Font.font("monospace"));
+        labelB.setFont(Font.font("monospace"));
+        labelB.setFont(Font.font("monospace"));
+        labelDepth.setFont(Font.font("monospace"));
+        labelHeight.setFont(Font.font("monospace"));
+        labelWidth.setFont(Font.font("monospace"));
+        labelX.setFont(Font.font("monospace"));
+        labelY.setFont(Font.font("monospace"));
+        histogramLabel.setFont(Font.font("monospace"));
+        histogramValueLabel.setFont(Font.font("monospace"));
+        toggleHistogramViewBtn.setStyle("-fx-font-size:8;");
+        histogramPane.setMaxHeight(0);
     }
 
     private void updateLabels(ImagePane pane) {
@@ -313,8 +330,8 @@ public class MainController implements Initializable, ToolController {
     public void handleMouseMoved(MouseEvent event) {
         int x = (int)event.getX();
         int y = (int)event.getY();
-        labelX.setText("X: " + x);
-        labelY.setText("Y: " + y);
+        labelX.setText("X: " + (x+1));
+        labelY.setText("Y: " + (y+1));
         try {
             int rgb = activePaneProperty.getValue().getImage().getRGB(x, y);
             if(activePaneProperty.getValue().getChannels() == 3) {
@@ -505,9 +522,11 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleProfileLineTool(ActionEvent actionEvent) {
+        profileLineButton.setSelected(true);
         histogramPane.selectProfileLineChart();
         rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
         getActivePaneProperty().enableProfileLineSelection();
+        handleToggleHistogramView(null);
     }
 
 
@@ -529,5 +548,16 @@ public class MainController implements Initializable, ToolController {
 
     public void handleGradientFiltering(ActionEvent actionEvent) {
         addToToolbox(GradientEdgeDetectionTool.getInstance(this));
+    }
+
+    public void handleToggleHistogramView(ActionEvent actionEvent) {
+        if(histogramPane.getHeight() > 0) {
+            histogramPane.setMaxHeight(0);
+            toggleHistogramViewBtn.setText(bundle.getString("mdi-3arrow-down"));
+        }
+        else {
+            histogramPane.setMaxHeight(300);
+            toggleHistogramViewBtn.setText(bundle.getString("mdi-3arrow-up"));
+        }
     }
 }

@@ -41,7 +41,7 @@ public class MonoHistogramChart extends BarChart<String, Number> {
         for (Data<String, Number> data : series.getData()) {
             Node n = data.getNode();
             n.setOnMouseEntered(e -> {
-                if (valueLabel != null) valueLabel.setText("X: " + data.getXValue() + " Y:" + data.getYValue());
+                if (valueLabel != null) valueLabel.setText("Poziom: " + data.getXValue() + "\nWartość:" + data.getYValue());
                 n.setStyle("-fx-bar-fill: blue;");
             });
             n.setOnMouseExited(e -> {

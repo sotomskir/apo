@@ -33,6 +33,7 @@ public class HistogramPane extends TabPane {
         Tab tab3 = new Tab(bundle.getString("cumulativeHistogram"));
         profileLineTab = new Tab(bundle.getString("lineProfile"));
         this.getTabs().addAll(tab1, tab2, tab3, profileLineTab);
+        for(Tab tab : getTabs()) tab.setClosable(false);
         rgbHistogramChart = new RGBHistogramChart();
         monoHistogramChart = new MonoHistogramChart();
         cumulativeHistogramChart = new CumulativeHistogramChart();
