@@ -38,7 +38,6 @@ import pl.sotomski.apoz.utils.UTF8Control;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -149,9 +148,9 @@ public class MainController implements Initializable, ToolController {
                 if(activePaneProperty.getValue().isTabbed())
                     histogramPane.update(activePaneProperty.getValue().getImage());
                 zoomLabel.setText(String.format("%.0f%%", activePaneProperty.getValue().getZoomLevel()));
+                System.out.println("Selected: " + activePaneProperty.getValue().getName());
             }
             needsImage.setValue(activePaneProperty.getValue() == null);
-            System.out.println("Selected: " + activePaneProperty.getValue().getName());
         });
 
         menuBar.setFocusTraversable(false);
@@ -353,12 +352,9 @@ public class MainController implements Initializable, ToolController {
         File apozDir = new File(path);
         try {
             apozDir.mkdir();
-            String[] snapshots = apozDir.list(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    String lowercaseName = name.toLowerCase();
-                    return lowercaseName.endsWith(".png") && lowercaseName.startsWith("snapshot");
-                }
+            String[] snapshots = apozDir.list((dir, name) -> {
+                String lowercaseName = name.toLowerCase();
+                return lowercaseName.endsWith(".png") && lowercaseName.startsWith("snapshot");
             });
 
             int currentSnapshotNumber;
@@ -376,6 +372,7 @@ public class MainController implements Initializable, ToolController {
 
     public void handleUnpinTab(ActionEvent actionEvent) {
         Window window = getActivePaneProperty().getWindow();
+        // ImagePane tabbed
         if(window == null) {
             ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
             selectedTab.getPane().setTabbed(false);
@@ -384,6 +381,11 @@ public class MainController implements Initializable, ToolController {
             ImagePane imagePane = selectedTab.getPane();
             ImageWindow imageWindow = new ImageWindow(parent, imagePane, new HistogramPane(bundle));
             imagePane.setWindow(imageWindow);
+            imageWindow.setOnCloseRequest(e -> {
+                imagePane.onClose();
+                activePaneProperty.setValue(null);
+            });
+            pinButton.setText(bundle.getString("mdi-pin"));
             imageWindow.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
                 if (newPropertyValue) {
                     activePaneProperty.setValue(imageWindow.getImagePane());
@@ -395,6 +397,7 @@ public class MainController implements Initializable, ToolController {
             });
             activePaneProperty.setValue(imagePane);
 
+            //ImagePane windowed
         } else {
             ImagePane pane = activePaneProperty.getValue();
             Stage stage = (Stage) pane.getWindow();

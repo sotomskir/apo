@@ -30,7 +30,8 @@ public class ChartControl extends LineChart {
     protected boolean keepLevels;
     protected boolean inverted = false;
     protected Series<Number, Number> series;
-    private boolean stretched;
+    protected boolean stretched;
+    protected boolean negated;
 
     public ChartControl() {
         super(new NumberAxis(0, 255, 25), new NumberAxis(0, 255, 25));
@@ -39,7 +40,7 @@ public class ChartControl extends LineChart {
         setMaxWidth(Double.MAX_VALUE);
         changed = new SimpleIntegerProperty();
         intervalDatas = new ArrayList<>();
-        levelLines    = new ArrayList<>();
+        levelLines = new ArrayList<>();
         keepLevels = false;
     }
 
@@ -86,9 +87,11 @@ public class ChartControl extends LineChart {
         layoutPlotChildren();
     }
 
-    /** @inheritDoc */
-    @Override protected void layoutPlotChildren() {
-        System.out.println("layoutPlotChildren");
+    /**
+     * @inheritDoc
+     */
+    @Override
+    protected void layoutPlotChildren() {
         super.layoutPlotChildren();
         for (IntervalData d : intervalDatas) {
             IntervalLine line = d.getLine();
@@ -96,14 +99,15 @@ public class ChartControl extends LineChart {
             line.setEndX(xDisplay(d.getX().getValue()));
             line.setStartY(yDisplay(d.getStartY()));
             line.setEndY(yDisplay(d.getEndY()));
-            System.out.println(d);
         }
         updateLUT();
     }
 
-    /** creates default equal intervals
+    /**
+     * creates default equal intervals
+     *
      * @param intervals number of intervals
-     * */
+     */
     public void createDefaultIntervals(int intervals) {
         //clear plotChildren and lists
         intervalDatas.forEach(intervalData1 -> getPlotChildren().remove(intervalData1.getLine()));
@@ -112,22 +116,21 @@ public class ChartControl extends LineChart {
         levelLines.clear();
 
         // create new intervals
-        for (int i = 0; i<intervals; ++i) {
+        for (int i = 0; i < intervals; ++i) {
             IntervalData d = new IntervalData(255.0 / intervals * i);
             intervalDatas.add(d);
-            System.out.println(d);
             this.getPlotChildren().add(d.getLine());
         }
         intervalDatas.add(new IntervalData(255));
 
         // create new levelLines
-        for (int i = 0; i<intervals; ++i) {
-            IntervalLine left  = intervalDatas.get(i).getLine();
-            IntervalLine right = intervalDatas.get(i+1).getLine();
+        for (int i = 0; i < intervals; ++i) {
+            IntervalLine left = intervalDatas.get(i).getLine();
+            IntervalLine right = intervalDatas.get(i + 1).getLine();
             DoubleProperty startX = left.startXProperty();
-            DoubleProperty endX   = right.startXProperty();
-            DoubleProperty startY = (i % 2 == 0) ? left.startYProperty()  : left.endYProperty();
-            DoubleProperty endY   = (i % 2 == 0) ? right.startYProperty() : right.endYProperty();
+            DoubleProperty endX = right.startXProperty();
+            DoubleProperty startY = (i % 2 == 0) ? left.startYProperty() : left.endYProperty();
+            DoubleProperty endY = (i % 2 == 0) ? right.startYProperty() : right.endYProperty();
             LevelLine levelLine = new LevelLine(startX.doubleValue(), startY.doubleValue(), endX.doubleValue(), endY.doubleValue());
             levelLine.startXProperty().bind(startX);
             levelLine.startYProperty().bind(startY);
@@ -138,19 +141,19 @@ public class ChartControl extends LineChart {
         this.getPlotChildren().addAll(levelLines);
 
         // enable drag
-        for (int i = 1; i < intervalDatas.size()-1; ++i) intervalDatas.get(i).getLine().enableDrag();
+        for (int i = 1; i < intervalDatas.size() - 1; ++i) intervalDatas.get(i).getLine().enableDrag();
         updateLUT();
     }
 
     public void toggleStretch(boolean stretch) {
         for (int i = 0; i < intervalDatas.size(); ++i) {
             if (stretch) {
-                if (inverted ? i%2 == 0 : i%2 != 0) {
+                if (inverted ? i % 2 == 0 : i % 2 != 0) {
                     intervalDatas.get(i).setStartY(inverted ? 255 : 0);
                     intervalDatas.get(i).setEndY(inverted ? 255 : 0);
                 }
             } else {
-                if (inverted ? i%2 == 0 : i%2 != 0) {
+                if (inverted ? i % 2 == 0 : i % 2 != 0) {
                     intervalDatas.get(i).setStartY(inverted ? 255 : 0);
                     intervalDatas.get(i).setEndY(inverted ? 0 : 255);
                 }
@@ -161,18 +164,13 @@ public class ChartControl extends LineChart {
     }
 
     protected void updateLUT() {
-        for(LevelLine l : levelLines) {
-            System.out.println("start: "+xValue(l.getStartX()));
-            System.out.println("end: "+xValue(l.getEndX()));
+        for (LevelLine l : levelLines) {
             double slope = (yValue(l.getEndY()) - yValue(l.getStartY())) / (xValue(l.getEndX()) - xValue(l.getStartX()));
-            for (int x = (int) xValue(l.getStartX()); x<=Math.round(xValue(l.getEndX())); ++x) {
+            for (int x = (int) xValue(l.getStartX()); x <= Math.round(xValue(l.getEndX())); ++x) {
                 LUT[x] = (int) (slope * (x - xValue(l.getStartX())) + yValue(l.getStartY()));
                 LUT[x] = LUT[x] > 255 ? 255 : LUT[x] < 0 ? 0 : LUT[x];
-                System.out.print(x + ";");
             }
         }
-        System.out.println();
-
         changed.setValue(changed.get() + 1);
     }
 
@@ -182,10 +180,17 @@ public class ChartControl extends LineChart {
 
     public void setKeepLevels(boolean keepLevels) {
         this.keepLevels = keepLevels;
-        if (keepLevels) {
-            for (IntervalData l : intervalDatas) l.bindYtoX();
-        }
-        else for (IntervalData l : intervalDatas) l.unBindYfromX();
+        handleBindXY();
+    }
+
+    public void setNegative(boolean negative) {
+        this.negated = negative;
+        handleBindXY();
+    }
+
+    private void handleBindXY() {
+        if(keepLevels) for (IntervalData l : intervalDatas) l.bindYtoX();
+        else for(IntervalData l :intervalDatas) l.unBindYfromX();
         layoutPlotChildren();
     }
 
@@ -209,6 +214,7 @@ public class ChartControl extends LineChart {
         return getYAxis().getDisplayPosition(y);
     }
 
+
     /*******************************************************************************************************************
      *                                          Internal classes                                                       *
      ******************************************************************************************************************/
@@ -216,6 +222,7 @@ public class ChartControl extends LineChart {
         DoubleProperty x, startY, endY;
         IntervalLine line;
         private InvalidationListener bindXYListener = l -> setEndY(getX().getValue());
+        private InvalidationListener bindXYNegatedListener = l -> setEndY(255 - getX().getValue());
 
         IntervalData() {
             x = new SimpleDoubleProperty();
@@ -277,13 +284,12 @@ public class ChartControl extends LineChart {
         }
 
         public void bindYtoX() {
-            System.out.println(getX().getValue());
-            endXProperty().addListener(bindXYListener);
-            setEndY(getX().getValue());
+            endXProperty().addListener(negated ? bindXYNegatedListener : bindXYListener);
+            setEndY(negated ? 255 - getX().getValue() : getX().getValue());
         }
 
         public void unBindYfromX() {
-            endXProperty().removeListener(bindXYListener);
+            endXProperty().removeListener(!negated ? bindXYNegatedListener : bindXYListener);
             if (inverted) endYProperty().setValue(getEndY() < 255 ? 0 : 255);
             else endYProperty().setValue(getEndY() > 0 ? 255 : 0);
             // special case for first and last line
