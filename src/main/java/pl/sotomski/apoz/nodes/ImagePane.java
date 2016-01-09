@@ -209,26 +209,18 @@ public class ImagePane extends BorderPane {
     }
 
     public void handleZoomIn(Label textField) {
-        zoomIndex.setValue(zoomIndex.getValue()+1);
-        if(zoomIndex.getValue()>=zoomLevels.length) zoomIndex.setValue(zoomLevels.length-1);
+        if(zoomIndex.getValue() < zoomLevels.length - 1)
+            zoomIndex.setValue(zoomIndex.getValue()+1);
         imageStack.setScaleX(zoomLevels[zoomIndex.getValue()]);
         imageStack.setScaleY(zoomLevels[zoomIndex.getValue()]);
-//        setFitWidth(zoomIndex.getValue() * imageView.getImage().getWidth());
-//        setFitHeight(zoomIndex.getValue() * imageView.getImage().getHeight());
-//        if(getZoomLevel() > 100) {
-//            scrollPane.setHvalue(scrollPane.getHvalue() + scrollPane.getWidth() / 1.75);
-//            scrollPane.setVvalue(scrollPane.getVvalue() + scrollPane.getHeight() / 1.75);
-//        }
         textField.setText(String.format("%.0f%%", getZoomLevel()));
     }
 
     public void handleZoomOut(Label textField) {
-        zoomIndex.setValue(zoomIndex.getValue()-1);
-        if(zoomIndex.getValue()<0) zoomIndex.setValue(0);
+        if(zoomIndex.getValue() > 0)
+            zoomIndex.setValue(zoomIndex.getValue()-1);
         imageStack.setScaleX(zoomLevels[zoomIndex.getValue()]);
         imageStack.setScaleY(zoomLevels[zoomIndex.getValue()]);
-//        setFitWidth(zoomIndex.getValue() * imageView.getImage().getWidth());
-//        setFitHeight(zoomIndex.getValue() * imageView.getImage().getHeight());
         textField.setText(String.format("%.0f%%", getZoomLevel()));
     }
 
@@ -308,6 +300,7 @@ public class ImagePane extends BorderPane {
             }
         });
 
+        profileLine.changedProperty().addListener(observable -> histogramPane.updateProfileLineChart(getImage(), profileLine));
         imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, profileLine));
 
         imageView.setOnMouseReleased(mouseEvent -> histogramPane.updateProfileLineChart(getImage(), profileLine));

@@ -74,6 +74,7 @@ public class MainController implements Initializable, ToolController {
     private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
 
 
+
     /***************************************************************************
      *                                                                         *
      *                          GETTERS & SETTERS                              *
@@ -313,8 +314,6 @@ public class MainController implements Initializable, ToolController {
     public void handleMouseMoved(MouseEvent event) {
         int x = (int)event.getX();
         int y = (int)event.getY();
-        x *= activePaneProperty.getValue().getZoomLevel() / 100;
-        y *= activePaneProperty.getValue().getZoomLevel() / 100;
         labelX.setText("X: " + x);
         labelY.setText("Y: " + y);
         try {
@@ -525,7 +524,7 @@ public class MainController implements Initializable, ToolController {
         addToToolbox(GradientSharpeningTool.getInstance(this));
     }
 
-    public void handleEdgeDetection(ActionEvent actionEvent) {
+    public void handleGradientFiltering(ActionEvent actionEvent) {
         addToToolbox(GradientEdgeDetectionTool.getInstance(this));
     }
 }

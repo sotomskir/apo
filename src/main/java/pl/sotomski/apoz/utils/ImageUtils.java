@@ -25,6 +25,9 @@ public class ImageUtils {
         for (int i = 0; i < points.length; ++i) {
             pixels[i] = getPixel(image, points[i][0], points[i][1]);
         }
+
+        System.out.println("Profile line start: " + line.getStartX() + ":" + line.getStartY());
+        System.out.println("Profile line end:   " + line.getEndX() + ":" + line.getEndY());
         return pixels;
     }
 

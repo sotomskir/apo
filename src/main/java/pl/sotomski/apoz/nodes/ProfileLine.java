@@ -95,6 +95,15 @@ public class ProfileLine extends Group {
                 points[y - minY][0] = y;
                 points[y - minY][1] = (int) Math.round(slope * ((double) y - getEndY()) + getEndX());
             }
+
+            //Reverse array
+            if(getEndY() > getStartY() && getStartX() > getEndX()) {
+                for(int i = 0; i < points.length / 2; i++) {
+                    int[] temp = points[i];
+                    points[i] = points[points.length - i - 1];
+                    points[points.length - i - 1] = temp;
+                }
+            }
         }
         return points;
     }
@@ -125,7 +134,7 @@ public class ProfileLine extends Group {
             x.bind(centerXProperty());
             y.bind(centerYProperty());
             this.setStroke(Color.RED);
-            this.setFill(Color.rgb(222, 222, 222));
+            this.setFill(Color.rgb(222, 222, 222, 0.1));
         }
 
         public void enableDrag() {

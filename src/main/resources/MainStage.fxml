@@ -39,7 +39,7 @@
                 <MenuItem disable="${controller.needsImage}" onAction="#handleLevelsReduction" text="%LevelsReduction"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleCurves" text="%Curves"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>
+                <!--<MenuItem disable="${controller.needsImage}" onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>-->
             </Menu>
             <Menu text="%NeighborhoodOperations">
                 <MenuItem disable="${controller.needsImage}" onAction="#handleMaskTool" text="%MaskTool"/>
@@ -48,10 +48,7 @@
                 <MenuItem disable="${controller.needsImage}" onAction="#handleLogicalFilterTool" text="%LogicalFilterTool"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleMorphTool" text="%MorphTool"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleTurtleAlgorithm" text="%TurtleAlgorithm"/>
-            </Menu>
-            <Menu text="%GradientOperations">
-                <MenuItem disable="${controller.needsImage}" onAction="#handleGradientSharpening" text="%GradientSharpening"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleEdgeDetection" text="%EdgeDetection"/>
+                <MenuItem disable="${controller.needsImage}" onAction="#handleGradientFiltering" text="%GradientFiltering"/>
             </Menu>
             <Menu text="%Help">
                 <MenuItem disable="true" text="%Search"/>
@@ -144,7 +141,6 @@
                                 <Tooltip text="%ProfileLine"/>
                             </tooltip>
                         </ToggleButton>
-
                     </ToolBar>
                 </top>
                 <center><TabPane fx:id="tabPane"/></center>
@@ -169,7 +165,6 @@
                     </ToolBar>
                 </bottom>
             </BorderPane>
-
 
             <BorderPane>
                 <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>

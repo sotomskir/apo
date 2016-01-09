@@ -1,12 +1,28 @@
 package pl.sotomski.apoz.nodes;
 
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import pl.sotomski.apoz.utils.ImageUtils;
+
+import java.awt.image.BufferedImage;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by sotomski on 13/12/15.
  */
 public class ProfileLineTest {
+    BufferedImage image;
+    ProfileLine line = new ProfileLine();
+
+    @Before
+    public void setUp() {
+        image = new BufferedImage(10, 10, BufferedImage.TYPE_BYTE_GRAY);
+        for (int x = 0; x < 10; x++)
+            for (int y = 0; y < 10; y++)
+                ImageUtils.setPixel(image, x, y, x*y);
+    }
 
     @Test
     public void testGetLinePoints() throws Exception {
@@ -78,5 +94,95 @@ public class ProfileLineTest {
         line.setEndPoint(0,10);
         actuals = line.getLinePoints();
         assertEquals(11, actuals.length);
+    }
+
+    @Test
+    public void testGetPixelValuesDiagonal() {
+        line.setStartPoint(0, 0);
+        line.setEndPoint(9, 9);
+        int[][] actuals = ImageUtils.getLineProfilePixels(image, line);
+        int[][] expecteds = {{0}, {1}, {4}, {9}, {16}, {25}, {36}, {49}, {64}, {81}};
+        for (int i = 0; i < expecteds.length; ++i) assertArrayEquals(expecteds[i], actuals[i]);
+    }
+
+    @Test
+    public void testGetPixelValuesDiagonalReversed() {
+        line.setStartPoint(9, 9);
+        line.setEndPoint(0, 0);
+        int[][] actuals = ImageUtils.getLineProfilePixels(image, line);
+        int[][] expecteds = {{0}, {1}, {4}, {9}, {16}, {25}, {36}, {49}, {64}, {81}};
+        for (int i = 0; i < expecteds.length; ++i) assertArrayEquals(expecteds[i], actuals[i]);
+    }
+
+    @Test
+    public void testGetPixelValuesHorizontal() {
+        line.setStartPoint(0, 1);
+        line.setEndPoint(9, 1);
+        int[][] actuals = ImageUtils.getLineProfilePixels(image, line);
+        int[][] expecteds = {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}};
+        for (int i = 0; i < expecteds.length; ++i) assertArrayEquals(expecteds[i], actuals[i]);
+    }
+
+    @Test
+    public void testGetPixelValuesHorizontalReversed() {
+        line.setStartPoint(9, 1);
+        line.setEndPoint(0, 1);
+        int[][] actuals = ImageUtils.getLineProfilePixels(image, line);
+        int[][] expecteds = {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}};
+        for (int i = 0; i < expecteds.length; ++i) assertArrayEquals(expecteds[i], actuals[i]);
+    }
+
+    @Test
+    public void testGetPixelValuesPositiveAngle() {
+        line.setStartPoint(0, 0);
+        line.setEndPoint(4, 9);
+        int[][] actuals = ImageUtils.getLineProfilePixels(image, line);
+        int[][] expecteds = {{0}, {0}, {2}, {3}, {8}, {10}, {18}, {21}, {32}, {36}};
+        for (int i = 0; i < expecteds.length; ++i) assertArrayEquals(expecteds[i], actuals[i]);
+    }
+
+    @Test
+    public void testGetPixelValuesPositiveAngleReversed() {
+        line.setStartPoint(4, 9);
+        line.setEndPoint(0, 0);
+        int[][] actuals = ImageUtils.getLineProfilePixels(image, line);
+        int[][] expecteds = {{0}, {0}, {2}, {3}, {8}, {10}, {18}, {21}, {32}, {36}};
+        for (int i = 0; i < expecteds.length; ++i) assertArrayEquals(expecteds[i], actuals[i]);
+    }
+
+    @Test
+    public void testGetPixelValuesNegativeAngle() {
+        line.setStartPoint(4, 0);
+        line.setEndPoint(0, 9);
+        int[][] actuals = ImageUtils.getLineProfilePixels(image, line);
+        int[][] expecteds = {{0}, {4}, {6}, {9}, {8}, {10}, {6}, {7}, {0}, {0}};
+        for (int i = 0; i < expecteds.length; ++i) assertArrayEquals(expecteds[i], actuals[i]);
+    }
+
+    @Test
+    public void testGetPixelValuesNegativeAngleReversed() {
+        line.setStartPoint(0, 9);
+        line.setEndPoint(4, 0);
+        int[][] actuals = ImageUtils.getLineProfilePixels(image, line);
+        int[][] expecteds = {{0}, {4}, {6}, {9}, {8}, {10}, {6}, {7}, {0}, {0}};
+        for (int i = 0; i < expecteds.length; ++i) assertArrayEquals(expecteds[i], actuals[i]);
+    }
+
+    @Test
+    public void testGetPixelValuesVertical() {
+        line.setStartPoint(1, 0);
+        line.setEndPoint(1, 9);
+        int[][] actuals = ImageUtils.getLineProfilePixels(image, line);
+        int[][] expecteds = {{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}};
+        for (int i = 0; i < expecteds.length; ++i) assertArrayEquals(expecteds[i], actuals[i]);
+    }
+
+    @Test
+    public void testGetPixelValuesVerticalReversed() {
+        line.setStartPoint(1, 9);
+        line.setEndPoint(1, 0);
+        int[][] actuals = ImageUtils.getLineProfilePixels(image, line);
+        int[][] expecteds = {{9}, {8}, {7}, {6}, {5}, {4}, {3}, {2}, {1}, {0}};
+        for (int i = 0; i < expecteds.length; ++i) assertArrayEquals(expecteds[i], actuals[i]);
     }
 }

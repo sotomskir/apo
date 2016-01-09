@@ -21,6 +21,7 @@ public class PrefsController implements Initializable {
      */
     public final static String SCREENSHOT_PATH = "screenshot_path";
     public final static String LANGUAGE = "locale";
+    public final static String LAST_DIRECTORY = "last_directory";
 
     /**
      * Available languages

@@ -8,6 +8,8 @@ import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import pl.sotomski.apoz.Main;
+import pl.sotomski.apoz.controllers.PrefsController;
 
 import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
@@ -15,8 +17,11 @@ import javax.media.jai.RenderedOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.*;
+import java.util.prefs.Preferences;
 
 public class FileMenuUtils {
+
+    private static Preferences prefs = Preferences.userNodeForPackage(Main.class);
 
     public static File saveAsDialog(BorderPane layoutRoot, BufferedImage image) {
         Window window = layoutRoot.getScene().getWindow();
@@ -36,9 +41,12 @@ public class FileMenuUtils {
     public static File saveAsCSVDialog(Parent layoutRoot, BufferedImage image) {
         Window window = layoutRoot.getScene().getWindow();
         final FileChooser fileChooser = new FileChooser();
+        String path = prefs.get(PrefsController.LAST_DIRECTORY, null);
+        File initialDirectory = new File(path);
+        fileChooser.setInitialDirectory(initialDirectory);
         fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("CSV", "csv"));
         File file = fileChooser.showSaveDialog(window);
-
+        prefs.put(PrefsController.LAST_DIRECTORY, file.getParent());
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new FileWriter(file));
@@ -77,13 +85,25 @@ public class FileMenuUtils {
     public static File openFileDialog(BorderPane layoutRoot) {
         Window window = layoutRoot.getScene().getWindow();
         final FileChooser fileChooser = new FileChooser();
-        return fileChooser.showOpenDialog(window);
+        String path = prefs.get(PrefsController.LAST_DIRECTORY, System.getProperty("user.dir") + File.separator);
+        File initialDirectory = new File(path);
+        fileChooser.setInitialDirectory(initialDirectory);
+        File choosenFile = fileChooser.showOpenDialog(window);
+        prefs.put(PrefsController.LAST_DIRECTORY, choosenFile.getParent());
+        System.out.println(choosenFile.getParent());
+        return choosenFile;
     }
 
     public static File openDirDialog(Pane layoutRoot) {
         Window window = layoutRoot.getScene().getWindow();
         final DirectoryChooser directoryChooser = new DirectoryChooser();
-        return directoryChooser.showDialog(window);
+        String path = prefs.get(PrefsController.LAST_DIRECTORY, null);
+        File initialDirectory = new File(path);
+        directoryChooser.setInitialDirectory(initialDirectory);
+        File choosenFile = directoryChooser.showDialog(window);
+        prefs.put(PrefsController.LAST_DIRECTORY, choosenFile.getParent());
+        System.out.println(choosenFile.getParent());
+        return choosenFile;
     }
 
     public static BufferedImage loadImage(File file) {
