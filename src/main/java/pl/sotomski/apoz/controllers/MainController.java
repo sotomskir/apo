@@ -129,6 +129,10 @@ public class MainController implements Initializable, ToolController {
         return activePaneProperty.getValue();
     }
 
+    public ToggleButton getPointerButton() {
+        return pointerButton;
+    }
+
     /***************************************************************************
      *                                                                         *
      *                               METHODS                                   *
@@ -175,7 +179,7 @@ public class MainController implements Initializable, ToolController {
                 undoUnavailable.bind(newActiveTab.getPane().getCommandManager().undoAvailableProperty().not());
                 redoUnavailable.bind(newActiveTab.getPane().getCommandManager().redoAvailableProperty().not());
             } else {
-//                activePaneProperty.setValue(null);
+                activePaneProperty.setValue(null);
                 undoUnavailable.setValue(true);
                 redoUnavailable.setValue(true);
             }
@@ -190,11 +194,11 @@ public class MainController implements Initializable, ToolController {
         histogramPaneContainer.setMinHeight(Control.USE_PREF_SIZE);
         toolboxScrollPane.setFitToHeight(true);
 
-        ToggleGroup pointersToggleGroup = new ToggleGroup();
-        pointerButton.setToggleGroup(pointersToggleGroup);
-        cropButton.setToggleGroup(pointersToggleGroup);
-        profileLineButton.setToggleGroup(pointersToggleGroup);
-        pointerButton.setSelected(true);
+//        ToggleGroup pointersToggleGroup = new ToggleGroup();
+//        pointerButton.setToggleGroup(pointersToggleGroup);
+//        cropButton.setToggleGroup(pointersToggleGroup);
+//        profileLineButton.setToggleGroup(pointersToggleGroup);
+//        pointerButton.setSelected(true);
         final String os = System.getProperty ("os.name");
         if (os != null && os.startsWith ("Mac"))
             menuBar.useSystemMenuBarProperty ().set (true);
@@ -238,7 +242,9 @@ public class MainController implements Initializable, ToolController {
         tabPane.getSelectionModel().select(imageTab);
     }
 
-    private void addToToolbox(VBox tool) {
+    private void addToToolbox(Tool tool) {
+        disableTools();
+        activePaneProperty.getValue().refresh();
         toolbox.getChildren().clear();
         toolbox.getChildren().add(tool);
     }
@@ -282,6 +288,9 @@ public class MainController implements Initializable, ToolController {
                 handleRedo(null);
             } else if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.Z) {
                 handleUndo(null);
+            } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                Tool tool = (Tool) toolbox.getChildren().get(0);
+                if(tool != null) tool.handleCancel();
             }
         }
     }
@@ -470,10 +479,6 @@ public class MainController implements Initializable, ToolController {
         addToToolbox(IntervalThresholdTool.getInstance(this));
     }
 
-    public void handleSampleTool(ActionEvent actionEvent) {
-        addToToolbox(SampleTool.getInstance(this));
-    }
-
     public void handleLevelsReduction(ActionEvent actionEvent) {
         addToToolbox(LevelsReductionTool.getInstance(this));
     }
@@ -511,22 +516,43 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleCropTool(ActionEvent actionEvent) {
-        addToToolbox(CropTool.getInstance(this));
-        rootLayout.getScene().setCursor(Cursor.DEFAULT);
-        getActivePaneProperty().enableCropSelection();
+        if(cropButton.isSelected()) {
+            addToToolbox(CropTool.getInstance(this));
+            cropButton.setSelected(true);
+            rootLayout.getScene().setCursor(Cursor.DEFAULT);
+            getActivePaneProperty().enableCropSelection();
+        } else disableTools();
     }
 
-    public void handlePointerTool(ActionEvent actionEvent) {
+    public void handleCropToolMenu(ActionEvent actionEvent) {
+        cropButton.setSelected(true);
+        handleCropTool(actionEvent);
+    }
+
+    public void disableTools() {
         rootLayout.getScene().setCursor(Cursor.DEFAULT);
-        getActivePaneProperty().enablePointerSelection();
+        getActivePaneProperty().disableTools();
+        toolbox.getChildren().clear();
+        toolbox.getChildren().add(EmptyTool.getInstance(this));
+        cropButton.setSelected(false);
+        profileLineButton.setSelected(false);
+        activePaneProperty.getValue().refresh();
+    }
+
+    public void handleProfileLineToolMenu(ActionEvent actionEvent) {
+        profileLineButton.setSelected(true);
+        handleProfileLineTool(actionEvent);
     }
 
     public void handleProfileLineTool(ActionEvent actionEvent) {
-        profileLineButton.setSelected(true);
-        histogramPane.selectProfileLineChart();
-        rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
-        getActivePaneProperty().enableProfileLineSelection();
-        handleToggleHistogramView(null);
+        if(profileLineButton.isSelected()) {
+            disableTools();
+            profileLineButton.setSelected(true);
+            histogramPane.selectProfileLineChart();
+            rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
+            getActivePaneProperty().enableProfileLineSelection();
+            if (histogramPane.getHeight() == 0) handleToggleHistogramView(null);
+        } else disableTools();
     }
 
 

@@ -75,7 +75,7 @@ public class ImagePane extends BorderPane {
             zoomLevel.setValue(zoomLevels[zoomIndex.get()]);
         });
         zoomLevel.setValue(zoomLevels[zoomIndex.get()]);
-
+        imageView.setOnMouseClicked(event -> refresh());
     }
 
     public ImagePane(HistogramPane histogramPane, File file) {
@@ -312,10 +312,10 @@ public class ImagePane extends BorderPane {
         });
     }
 
-    public void enablePointerSelection() {
-        setOnMousePressed(event -> {});
-        setOnMouseReleased(event -> {});
-        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
+    public void disableTools() {
+        imageView.setOnMousePressed(event -> {});
+        imageView.setOnMouseReleased(event -> {});
+        imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
         getImageStack().clear();
     }
 

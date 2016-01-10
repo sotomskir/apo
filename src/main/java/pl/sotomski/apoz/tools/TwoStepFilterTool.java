@@ -17,12 +17,10 @@ import pl.sotomski.apoz.utils.Mask;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
-public class TwoStepFilterTool extends VBox {
+public class TwoStepFilterTool extends Tool {
 
-    private static VBox instance;
-    private ToolController toolController;
+    private static Tool instance;
     private ChoiceBox<String> choiceBox;
     private int[] mask = new int[9];
     private List<Spinner<Integer>> spinners;
@@ -32,12 +30,12 @@ public class TwoStepFilterTool extends VBox {
     private Mask maskG = new Mask(3);
     private RadioButton oneStepRadio;
     private RadioButton twoStepRadio;
-    private BordersMethodToggles bordersMethodCombo;
+    private ComboBox<String> scalingComboBox = new ComboBox<>();
+    private BordersMethodToggles bordersMethodToggles;
 
 
     protected TwoStepFilterTool(ToolController controller) {
-        ResourceBundle bundle = controller.getBundle();
-        this.toolController = controller;
+        super(controller);
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("TwoStepFilterTool"));
         GridPane gridPane1 = new GridPane();
@@ -69,16 +67,14 @@ public class TwoStepFilterTool extends VBox {
         twoStepRadio.setToggleGroup(toggleGroup);
         oneStepRadio.setSelected(true);
 
-        bordersMethodCombo = new BordersMethodToggles(bundle);
-
-        Button button = new Button(bundle.getString("Apply"));
-        button.setOnAction((actionEvent) -> {
-            try {
-                handleApply(actionEvent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        bordersMethodToggles = new BordersMethodToggles(bundle);
+        scalingComboBox.getItems().addAll(
+                bundle.getString("scalingMethod0"),
+                bundle.getString("scalingMethod1"),
+                bundle.getString("scalingMethod2"),
+                bundle.getString("scalingMethod3")
+        );
+        scalingComboBox.getSelectionModel().selectFirst();
 
         getChildren().addAll(
                 separator,
@@ -95,8 +91,9 @@ public class TwoStepFilterTool extends VBox {
                 twoStepRadio,
                 new Separator(Orientation.HORIZONTAL),
                 new Label(bundle.getString("extremePixelsMethod")),
-                bordersMethodCombo,
-                button
+                scalingComboBox,
+                bordersMethodToggles,
+                applyCancelBtns
         );
     }
 
@@ -143,28 +140,33 @@ public class TwoStepFilterTool extends VBox {
         for (int y = 0; y < yV; y++)
             for (int x = 0; x < xV; x++) {
                 Label label = new Label();
-                label.setPrefSize(60, 60);
+                label.setPrefSize(35, 35);
                 labels.add(label);
                 gridPane.add(label, x, y);
             }
     }
 
-    public static VBox getInstance(ToolController controller) {
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new TwoStepFilterTool(controller);
         return instance;
     }
 
-    public void handleApply(ActionEvent actionEvent) throws Exception {
+    @Override
+    public void handleApply(ActionEvent actionEvent) {
         if (oneStepRadio.isSelected()) {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
-            manager.executeCommand(new LinearFilterCommand(imagePane, maskM.getData(), bordersMethodCombo.getMethod()));
+            int bordersMethod = bordersMethodToggles.getMethod();
+            int scalingMethod = scalingComboBox.getSelectionModel().getSelectedIndex();
+            manager.executeCommand(new LinearFilterCommand(imagePane, maskM.getData(), bordersMethod, scalingMethod));
             imagePane.refresh();
         } else if (twoStepRadio.isSelected()) {
             ImagePane imagePane = toolController.getActivePaneProperty();
             CommandManager manager = imagePane.getCommandManager();
-            manager.executeCommand(new LinearFilterCommand(imagePane, maskF.getData(), bordersMethodCombo.getMethod()));
-            manager.executeCommand(new LinearFilterCommand(imagePane, maskG.getData(), bordersMethodCombo.getMethod()));
+            int bordersMethod = bordersMethodToggles.getMethod();
+            int scalingMethod = scalingComboBox.getSelectionModel().getSelectedIndex();
+            manager.executeCommand(new LinearFilterCommand(imagePane, maskF.getData(), bordersMethod, scalingMethod));
+            manager.executeCommand(new LinearFilterCommand(imagePane, maskG.getData(), bordersMethod, scalingMethod));
             imagePane.refresh();
         }
     }

@@ -51,28 +51,30 @@ public class FileMenuUtils {
         fileChooser.setInitialDirectory(initialDirectory);
         fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("CSV", "csv"));
         File file = fileChooser.showSaveDialog(window);
-        if(file != null) prefs.put(LAST_DIRECTORY, file.getParent());
-        BufferedWriter bw = null;
-        try {
-            bw = new BufferedWriter(new FileWriter(file));
-            byte[] a = ImageUtils.getImageData(image);
-            int width = image.getWidth();
-            for (int i = 0; i < a.length; ++i) {
-                int value = a[i] & 0xFF;
-                bw.write(String.valueOf(value));
-                if (i % width == width-1) {
-                    bw.write('\n');
-                } else bw.write(";");
-            }
-        } catch (IOException e) {
-            new ExceptionDialog(e, "Wystąpił błąd podczas zapisu pliku");
-            e.printStackTrace();
-        } finally {
-            if (bw != null) try {
-                bw.close();
+        if(file != null) {
+            prefs.put(LAST_DIRECTORY, file.getParent());
+            BufferedWriter bw = null;
+            try {
+                bw = new BufferedWriter(new FileWriter(file));
+                byte[] a = ImageUtils.getImageData(image);
+                int width = image.getWidth();
+                for (int i = 0; i < a.length; ++i) {
+                    int value = a[i] & 0xFF;
+                    bw.write(String.valueOf(value));
+                    if (i % width == width-1) {
+                        bw.write('\n');
+                    } else bw.write(";");
+                }
             } catch (IOException e) {
                 new ExceptionDialog(e, "Wystąpił błąd podczas zapisu pliku");
                 e.printStackTrace();
+            } finally {
+                if (bw != null) try {
+                    bw.close();
+                } catch (IOException e) {
+                    new ExceptionDialog(e, "Wystąpił błąd podczas zapisu pliku");
+                    e.printStackTrace();
+                }
             }
         }
         return file;

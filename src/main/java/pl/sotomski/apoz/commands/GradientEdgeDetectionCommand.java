@@ -44,7 +44,7 @@ public class GradientEdgeDetectionCommand extends UndoableCommand implements Com
             { 3, 3, 3, 3, 0,-5, 3,-5,-5} //NW
     };
 
-    public GradientEdgeDetectionCommand(ImagePane image, String maskName, int edgeDirection, int bordersMethod, int scalingMethod, int calcMethod) throws Exception {
+    public GradientEdgeDetectionCommand(ImagePane image, String maskName, int edgeDirection, int bordersMethod, int scalingMethod, int calcMethod) {
         super(image);
         this.bordersMethod = bordersMethod;
         this.maskName = maskName;

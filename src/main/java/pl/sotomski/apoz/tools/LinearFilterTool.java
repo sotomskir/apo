@@ -4,7 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LinearFilterCommand;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -13,17 +12,17 @@ import pl.sotomski.apoz.nodes.ImagePane;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
-public class LinearFilterTool extends VBox {
+public class LinearFilterTool extends Tool {
 
-    private static VBox instance;
+    private static Tool instance;
+    private ComboBox<String> scalingComboBox = new ComboBox<>();
+    private BordersMethodToggles bordersMethodToggles;
     private ToolController toolController;
     private ChoiceBox<String> choiceBox;
     private String[] masks;
     private int[] mask = new int[9];
     private List<Spinner> spinners;
-    private BordersMethodToggles bordersMethodToggles;
     private static int[][] maskTemplates = {
             {1, 1, 1, 1, 1, 1, 1, 1, 1},
             {1, 1, 1, 1, 8, 1, 1, 1, 1},
@@ -39,7 +38,7 @@ public class LinearFilterTool extends VBox {
     };
 
     protected LinearFilterTool(ToolController controller) {
-        ResourceBundle bundle = controller.getBundle();
+        super(controller);
         masks = new String[11];
         masks[0] = bundle.getString("BlurMask1");
         masks[1] = bundle.getString("BlurMask2");
@@ -65,6 +64,7 @@ public class LinearFilterTool extends VBox {
         for (int x = 0; x < 9; x++) {
             Spinner<Integer> spinner = new Spinner<>(-9, 9, 1);
             spinners.add(spinner);
+//            spinner.setPrefSize(60, 60);
             tilePane.getChildren().add(spinner);
         }
         choiceBox.getItems().addAll(masks);
@@ -77,29 +77,41 @@ public class LinearFilterTool extends VBox {
 
         });
 
+        scalingComboBox.getItems().addAll(
+                bundle.getString("scalingMethod0"),
+                bundle.getString("scalingMethod1"),
+                bundle.getString("scalingMethod2"),
+                bundle.getString("scalingMethod3")
+        );
+        scalingComboBox.getSelectionModel().selectFirst();
+
         // add other controls
         bordersMethodToggles = new BordersMethodToggles(bundle);
-        Button button = new Button(bundle.getString("Apply"));
-        button.setOnAction((actionEvent) -> {
-            try {
-                handleApply(actionEvent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        getChildren().addAll(separator, label, tilePane, choiceBox, bordersMethodToggles, button);
+        getChildren().addAll(
+                separator,
+                label,
+                tilePane,
+                choiceBox,
+                new Label(bundle.getString("scalingMethod")),
+                scalingComboBox,
+                bordersMethodToggles,
+                applyCancelBtns
+        );
     }
 
-    public static VBox getInstance(ToolController controller) {
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new LinearFilterTool(controller);
         return instance;
     }
 
-    public void handleApply(ActionEvent actionEvent) throws Exception {
+    @Override
+    public void handleApply(ActionEvent actionEvent) {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         for (int i = 0; i < 9; ++i) mask[i] = (int) spinners.get(i).getValue();
-        manager.executeCommand(new LinearFilterCommand(imagePane, mask, bordersMethodToggles.getMethod()));
+        int bordersMethod = bordersMethodToggles.getMethod();
+        int scalingMethod = scalingComboBox.getSelectionModel().getSelectedIndex();
+        manager.executeCommand(new LinearFilterCommand(imagePane, mask, bordersMethod, scalingMethod));
         imagePane.setImage(imagePane.getImage());
     }
 

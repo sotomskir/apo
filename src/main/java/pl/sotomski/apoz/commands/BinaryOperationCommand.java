@@ -12,7 +12,7 @@ public class BinaryOperationCommand extends UndoableCommand implements Command {
     private String method;
     private BufferedImage secondImage;
 
-    public BinaryOperationCommand(ImagePane image, BufferedImage secondImage, String method) throws Exception {
+    public BinaryOperationCommand(ImagePane image, BufferedImage secondImage, String method) {
         super(image);
         this.method = method;
         this.secondImage = secondImage;

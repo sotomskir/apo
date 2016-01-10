@@ -14,7 +14,7 @@ import java.util.Random;
 public class HistogramEqCommand extends UndoableCommand implements Command {
     private int method;
 
-    public HistogramEqCommand(ImagePane image, int method) throws Exception {
+    public HistogramEqCommand(ImagePane image, int method) {
         super(image);
         if (method < 1 || method > 5) throw new IllegalArgumentException("Bad method. Eligible methods: 1, 2, 3, 4, 5");
         this.method = method;

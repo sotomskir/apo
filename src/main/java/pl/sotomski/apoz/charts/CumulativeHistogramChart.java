@@ -31,8 +31,8 @@ public class CumulativeHistogramChart extends LineChart<Number, Number> {
 
     private void applyStyle() {
 //        this.setHorizontalGridLinesVisible(false);
-        this.setVerticalGridLinesVisible(false);
-        this.setVerticalZeroLineVisible(false);
+//        this.setVerticalGridLinesVisible(false);
+//        this.setVerticalZeroLineVisible(false);
 //        this.setCategoryGap(0d);
 //        this.setBarGap(0d);
         this.setAnimated(false);
@@ -41,10 +41,10 @@ public class CumulativeHistogramChart extends LineChart<Number, Number> {
         NumberAxis xAxis = (NumberAxis) this.getXAxis();
         NumberAxis yAxis = (NumberAxis) this.getYAxis();
         yAxis.setMinorTickVisible(false);
-        yAxis.setTickMarkVisible(false);
-        xAxis.setTickMarkVisible(false);
+//        yAxis.setTickMarkVisible(false);
+//        xAxis.setTickMarkVisible(false);
         yAxis.setTickLabelsVisible(false);
-        xAxis.setTickLabelsVisible(false);
+//        xAxis.setTickLabelsVisible(false);
         this.setMaxHeight(200.0);
         getStyleClass().add("thick-chart");
     }

@@ -198,21 +198,13 @@ public class ImageUtils {
         return r;    }
 
     public static void linearFilter(BufferedImage bi, int[] mask, int bordersMethod) {
-        int width = bi.getWidth();
-        int height = bi.getHeight();
-        int channels = bi.getColorModel().getNumComponents();
         byte[] a = getImageData(bi);
-        final int bordersWidth = (int) (Math.sqrt(mask.length));
-
-        //create temporary image with extended borders
-        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
 
         //calculate mask multiplier
         int multiplier = arraySum(mask);
         boolean sharpening = false;
         if (multiplier == 0) {
             sharpening = true;
-            multiplier = 1;
         }
 
         //filter image
@@ -223,14 +215,7 @@ public class ImageUtils {
     }
 
     public static void linearFilterWithScaling(BufferedImage bi, int[] mask, int bordersMethod, int scaleMethod) {
-        int width = bi.getWidth();
-        int height = bi.getHeight();
-        int channels = bi.getColorModel().getNumComponents();
         byte[] a = getImageData(bi);
-        final int bordersWidth = (int) (Math.sqrt(mask.length));
-
-        //create temporary image with extended borders
-        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
 
         //filter image
         int[] b = filterImage(bi, mask, bordersMethod);
@@ -240,19 +225,13 @@ public class ImageUtils {
     }
 
     public static void gradientFilter(BufferedImage bi, int[][] masks, int bordersMethod, int scalingMethod, int calcMethod) {
-        int width = bi.getWidth();
-        int height = bi.getHeight();
-        int channels = bi.getColorModel().getNumComponents();
         byte[] a = getImageData(bi);
-        final int bordersWidth = (int) (Math.sqrt(masks.length));
-
-        //create temporary image with extended borders
-        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
 
         //filter image
         int[] Gx = filterImage(bi, masks[0], bordersMethod);
         int[] Gy = filterImage(bi, masks[1], bordersMethod);
         int[] b = calcMethod == 1 ? arrayAbsSum(Gx, Gy) : arraySqrtSumOfSquares(Gx, Gy);
+
         //scale image levels
         scaleImage(a, b, scalingMethod);
     }
@@ -319,7 +298,6 @@ public class ImageUtils {
                 inputArray[i] = (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
                 inputArray[i] += imageData[i] & 0xFF;
                 imageData[i] = (byte) (inputArray[i] < 0 ? 0 : inputArray[i] > 255 ? 255 : inputArray[i]); // skalowanie przez obcinanie
-//                imageData[i] = (byte) (((inputArray[i] - min) / (max - min)) * 255); // skalowanie proporcjonalne
             }
         } else {
             for (int i = 0; i < imageData.length; ++i) {
@@ -337,7 +315,7 @@ public class ImageUtils {
      * @param scaleMethod 0 - bez skalowania, 3 - obcinanie, 1 - skalowanie proporcjonalne
      * @return
      */
-    private static byte[] scaleImage(byte[] imageData, int[] inputArray, int scaleMethod) {
+    public static byte[] scaleImage(byte[] imageData, int[] inputArray, int scaleMethod) {
         int min = Ints.min(inputArray);
         int max = Ints.max(inputArray);
 
@@ -352,7 +330,7 @@ public class ImageUtils {
             for (int i = 0; i < imageData.length; ++i)
                 imageData[i] = (byte) (((inputArray[i] - min) / (max - min)) * 255); // skalowanie proporcjonalne
 
-        } else if (scaleMethod == 2) { // scaling
+        } else if (scaleMethod == 2) { // 3 value scaling
             for (int i = 0; i < imageData.length; ++i)
                 imageData[i] = (byte)(inputArray[i] < 0 ? 0 : inputArray[i] == 0 ? 128 : 255);
 
@@ -654,6 +632,7 @@ public class ImageUtils {
         int width = image.getWidth();
         int height = image.getHeight();
 
+        int maxIterations = 1000;
         int nonZero;
         do
         {
@@ -664,7 +643,8 @@ public class ImageUtils {
             System.arraycopy(eroded, 0, img, 0, img.length);
             nonZero = countNonZero(img);
             System.out.println(nonZero);
-        } while (nonZero != 0);
+            --maxIterations;
+        } while (nonZero != 0 && maxIterations > 0);
         byte[] a = getImageData(image);
         System.arraycopy(skel, 0, a, 0, img.length);
     }

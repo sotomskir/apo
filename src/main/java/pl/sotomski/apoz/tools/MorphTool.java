@@ -1,8 +1,8 @@
 package pl.sotomski.apoz.tools;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.MorphCommand;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -10,18 +10,15 @@ import pl.sotomski.apoz.nodes.ImagePane;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
-public class MorphTool extends VBox {
+public class MorphTool extends Tool {
 
-    private static VBox instance;
-    private ToolController toolController;
+    private static Tool instance;
     private List<Button> buttons;
     private RadioButton squareRadio;
 
     protected MorphTool(ToolController controller) {
-        ResourceBundle bundle = controller.getBundle();
-        this.toolController = controller;
+        super(controller);
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("MorphTool"));
         buttons = new ArrayList<>();
@@ -46,6 +43,11 @@ public class MorphTool extends VBox {
         getChildren().addAll(squareRadio, diamondRadio);
     }
 
+    @Override
+    protected void handleApply(ActionEvent actionEvent) {
+
+    }
+
     private void handleAction(int action) {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
@@ -53,7 +55,7 @@ public class MorphTool extends VBox {
         imagePane.refresh();
     }
 
-    public static VBox getInstance(ToolController controller) {
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new MorphTool(controller);
         return instance;
     }

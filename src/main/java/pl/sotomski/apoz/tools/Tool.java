@@ -1,10 +1,12 @@
 package pl.sotomski.apoz.tools;
 
+import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import pl.sotomski.apoz.controllers.MainController;
 import pl.sotomski.apoz.controllers.ToolController;
-import pl.sotomski.apoz.utils.ImageUtils;
 
-import java.awt.image.BufferedImage;
 import java.util.ResourceBundle;
 
 /**
@@ -14,12 +16,31 @@ public abstract class Tool extends VBox {
 
     protected ToolController toolController;
     protected ResourceBundle bundle;
-    protected BufferedImage originalImage;
+    protected HBox applyCancelBtns;
+
+    protected Tool() {}
 
     protected Tool(ToolController toolController) {
         this.toolController = toolController;
         bundle = toolController.getBundle();
-        originalImage = ImageUtils.deepCopy(toolController.getBufferedImage());
+        Button applyBtn = new Button(bundle.getString("Apply"));
+        applyBtn.setOnAction(this::handleApply);
+        Button cancelBtn = new Button(bundle.getString("Cancel"));
+        cancelBtn.setOnAction((actionEvent) -> handleCancel());
+        applyCancelBtns = new HBox(applyBtn, cancelBtn);
     }
 
+    public void setToolController(ToolController toolController) {
+        this.toolController = toolController;
+    }
+
+    protected abstract void handleApply(ActionEvent actionEvent);
+
+    public void handleCancel() {
+        disableTool();
+    }
+
+    public void disableTool() {
+        ((MainController)toolController).disableTools();
+    }
 }

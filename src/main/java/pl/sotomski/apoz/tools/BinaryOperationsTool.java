@@ -5,7 +5,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.BinaryOperationCommand;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -15,18 +14,17 @@ import pl.sotomski.apoz.utils.FileMenuUtils;
 import java.io.File;
 import java.util.ResourceBundle;
 
-public class BinaryOperationsTool extends VBox {
+public class BinaryOperationsTool extends Tool {
 
     private static BinaryOperationsTool instance;
-    private ToolController toolController;
     private ChoiceBox<String> choiceBox;
     private String[] methods = {"add", "sub", "multiply", "divide", "AND", "OR", "XOR"};
     private File secondFile;
 
     protected BinaryOperationsTool(ToolController controller) {
+        super(controller);
         ResourceBundle bundle = controller.getBundle();
         this.choiceBox = new ChoiceBox<>();
-        this.toolController = controller;
         choiceBox.getItems().addAll(methods);
         choiceBox.getSelectionModel().select(0);
 
@@ -49,7 +47,7 @@ public class BinaryOperationsTool extends VBox {
                 e.printStackTrace();
             }
         });
-        getChildren().addAll(separator, label, choiceBox, hBox, buttonApply);
+        getChildren().addAll(separator, label, choiceBox, hBox, applyCancelBtns);
     }
 
     public static BinaryOperationsTool getInstance(ToolController controller) {
@@ -57,7 +55,7 @@ public class BinaryOperationsTool extends VBox {
         return instance;
     }
 
-    public void handleApply(ActionEvent actionEvent) throws Exception {
+    public void handleApply(ActionEvent actionEvent) {
         String method = choiceBox.getValue();
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();

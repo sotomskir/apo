@@ -3,10 +3,8 @@ package pl.sotomski.apoz.tools;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.layout.HBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -27,25 +25,10 @@ public class CurvesTool extends Tool {
         // create controls
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("Curves"));
-        Button buttonApply = new Button(bundle.getString("Apply"));
-        Button buttonCancel = new Button(bundle.getString("Cancel"));
         curvesControl = new CurvesControl();
-        HBox hBox = new HBox(buttonCancel, buttonApply);
-
-        // create listeners
-
-        buttonApply.setOnAction((actionEvent) -> {
-            try {
-                handleApply(actionEvent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
         curvesControl.changedProperty().addListener(observable -> updateImageViewAndHistogram());
 
-        //
-        getChildren().addAll(separator, label, curvesControl, hBox);
+        getChildren().addAll(separator, label, curvesControl, applyCancelBtns);
         updateImageViewAndHistogram();
     }
 
@@ -61,10 +44,12 @@ public class CurvesTool extends Tool {
         return instance;
     }
 
-    public void handleApply(ActionEvent actionEvent) throws Exception {
+    @Override
+    public void handleApply(ActionEvent actionEvent) {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         manager.executeCommand(new LUTCommand(imagePane, curvesControl.getLUT()));
+        disableTool();
     }
 
 }

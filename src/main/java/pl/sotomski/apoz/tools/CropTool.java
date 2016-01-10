@@ -2,10 +2,8 @@ package pl.sotomski.apoz.tools;
 
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.controllers.MainController;
 import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.CropRectangle;
@@ -15,36 +13,35 @@ import pl.sotomski.apoz.nodes.ImageTab;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
-import java.util.ResourceBundle;
 
-public class CropTool extends VBox {
+public class CropTool extends Tool {
 
-    private static VBox instance;
-    private ToolController toolController;
-    ResourceBundle bundle;
+    private static Tool instance;
 
     protected CropTool(ToolController controller) {
-        bundle = controller.getBundle();
-        this.toolController = controller;
+        super(controller);
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("CropTool"));
-        Button button = new Button(bundle.getString("Apply"));
-        button.setOnAction((actionEvent) -> {
-            try {
-                handleApply(actionEvent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        getChildren().addAll(separator, label, button);
+        System.out.println(separator);
+        System.out.println(applyCancelBtns);
+        System.out.println(label);
+        getChildren().addAll(
+                separator,
+                label,
+                applyCancelBtns);
     }
 
-    public static VBox getInstance(ToolController controller) {
+    private void handleCancel(ActionEvent actionEvent) {
+        ((MainController)toolController).disableTools();
+    }
+
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new CropTool(controller);
         return instance;
     }
 
-    public void handleApply(ActionEvent actionEvent) throws Exception {
+    @Override
+    public void handleApply(ActionEvent actionEvent) {
         ImagePane imagePane = toolController.getActivePaneProperty();
         BufferedImage image = toolController.getBufferedImage();
         CropRectangle cropRectangle = toolController.getActivePaneProperty().getCropRectangle();
@@ -68,6 +65,7 @@ public class CropTool extends VBox {
         }
         ImagePane newImagePane = new ImagePane(histogramPane, croppedImage, tabName);
         ((MainController)toolController).attachTab(new ImageTab(newImagePane));
+        disableTool();
     }
 
 }

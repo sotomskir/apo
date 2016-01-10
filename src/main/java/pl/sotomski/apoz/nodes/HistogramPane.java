@@ -35,7 +35,7 @@ public class HistogramPane extends TabPane {
         this.getTabs().addAll(tab1, tab2, tab3, profileLineTab);
         for(Tab tab : getTabs()) tab.setClosable(false);
         rgbHistogramChart = new RGBHistogramChart();
-        monoHistogramChart = new MonoHistogramChart();
+        monoHistogramChart = new MonoHistogramChart(bundle);
         cumulativeHistogramChart = new CumulativeHistogramChart();
         profileLineChart = new ProfileLineChart();
         VBox histogramPane = new VBox(monoHistogramChart);

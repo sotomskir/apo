@@ -3,9 +3,11 @@ package pl.sotomski.apoz.tools;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -14,18 +16,15 @@ import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
-import java.util.ResourceBundle;
 
-public class IntervalThresholdTool extends VBox {
+public class IntervalThresholdTool extends Tool {
 
-    private static VBox instance;
-    private ToolController toolController;
+    private static Tool instance;
     private Spinner<Integer> spinner;
     private ChartControl chartControl;
 
     protected IntervalThresholdTool(ToolController controller) {
-        this.toolController = controller;
-        ResourceBundle bundle = controller.getBundle();
+        super(controller);
 
         // create controls
         Separator separator = new Separator(Orientation.HORIZONTAL);
@@ -36,9 +35,7 @@ public class IntervalThresholdTool extends VBox {
         CheckBox checkBoxStretch = new CheckBox(bundle.getString("Stretch"));
         chartControl = new ChartControl();
         spinner = new Spinner<>(2, 255, 3);
-        Button buttonCancel = new Button(bundle.getString("Cancel"));
-        Button buttonApply = new Button(bundle.getString("Apply"));
-        HBox hBox = new HBox(spinner, buttonCancel, buttonApply);
+        HBox hBox = new HBox(spinner, applyCancelBtns);
 
         // add listeners
         spinner.valueProperty().addListener(e -> {
@@ -69,14 +66,6 @@ public class IntervalThresholdTool extends VBox {
             updateImageView();
         });
 
-        buttonApply.setOnAction((actionEvent) -> {
-            try {
-                handleApply(actionEvent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
         chartControl.changedProperty().addListener(observable -> updateImageView());
 
         // add controls to view and init
@@ -102,15 +91,17 @@ public class IntervalThresholdTool extends VBox {
         ap.getHistogramPane().update(image);
     }
 
-    public static VBox getInstance(ToolController controller) {
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new IntervalThresholdTool(controller);
         return instance;
     }
 
-    public void handleApply(ActionEvent actionEvent) throws Exception {
+    @Override
+    public void handleApply(ActionEvent actionEvent) {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         manager.executeCommand(new LUTCommand(imagePane, chartControl.getLUT()));
+        disableTool();
     }
 
 

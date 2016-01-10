@@ -8,12 +8,15 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import pl.sotomski.apoz.utils.Histogram;
 
+import java.util.ResourceBundle;
+
 /**
  * Created by sotomski on 19/10/15.
  */
 public class MonoHistogramChart extends BarChart<String, Number> {
     private XYChart.Data<String, Number> data[] = new XYChart.Data[256];
     Label valueLabel;
+    private ResourceBundle bundle;
 
     public MonoHistogramChart() {
         super(new CategoryAxis(), new NumberAxis());
@@ -24,6 +27,11 @@ public class MonoHistogramChart extends BarChart<String, Number> {
         this.getData().add(series);
         applyStyle();
         setupHover(series);
+    }
+
+    public MonoHistogramChart(ResourceBundle bundle) {
+        this();
+        this.bundle = bundle;
     }
 
     public void update(Histogram histogram) {
@@ -41,7 +49,10 @@ public class MonoHistogramChart extends BarChart<String, Number> {
         for (Data<String, Number> data : series.getData()) {
             Node n = data.getNode();
             n.setOnMouseEntered(e -> {
-                if (valueLabel != null) valueLabel.setText("Poziom: " + data.getXValue() + "\nWartość:" + data.getYValue());
+                if (valueLabel != null)
+                    valueLabel.setText(
+                            String.format(bundle.getString("LevelValue"), data.getXValue(), data.getYValue())
+                    );
                 n.setStyle("-fx-bar-fill: blue;");
             });
             n.setOnMouseExited(e -> {

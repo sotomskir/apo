@@ -369,14 +369,21 @@ public class ImageUtilsTest {
             ImageUtils.setPixel(image, i, 0, i);
             expecteds[i] = 255 - i;
             lut[i] = 255 - i;
-            System.out.print(lut[i] + ";");
         }
-        System.out.println();
         image = applyLUT(image, lut);
         a = getImageData(image);
         int[] actuals = new int[256];
         for (int i = 0; i < 256; i++) actuals[i] = a[i] & 0xFF;
 
         assertArrayEquals(expecteds, actuals);
+    }
+
+    @Test
+    public void scaleImageProportionalScalingTest() {
+        int[] data = {128, 255};
+        byte[] imageData = new byte[2];
+        imageData = scaleImage(imageData, data, 1);
+        byte[] expecteds = {0, (byte) 255};
+        assertArrayEquals(expecteds, imageData);
     }
 }

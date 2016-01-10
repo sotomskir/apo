@@ -27,8 +27,8 @@
                 <MenuItem disable="${controller.redoUnavailable}" onAction="#handleRedo" text="%Redo"/>
             </Menu>
             <Menu text="%Tools">
-                <MenuItem disable="${controller.needsImage}" onAction="#handleProfileLineTool" text="%ProfileLine"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleCropTool" text="%Crop"/>
+                <MenuItem disable="${controller.needsImage}" onAction="#handleProfileLineToolMenu" text="%ProfileLine"/>
+                <MenuItem disable="${controller.needsImage}" onAction="#handleCropToolMenu" text="%Crop"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleNumberTable" text="%GenerateNumberTable"/>
                 <MenuItem onAction="#handleToggleHistogramView" text="Histogram"/>
             </Menu>
@@ -53,9 +53,6 @@
                 <MenuItem disable="${controller.needsImage}" onAction="#handleGradientFiltering" text="%GradientFiltering"/>
             </Menu>
             <Menu text="%Help">
-                <MenuItem disable="true" text="%Search"/>
-                <MenuItem text="Online Manual" visible="false"/>
-                <SeparatorMenuItem/>
                 <MenuItem onAction="#handleAboutAction" text="%About"/>
             </Menu>
         </MenuBar>
@@ -123,12 +120,12 @@
 
                         <Separator orientation="VERTICAL"/>
 
-                        <ToggleButton text="%mdi-cursor-default-outline" styleClass="mdi" disable="${controller.needsImage}" fx:id="pointerButton" mnemonicParsing="false" onAction="#handlePointerTool">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
-                            <tooltip>
-                                <Tooltip text="%Pointer"/>
-                            </tooltip>
-                        </ToggleButton>
+                        <!--<ToggleButton text="%mdi-cursor-default-outline" styleClass="mdi" disable="${controller.needsImage}" fx:id="pointerButton" mnemonicParsing="false" onAction="#disableTools">-->
+                            <!--<padding><Insets bottom="2" right="2" left="2" top="2"/></padding>-->
+                            <!--<tooltip>-->
+                                <!--<Tooltip text="%Pointer"/>-->
+                            <!--</tooltip>-->
+                        <!--</ToggleButton>-->
 
                         <ToggleButton text="%mdi-crop" styleClass="mdi" disable="${controller.needsImage}" fx:id="cropButton" mnemonicParsing="false" onAction="#handleCropTool">
                             <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
@@ -196,7 +193,7 @@
                             <Separator orientation="VERTICAL"/>
                             <VBox>
                                 <Label fx:id="histogramLabel" text="Histogram:"/>
-                                <Label fx:id="histogramValueLabel" text="%PoziomWartość"/>
+                                <Label fx:id="histogramValueLabel" text="%LevelValueEmpty"/>
                             </VBox>
                         </HBox>
                     </VBox>

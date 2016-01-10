@@ -1,8 +1,11 @@
 package pl.sotomski.apoz.tools;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Separator;
+import javafx.scene.control.ToggleGroup;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LogicalFilterCommand;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -10,22 +13,17 @@ import pl.sotomski.apoz.nodes.ImagePane;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
-public class LogicalFilterTool extends VBox {
+public class LogicalFilterTool extends Tool {
 
-    private static VBox instance;
-    private ToolController toolController;
+    private static Tool instance;
     private List<RadioButton> buttons;
     private ToggleGroup toggleGroup;
 
     protected LogicalFilterTool(ToolController controller) {
-        ResourceBundle bundle = controller.getBundle();
-        this.toolController = controller;
+        super(controller);
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("LogicalFilterTool"));
-        Button applyBtn = new Button(bundle.getString("Apply"));
-        applyBtn.setOnAction((actionEvent) -> handleApply());
         toggleGroup = new ToggleGroup();
         buttons = new ArrayList<>();
         buttons.add(new RadioButton(bundle.getString("horizontal")));
@@ -35,10 +33,11 @@ public class LogicalFilterTool extends VBox {
         toggleGroup.getToggles().addAll(buttons);
         getChildren().addAll(separator, label);
         getChildren().addAll(buttons);
-        getChildren().addAll(applyBtn);
+        getChildren().addAll(applyCancelBtns);
     }
 
-    private void handleApply() {
+    @Override
+    public void handleApply(ActionEvent actionEvent) {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         int direction = buttons.indexOf((RadioButton)toggleGroup.getSelectedToggle());
@@ -46,7 +45,7 @@ public class LogicalFilterTool extends VBox {
         imagePane.refresh();
     }
 
-    public static VBox getInstance(ToolController controller) {
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new LogicalFilterTool(controller);
         return instance;
     }

@@ -11,7 +11,7 @@ public class GradientSharpeningCommand extends UndoableCommand implements Comman
             {-1, 0, 1, -2, 0, 2, -1, 0, 1},
     };
 
-    public GradientSharpeningCommand(ImagePane image, int bordersMethod) throws Exception {
+    public GradientSharpeningCommand(ImagePane image, int bordersMethod) {
         super(image);
         this.bordersMethod = bordersMethod;
     }

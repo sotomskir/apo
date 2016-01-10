@@ -9,7 +9,7 @@ import pl.sotomski.apoz.utils.ImageUtils;
 public class MedianCommand extends UndoableCommand implements Command {
     private int radius;
 
-    public MedianCommand(ImagePane image, int radius) throws Exception {
+    public MedianCommand(ImagePane image, int radius) {
         super(image);
         this.radius = radius;
     }

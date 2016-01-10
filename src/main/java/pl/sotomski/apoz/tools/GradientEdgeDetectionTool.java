@@ -2,8 +2,10 @@ package pl.sotomski.apoz.tools;
 
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.text.Font;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.GradientEdgeDetectionCommand;
@@ -11,12 +13,9 @@ import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.BordersMethodToggles;
 import pl.sotomski.apoz.nodes.ImagePane;
 
-import java.util.ResourceBundle;
+public class GradientEdgeDetectionTool extends Tool {
 
-public class GradientEdgeDetectionTool extends VBox {
-
-    private static VBox instance;
-    private ToolController toolController;
+    private static Tool instance;
     private ChoiceBox<String> choiceBox;
     private String[] masks;
     Label masksLabel = new Label();
@@ -48,7 +47,7 @@ public class GradientEdgeDetectionTool extends VBox {
             "  3  3  3\n  3  0 -5\n  3 -5 -5" //NW
     };
     protected GradientEdgeDetectionTool(ToolController controller) {
-        ResourceBundle bundle = controller.getBundle();
+        super(controller);
         masks = new String[4];
         masks[0] = bundle.getString("RobertsMask");
         masks[1] = bundle.getString("SobelMask");
@@ -106,14 +105,6 @@ public class GradientEdgeDetectionTool extends VBox {
             }
         });
 
-        Button button = new Button(bundle.getString("Apply"));
-        button.setOnAction((actionEvent) -> {
-            try {
-                handleApply(actionEvent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
         bordersMethodToggles = new BordersMethodToggles(bundle);
         getChildren().addAll(
                 label,
@@ -128,16 +119,17 @@ public class GradientEdgeDetectionTool extends VBox {
                 new Label(bundle.getString("scalingMethod")),
                 scalingComboBox,
                 bordersMethodToggles,
-                button
+                applyCancelBtns
         );
     }
 
-    public static VBox getInstance(ToolController controller) {
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new GradientEdgeDetectionTool(controller);
         return instance;
     }
 
-    public void handleApply(ActionEvent actionEvent) throws Exception {
+    @Override
+    public void handleApply(ActionEvent actionEvent) {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         String maskName;

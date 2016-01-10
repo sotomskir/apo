@@ -3,11 +3,9 @@ package pl.sotomski.apoz.tools;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
-import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -16,12 +14,10 @@ import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.util.ResourceBundle;
 
-public class BrightnessContrastTool extends VBox {
+public class BrightnessContrastTool extends Tool {
 
     private static BrightnessContrastTool instance;
-    private ToolController toolController;
     private Slider contrastSlider;
     private Slider brightnessSlider;
     private Slider gammaSlider;
@@ -29,9 +25,7 @@ public class BrightnessContrastTool extends VBox {
 
 
     private BrightnessContrastTool(ToolController controller) {
-        ResourceBundle bundle = controller.getBundle();
-        this.toolController = controller;
-
+        super(controller);
         contrastSlider = new Slider(-100, 100, 0);
         brightnessSlider = new Slider(-100, 100, 0);
         gammaSlider = new Slider(0.3, 6, 1);
@@ -44,8 +38,6 @@ public class BrightnessContrastTool extends VBox {
         Label brightnessValueLabel = new Label("0");
         Label contrastValueLabel = new Label("0");
         Label gammaValueLabel = new Label("0");
-        Button buttonApply = new Button(bundle.getString("Apply"));
-        Button buttonCancel = new Button(bundle.getString("Cancel"));
 
         sliderStyle(contrastSlider);
         sliderStyle(brightnessSlider);
@@ -66,19 +58,10 @@ public class BrightnessContrastTool extends VBox {
             updateImageView();
         });
 
-        buttonApply.setOnAction((actionEvent) -> {
-            try {
-                handleApply(actionEvent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
 //        getChildren().addAll(separator, brightnessLabel, brightnessSlider,brightnessValueLabel, contrastLabel,
 //                contrastSlider, contrastValueLabel, gammaLabel, gammaSlider, gammaValueLabel, buttonApply, buttonCancel);
         getChildren().addAll(separator, brightnessLabel, brightnessSlider,brightnessValueLabel, contrastLabel,
-                contrastSlider, contrastValueLabel, buttonApply, buttonCancel);
+                contrastSlider, contrastValueLabel, applyCancelBtns);
     }
 
     private void updateImageView() {
@@ -106,9 +89,11 @@ public class BrightnessContrastTool extends VBox {
         slider.setMajorTickUnit(25.0f);
         slider.setBlockIncrement(1.0f);
         slider.setOrientation(Orientation.HORIZONTAL);
+        slider.setMaxWidth(Double.MAX_VALUE);
+        slider.setPrefWidth(300);
     }
 
-    public static VBox getInstance(ToolController controller) {
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new BrightnessContrastTool(controller);
         else {
             instance.contrastSlider.setValue(0);
@@ -117,10 +102,12 @@ public class BrightnessContrastTool extends VBox {
         return instance;
     }
 
-    private void handleApply(ActionEvent actionEvent) throws Exception {
+    @Override
+    public void handleApply(ActionEvent actionEvent) {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         manager.executeCommand(new LUTCommand(imagePane, LUT));
+        disableTool();
     }
 
     private BufferedImage calculateImage() {

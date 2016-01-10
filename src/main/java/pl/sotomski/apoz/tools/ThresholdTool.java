@@ -3,8 +3,10 @@ package pl.sotomski.apoz.tools;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -13,19 +15,16 @@ import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.util.ResourceBundle;
 
-public class ThresholdTool extends VBox {
+public class ThresholdTool extends Tool {
 
-    private static VBox instance;
-    private ToolController toolController;
+    private static Tool instance;
     private Slider slider;
     private CheckBox reverseCheckBox;
     private Label sliderValue;
 
     protected ThresholdTool(ToolController controller) {
-        ResourceBundle bundle = controller.getBundle();
-        this.toolController = controller;
+        super(controller);
         Separator separator = new Separator(Orientation.HORIZONTAL);
         Label label = new Label(bundle.getString("Thresholding"));
         slider = new Slider(0, 255, 128);
@@ -34,21 +33,14 @@ public class ThresholdTool extends VBox {
         slider.setMajorTickUnit(25.0f);
         slider.setBlockIncrement(1.0f);
         slider.setOrientation(Orientation.HORIZONTAL);
+        slider.setMaxWidth(Double.MAX_VALUE);
+        slider.setPrefWidth(300);
+        setFillWidth(true);
         sliderValue = new Label("128");
         reverseCheckBox = new CheckBox(bundle.getString("Reverse"));
         reverseCheckBox.selectedProperty().addListener(e -> updateImageView());
         slider.valueProperty().addListener(e -> updateImageView());
-        Button buttonApply = new Button(bundle.getString("Apply"));
-        Button buttonCancel = new Button(bundle.getString("Cancel"));
-        buttonApply.setOnAction((actionEvent) -> {
-            try {
-                handleApply(actionEvent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        buttonCancel.setOnAction((actionEvent) -> toolController.getActivePaneProperty().refresh());
-        getChildren().addAll(separator, label, slider, sliderValue, reverseCheckBox, buttonApply, buttonCancel);
+        getChildren().addAll(separator, label, slider, sliderValue, reverseCheckBox, applyCancelBtns);
         updateImageView();
     }
 
@@ -61,15 +53,17 @@ public class ThresholdTool extends VBox {
         ap.getHistogramPane().update(image);
     }
 
-    public static VBox getInstance(ToolController controller) {
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new ThresholdTool(controller);
         return instance;
     }
 
-    public void handleApply(ActionEvent actionEvent) throws Exception {
+    @Override
+    public void handleApply(ActionEvent actionEvent) {
         ImagePane imagePane = toolController.getActivePaneProperty();
         CommandManager manager = imagePane.getCommandManager();
         manager.executeCommand(new LUTCommand(imagePane, getLUT()));
+        disableTool();
     }
 
     public static BufferedImage calculateImage(BufferedImage bi, int threshold, boolean reverse) {
