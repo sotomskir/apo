@@ -373,4 +373,9 @@ public class ImagePane extends BorderPane {
             return getChildren().contains(node);
         }
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

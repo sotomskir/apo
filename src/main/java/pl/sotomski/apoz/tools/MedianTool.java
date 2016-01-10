@@ -30,7 +30,7 @@ public class MedianTool extends Tool {
 
     @Override
     public void handleApply(ActionEvent actionEvent) {
-        ImagePane imagePane = toolController.getActivePaneProperty();
+        ImagePane imagePane = toolController.getActivePane();
         CommandManager manager = imagePane.getCommandManager();
         int radius = radiusSpinner.getValue();
         manager.executeCommand(new MedianCommand(imagePane, radius));

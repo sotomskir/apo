@@ -49,7 +49,7 @@ public class MorphTool extends Tool {
     }
 
     private void handleAction(int action) {
-        ImagePane imagePane = toolController.getActivePaneProperty();
+        ImagePane imagePane = toolController.getActivePane();
         CommandManager manager = imagePane.getCommandManager();
         manager.executeCommand(new MorphCommand(imagePane, action, (squareRadio.isSelected() ? 0 : 1) ));
         imagePane.refresh();

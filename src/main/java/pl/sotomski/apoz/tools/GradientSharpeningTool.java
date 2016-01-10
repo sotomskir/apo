@@ -36,7 +36,7 @@ public class GradientSharpeningTool extends Tool {
 
     @Override
     public void handleApply(ActionEvent actionEvent) {
-        ImagePane imagePane = toolController.getActivePaneProperty();
+        ImagePane imagePane = toolController.getActivePane();
         CommandManager manager = imagePane.getCommandManager();
         manager.executeCommand(new GradientSharpeningCommand(imagePane, bordersMethodToggles.getMethod()));
         imagePane.setImage(imagePane.getImage());

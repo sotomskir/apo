@@ -44,27 +44,27 @@ public class HistogramEqTool extends Tool {
     public void handleApply(ActionEvent actionEvent) {
         String method = choiceBox.getValue();
         if(methods[0].equals(method)) {
-            ImagePane imagePane = toolController.getActivePaneProperty();
+            ImagePane imagePane = toolController.getActivePane();
             CommandManager manager = imagePane.getCommandManager();
             manager.executeCommand(new HistogramEqCommand(imagePane, 1));
             imagePane.setImage(imagePane.getImage());
         } else       if(methods[1].equals(method)) {
-            ImagePane imagePane = toolController.getActivePaneProperty();
+            ImagePane imagePane = toolController.getActivePane();
             CommandManager manager = imagePane.getCommandManager();
             manager.executeCommand(new HistogramEqCommand(imagePane, 2));
             imagePane.setImage(imagePane.getImage());
         } else       if(methods[2].equals(method)) {
-            ImagePane imagePane = toolController.getActivePaneProperty();
+            ImagePane imagePane = toolController.getActivePane();
             CommandManager manager = imagePane.getCommandManager();
             manager.executeCommand(new HistogramEqCommand(imagePane, 3));
             imagePane.setImage(imagePane.getImage());
         } else       if(methods[3].equals(method)) {
-            ImagePane imagePane = toolController.getActivePaneProperty();
+            ImagePane imagePane = toolController.getActivePane();
             CommandManager manager = imagePane.getCommandManager();
             manager.executeCommand(new HistogramEqCommand(imagePane, 4));
             imagePane.setImage(imagePane.getImage());
         } else       if(methods[4].equals(method)) {
-            ImagePane imagePane = toolController.getActivePaneProperty();
+            ImagePane imagePane = toolController.getActivePane();
             CommandManager manager = imagePane.getCommandManager();
             manager.executeCommand(new HistogramEqCommand(imagePane, 5));
             imagePane.setImage(imagePane.getImage());

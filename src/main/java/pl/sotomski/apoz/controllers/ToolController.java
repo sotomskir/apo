@@ -8,5 +8,5 @@ import java.util.ResourceBundle;
 public interface ToolController {
     BufferedImage getBufferedImage();
     ResourceBundle getBundle();
-    ImagePane getActivePaneProperty();
+    ImagePane getActivePane();
 }

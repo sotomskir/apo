@@ -154,14 +154,14 @@ public class TwoStepFilterTool extends Tool {
     @Override
     public void handleApply(ActionEvent actionEvent) {
         if (oneStepRadio.isSelected()) {
-            ImagePane imagePane = toolController.getActivePaneProperty();
+            ImagePane imagePane = toolController.getActivePane();
             CommandManager manager = imagePane.getCommandManager();
             int bordersMethod = bordersMethodToggles.getMethod();
             int scalingMethod = scalingComboBox.getSelectionModel().getSelectedIndex();
             manager.executeCommand(new LinearFilterCommand(imagePane, maskM.getData(), bordersMethod, scalingMethod));
             imagePane.refresh();
         } else if (twoStepRadio.isSelected()) {
-            ImagePane imagePane = toolController.getActivePaneProperty();
+            ImagePane imagePane = toolController.getActivePane();
             CommandManager manager = imagePane.getCommandManager();
             int bordersMethod = bordersMethodToggles.getMethod();
             int scalingMethod = scalingComboBox.getSelectionModel().getSelectedIndex();

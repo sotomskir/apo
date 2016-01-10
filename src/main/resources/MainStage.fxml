@@ -41,7 +41,7 @@
                 <MenuItem disable="${controller.needsImage}" onAction="#handleLevelsReduction" text="%LevelsReduction"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
                 <MenuItem disable="${controller.needsImage}" onAction="#handleCurves" text="%Curves"/>
-                <!--<MenuItem disable="${controller.needsImage}" onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>-->
+                <MenuItem disable="${controller.needsImage}" onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>
             </Menu>
             <Menu text="%NeighborhoodOperations">
                 <MenuItem disable="${controller.needsImage}" onAction="#handleMaskTool" text="%MaskTool"/>

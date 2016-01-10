@@ -793,7 +793,7 @@ public class ImageUtils {
         }
 
         for (int i = 0; i < d.length; ++i) {
-            d[i] = (byte) (c[i] < 0 ? 0 : c[i] > 255 ? 255 : c[i]);
+            d[i] = (byte) (Math.abs(c[i]));
         }
 
         return resultImage;

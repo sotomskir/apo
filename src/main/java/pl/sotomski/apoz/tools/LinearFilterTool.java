@@ -106,7 +106,7 @@ public class LinearFilterTool extends Tool {
 
     @Override
     public void handleApply(ActionEvent actionEvent) {
-        ImagePane imagePane = toolController.getActivePaneProperty();
+        ImagePane imagePane = toolController.getActivePane();
         CommandManager manager = imagePane.getCommandManager();
         for (int i = 0; i < 9; ++i) mask[i] = (int) spinners.get(i).getValue();
         int bordersMethod = bordersMethodToggles.getMethod();

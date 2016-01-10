@@ -38,7 +38,7 @@ public class LogicalFilterTool extends Tool {
 
     @Override
     public void handleApply(ActionEvent actionEvent) {
-        ImagePane imagePane = toolController.getActivePaneProperty();
+        ImagePane imagePane = toolController.getActivePane();
         CommandManager manager = imagePane.getCommandManager();
         int direction = buttons.indexOf((RadioButton)toggleGroup.getSelectedToggle());
         manager.executeCommand(new LogicalFilterCommand(imagePane, direction));

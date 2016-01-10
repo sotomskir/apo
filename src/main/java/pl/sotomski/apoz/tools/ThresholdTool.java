@@ -46,7 +46,7 @@ public class ThresholdTool extends Tool {
 
     private void updateImageView() {
         sliderValue.setText(String.valueOf(((int) slider.getValue())));
-        ImagePane ap = toolController.getActivePaneProperty();
+        ImagePane ap = toolController.getActivePane();
         BufferedImage image = calculateImage(ap.getImage(), (int) slider.getValue(), reverseCheckBox.isSelected());
         ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
         ap.getHistogramPane().update(image);
@@ -60,7 +60,7 @@ public class ThresholdTool extends Tool {
 
     @Override
     public void handleApply(ActionEvent actionEvent) {
-        ImagePane imagePane = toolController.getActivePaneProperty();
+        ImagePane imagePane = toolController.getActivePane();
         CommandManager manager = imagePane.getCommandManager();
         manager.executeCommand(new LUTCommand(imagePane, getLUT()));
         disableTool();

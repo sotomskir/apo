@@ -65,7 +65,7 @@ public class BrightnessContrastTool extends Tool {
     }
 
     private void updateImageView() {
-        ImagePane ap = toolController.getActivePaneProperty();
+        ImagePane ap = toolController.getActivePane();
         updateLUT();
         BufferedImage image = calculateImage();
         ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
@@ -104,7 +104,7 @@ public class BrightnessContrastTool extends Tool {
 
     @Override
     public void handleApply(ActionEvent actionEvent) {
-        ImagePane imagePane = toolController.getActivePaneProperty();
+        ImagePane imagePane = toolController.getActivePane();
         CommandManager manager = imagePane.getCommandManager();
         manager.executeCommand(new LUTCommand(imagePane, LUT));
         disableTool();

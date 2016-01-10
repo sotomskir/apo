@@ -48,7 +48,7 @@ public class LevelsReductionTool extends Tool {
 
 
     private void updateImageViewAndHistogram() {
-        ImagePane ap = toolController.getActivePaneProperty();
+        ImagePane ap = toolController.getActivePane();
         BufferedImage image = ImageUtils.applyLUT(toolController.getBufferedImage(), chartControl.getLUT());
         ap.getImageView().setImage(SwingFXUtils.toFXImage(image, null));
         ap.getHistogramPane().update(image);
@@ -61,7 +61,7 @@ public class LevelsReductionTool extends Tool {
 
     @Override
     public void handleApply(ActionEvent actionEvent) {
-        ImagePane imagePane = toolController.getActivePaneProperty();
+        ImagePane imagePane = toolController.getActivePane();
         CommandManager manager = imagePane.getCommandManager();
         manager.executeCommand(new LUTCommand(imagePane, chartControl.getLUT()));
         disableTool();

@@ -42,11 +42,11 @@ public class CropTool extends Tool {
 
     @Override
     public void handleApply(ActionEvent actionEvent) {
-        ImagePane imagePane = toolController.getActivePaneProperty();
+        ImagePane imagePane = toolController.getActivePane();
         BufferedImage image = toolController.getBufferedImage();
-        CropRectangle cropRectangle = toolController.getActivePaneProperty().getCropRectangle();
+        CropRectangle cropRectangle = toolController.getActivePane().getCropRectangle();
         BufferedImage croppedImage = ImageUtils.crop(image, cropRectangle);
-        HistogramPane histogramPane = toolController.getActivePaneProperty().getHistogramPane();
+        HistogramPane histogramPane = toolController.getActivePane().getHistogramPane();
         String oldName = imagePane.getName();
         String cropStr = histogramPane.getBundle().getString("cropped");
         String tabName;

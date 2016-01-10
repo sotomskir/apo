@@ -54,7 +54,7 @@ public class MainController implements Initializable, ToolController {
      **************************************************************************/
     private ResourceBundle bundle;
     private HistogramPane histogramPane;
-    private ObjectProperty<ImagePane> activePaneProperty;
+    private ObjectProperty<ImagePane> activePane;
     private Preferences prefs;
     @FXML public ScrollPane toolboxScrollPane;
     @FXML public HBox labels;
@@ -123,10 +123,14 @@ public class MainController implements Initializable, ToolController {
     }
 
     @Override public BufferedImage getBufferedImage() {
-        return activePaneProperty.getValue().getImage();
+        return activePane.getValue().getImage();
     }
-    @Override public ImagePane getActivePaneProperty() {
-        return activePaneProperty.getValue();
+    public ImagePane getActivePane() {
+        return activePane.getValue();
+    }
+
+    public TabPane getTabPane() {
+        return tabPane;
     }
 
     public ToggleButton getPointerButton() {
@@ -141,23 +145,23 @@ public class MainController implements Initializable, ToolController {
     @Override public void initialize(java.net.URL arg0, ResourceBundle resources) {
         prefs = Preferences.userNodeForPackage(Main.class);
         bundle = resources;
-        activePaneProperty = new SimpleObjectProperty<>();
+        activePane = new SimpleObjectProperty<>();
         histogramPane = new HistogramPane(bundle);
         histogramPaneContainer.getChildren().add(histogramPane);
-        activePaneProperty.addListener(e -> {
-            if (activePaneProperty.getValue() != null) {
-                if (activePaneProperty.getValue().getWindow() == null) {
+        activePane.addListener(e -> {
+            if (activePane.getValue() != null) {
+                if (activePane.getValue().getWindow() == null) {
                     pinButton.setText(bundle.getString("mdi-pin-off"));
                 } else {
                     pinButton.setText(bundle.getString("mdi-pin"));
 //                    histogramPane.clear();
                 }
-                if(activePaneProperty.getValue().isTabbed())
-                    histogramPane.update(activePaneProperty.getValue().getImage());
-                zoomLabel.setText(String.format("%.0f%%", activePaneProperty.getValue().getZoomLevel()));
-                System.out.println("Selected: " + activePaneProperty.getValue().getName());
+                if(activePane.getValue().isTabbed())
+                    histogramPane.update(activePane.getValue().getImage());
+                zoomLabel.setText(String.format("%.0f%%", activePane.getValue().getZoomLevel()));
+                System.out.println("Selected: " + activePane.getValue().getName());
             }
-            needsImage.setValue(activePaneProperty.getValue() == null);
+            needsImage.setValue(activePane.getValue() == null);
         });
 
         menuBar.setFocusTraversable(false);
@@ -171,15 +175,15 @@ public class MainController implements Initializable, ToolController {
                 redoUnavailable.unbind();
             }
             if (newActiveTab != null) {
-                activePaneProperty.setValue(newActiveTab.getPane());
+                activePane.setValue(newActiveTab.getPane());
                 newActiveTab.getPane().imageVersionProperty().addListener(ev -> {
-                    updateLabels(activePaneProperty.getValue());
+                    updateLabels(activePane.getValue());
                 });
                 updateLabels(newActiveTab.getPane());
                 undoUnavailable.bind(newActiveTab.getPane().getCommandManager().undoAvailableProperty().not());
                 redoUnavailable.bind(newActiveTab.getPane().getCommandManager().redoAvailableProperty().not());
             } else {
-                activePaneProperty.setValue(null);
+                activePane.setValue(null);
                 undoUnavailable.setValue(true);
                 redoUnavailable.setValue(true);
             }
@@ -187,7 +191,7 @@ public class MainController implements Initializable, ToolController {
 
         tabPane.focusedProperty().addListener(e -> {
             ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
-            if (selectedTab != null) activePaneProperty.setValue(selectedTab.getPane());
+            if (selectedTab != null) activePane.setValue(selectedTab.getPane());
         });
 
         labels.setMinHeight(Control.USE_PREF_SIZE);
@@ -244,7 +248,7 @@ public class MainController implements Initializable, ToolController {
 
     private void addToToolbox(Tool tool) {
         disableTools();
-        activePaneProperty.getValue().refresh();
+        activePane.getValue().refresh();
         toolbox.getChildren().clear();
         toolbox.getChildren().add(tool);
     }
@@ -309,26 +313,26 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleDuplicate(ActionEvent actionEvent) {
-        ImagePane activePane = activePaneProperty.getValue();
+        ImagePane activePane = this.activePane.getValue();
         ImagePane pane = new ImagePane(histogramPane, activePane);
         ImageTab tab = new ImageTab(pane);
         attachTab(tab);
     }
 
     public void handleRevert(ActionEvent actionEvent) {
-        activePaneProperty.getValue().handleRevert(actionEvent);
+        activePane.getValue().handleRevert(actionEvent);
     }
 
     public void handleSaveAs(ActionEvent actionEvent) {
-        BufferedImage image = activePaneProperty.getValue().getImage();
+        BufferedImage image = activePane.getValue().getImage();
         File file = FileMenuUtils.saveAsDialog(rootLayout, image);
-        activePaneProperty.getValue().setFile(file);
-        activePaneProperty.getValue().setName(file.getName());
+        activePane.getValue().setFile(file);
+        activePane.getValue().setName(file.getName());
     }
 
     public void handleSave(ActionEvent actionEvent) {
-        File file = activePaneProperty.getValue().getFile();
-        FileMenuUtils.saveDialog(activePaneProperty.getValue().getImage(), file);
+        File file = activePane.getValue().getFile();
+        FileMenuUtils.saveDialog(activePane.getValue().getImage(), file);
     }
 
     public void handleHistogramEqualisation() {
@@ -342,8 +346,8 @@ public class MainController implements Initializable, ToolController {
         labelX.setText("X: " + (x+1));
         labelY.setText("Y: " + (y+1));
         try {
-            int rgb = activePaneProperty.getValue().getImage().getRGB(x, y);
-            if(activePaneProperty.getValue().getChannels() == 3) {
+            int rgb = activePane.getValue().getImage().getRGB(x, y);
+            if(activePane.getValue().getChannels() == 3) {
                 labelR.setText("R: " + ImageUtils.getR(rgb));
                 labelG.setText("G: " + ImageUtils.getG(rgb));
                 labelB.setText("B: " + ImageUtils.getB(rgb));
@@ -358,16 +362,16 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleConvertToGreyscale(ActionEvent actionEvent) {
-        CommandManager manager = activePaneProperty.getValue().getCommandManager();
-        manager.executeCommand(new ConvertToGrayCommand(activePaneProperty.getValue()));
+        CommandManager manager = activePane.getValue().getCommandManager();
+        manager.executeCommand(new ConvertToGrayCommand(activePane.getValue()));
     }
 
     public void handleZoomOut(Event event) {
-        activePaneProperty.getValue().handleZoomOut(zoomLabel);
+        activePane.getValue().handleZoomOut(zoomLabel);
     }
 
     public void handleZoomIn(Event event) {
-        activePaneProperty.getValue().handleZoomIn(zoomLabel);
+        activePane.getValue().handleZoomIn(zoomLabel);
     }
 
     public void handleScreenShot(ActionEvent actionEvent) {
@@ -397,7 +401,7 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleUnpinTab(ActionEvent actionEvent) {
-        Window window = getActivePaneProperty().getWindow();
+        Window window = getActivePane().getWindow();
         // ImagePane tabbed
         if(window == null) {
             ImageTab selectedTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
@@ -409,23 +413,23 @@ public class MainController implements Initializable, ToolController {
             imagePane.setWindow(imageWindow);
             imageWindow.setOnCloseRequest(e -> {
                 imagePane.onClose();
-                activePaneProperty.setValue(null);
+                activePane.setValue(null);
             });
             pinButton.setText(bundle.getString("mdi-pin"));
             imageWindow.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
                 if (newPropertyValue) {
-                    activePaneProperty.setValue(imageWindow.getImagePane());
+                    activePane.setValue(imageWindow.getImagePane());
                     imageWindow.toFront();
                     System.out.println("Window on focus: " + imageWindow.getTitle());
                 } else {
                     System.out.println("Window out focus: " + imageWindow.getTitle());
                 }
             });
-            activePaneProperty.setValue(imagePane);
+            activePane.setValue(imagePane);
 
             //ImagePane windowed
         } else {
-            ImagePane pane = activePaneProperty.getValue();
+            ImagePane pane = activePane.getValue();
             Stage stage = (Stage) pane.getWindow();
             pane.setHistogramPane(histogramPane);
             pane.setWindow(null);
@@ -437,13 +441,13 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleUndo(ActionEvent actionEvent) {
-        CommandManager manager = activePaneProperty.getValue().getCommandManager();
+        CommandManager manager = activePane.getValue().getCommandManager();
         manager.undo();
 
     }
 
     public void handleRedo(ActionEvent actionEvent) {
-        CommandManager manager = activePaneProperty.getValue().getCommandManager();
+        CommandManager manager = activePane.getValue().getCommandManager();
         manager.redo();
     }
 
@@ -467,8 +471,8 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleNegativeConversion(ActionEvent actionEvent) {
-        CommandManager manager = activePaneProperty.getValue().getCommandManager();
-        manager.executeCommand(new NegativeCommand(activePaneProperty.getValue()));
+        CommandManager manager = activePane.getValue().getCommandManager();
+        manager.executeCommand(new NegativeCommand(activePane.getValue()));
     }
 
     public void handleThresholding(ActionEvent actionEvent) {
@@ -520,7 +524,7 @@ public class MainController implements Initializable, ToolController {
             addToToolbox(CropTool.getInstance(this));
             cropButton.setSelected(true);
             rootLayout.getScene().setCursor(Cursor.DEFAULT);
-            getActivePaneProperty().enableCropSelection();
+            getActivePane().enableCropSelection();
         } else disableTools();
     }
 
@@ -531,12 +535,12 @@ public class MainController implements Initializable, ToolController {
 
     public void disableTools() {
         rootLayout.getScene().setCursor(Cursor.DEFAULT);
-        getActivePaneProperty().disableTools();
+        getActivePane().disableTools();
         toolbox.getChildren().clear();
         toolbox.getChildren().add(EmptyTool.getInstance(this));
         cropButton.setSelected(false);
         profileLineButton.setSelected(false);
-        activePaneProperty.getValue().refresh();
+        activePane.getValue().refresh();
     }
 
     public void handleProfileLineToolMenu(ActionEvent actionEvent) {
@@ -550,22 +554,22 @@ public class MainController implements Initializable, ToolController {
             profileLineButton.setSelected(true);
             histogramPane.selectProfileLineChart();
             rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
-            getActivePaneProperty().enableProfileLineSelection();
+            getActivePane().enableProfileLineSelection();
             if (histogramPane.getHeight() == 0) handleToggleHistogramView(null);
         } else disableTools();
     }
 
 
     public void handleTurtleAlgorithm(ActionEvent actionEvent) {
-        CommandManager manager = getActivePaneProperty().getCommandManager();
-        manager.executeCommand(new TurtleAlgorithmCommand(getActivePaneProperty()));
+        CommandManager manager = getActivePane().getCommandManager();
+        manager.executeCommand(new TurtleAlgorithmCommand(getActivePane()));
     }
 
     public void handleNumberTable(ActionEvent actionEvent) {
         Window parent = rootLayout.getScene().getWindow();
         ImageTab imageTab = (ImageTab) tabPane.getSelectionModel().getSelectedItem();
         String title = imageTab.getText() + " " + bundle.getString("NumberTable");
-        TableWindow tableWindow = new TableWindow(parent, getActivePaneProperty().getImage(), title);
+        TableWindow tableWindow = new TableWindow(parent, getActivePane().getImage(), title);
     }
 
     public void handleGradientSharpening(ActionEvent actionEvent) {

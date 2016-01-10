@@ -130,7 +130,7 @@ public class GradientEdgeDetectionTool extends Tool {
 
     @Override
     public void handleApply(ActionEvent actionEvent) {
-        ImagePane imagePane = toolController.getActivePaneProperty();
+        ImagePane imagePane = toolController.getActivePane();
         CommandManager manager = imagePane.getCommandManager();
         String maskName;
         switch (choiceBox.getSelectionModel().getSelectedIndex()) {
