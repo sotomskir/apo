@@ -43,7 +43,7 @@ public class TableWindow extends Stage {
     }
 
     private void fillTable(TableView<Integer[]> table, BufferedImage image) {
-        Integer[][] imageArray = ImageUtils.asArray(image);
+        Integer[][] imageArray = ImageUtils.asTwoDimensionalArray(image);
         ObservableList<Integer[]> data = FXCollections.observableArrayList();
         data.addAll(Arrays.asList(imageArray));
         for (int i = 0; i <= imageArray[0].length; i++) {

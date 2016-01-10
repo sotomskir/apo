@@ -1,3 +1,8 @@
+v0.2.0
+ - add online step by step skeleton
+ - fix proportional scaling
+ -
+
 v0.1.2
  - remove binary operations
  - add inverse option in interval threshold
@@ -6,3 +11,11 @@ v0.1.2
  - fix profile line tool
  - extend gradient filter options
  - bug fixes
+
+v0.1.1
+ - fix tab names on copy & crop
+ - add pin image widow to tab
+ - fix tab names increment
+ - fix Zooming
+ - fix scale bug in crop & profile line tool
+ - fix turtle algorithm on binary image

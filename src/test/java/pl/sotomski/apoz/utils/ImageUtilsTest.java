@@ -16,7 +16,8 @@ import static pl.sotomski.apoz.utils.ImageUtils.*;
  * Created by sotomski on 03/11/15.
  */
 public class ImageUtilsTest {
-
+    BufferedImage image1;
+    BufferedImage image2;
 //    ImagePane imagePane = new ImagePane();
 
 //    @Rule
@@ -24,7 +25,20 @@ public class ImageUtilsTest {
 
     @Before
     public void setUp() throws Exception {
-
+        int[] data1 = {
+                15, 13, 15,
+                14, 0,  15,
+                12, 12, 14
+        };
+        image1 = toImage(data1, 3);
+        int[] data2 = {
+                0,0,0,0,0,
+                0,0,0,0,0,
+                0,0,0,0,0,
+                0,0,0,0,0,
+                0,0,0,0,0
+        };
+        image2 = toImage(data2, 5);
     }
 
     @After
@@ -386,4 +400,77 @@ public class ImageUtilsTest {
         byte[] expecteds = {0, (byte) 255};
         assertArrayEquals(expecteds, imageData);
     }
+
+    @Test
+    public void toImageTest() {
+        int[] data = {
+                1, 2, 3, 4, 5,
+                1, 2, 3, 4, 5,
+                1, 2, 3, 4, 5,
+                1, 2, 3, 4, 5
+        };
+        BufferedImage image = ImageUtils.toImage(data, 5);
+        int[] actuals = ImageUtils.asArray(image);
+        assertArrayEquals(data, actuals);
+
+    }
+
+    @Test
+    public void linearFileterImage() {
+        int[] data = {
+                15, 13, 15,
+                14, 0,  15,
+                12, 12, 14
+        };
+        BufferedImage image = toImage(data, 3);
+        int[] mask = {
+                1,1,1,
+                1,1,1,
+                1,1,1
+        };
+        int[] actuals = filterImage(image, mask, 0);
+        int[] expedteds = {
+                 5,  8,  5,
+                 7, 12,  8,
+                 4,  7,  5
+        };
+        assertArrayEquals(expedteds, actuals);
+    }
+
+    @Test
+    public void testExtendedBorderImage() {
+        int[] data = {
+                15, 13, 15,
+                14, 0,  15,
+                12, 12, 14
+        };
+        ExtendedBordersImage extendedBordersImage = new ExtendedBordersImage(image1, 1, 0);
+        int[] actuals = ImageUtils.asArray(extendedBordersImage);
+        int[] expecteds = {
+                0,  0,  0,  0,  0,
+                0,  15, 13, 15, 0,
+                0,  14, 0,  15, 0,
+                0,  12, 12, 14, 0,
+                0,  0,  0,  0,  0
+        };
+        assertArrayEquals(expecteds, actuals);
+    }
+
+    @Test
+    public void fillBordersWithValueTest() {
+        int[] expecteds = {
+                11,11,11,11,11,
+                11, 0, 0, 0,11,
+                11, 0, 0, 0,11,
+                11, 0, 0, 0,11,
+                11,11,11,11,11
+        };
+        ExtendedBordersImage image = new ExtendedBordersImage(image1, 1, 1);
+        byte[] a = getImageData(image);
+        Arrays.fill(a, (byte)0);
+        image.fillBordersWithValue(image, 1, 11);
+        int[] actuals = asArray(image);
+        assertArrayEquals(expecteds, actuals);
+    }
+
 }

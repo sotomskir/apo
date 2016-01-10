@@ -96,9 +96,11 @@ public class ImageUtils {
 
     /**
      * @deprecated
-     */
-    /**
-     * @deprecated
+     * @param bordersMethod    0 fill black
+     *                         1 fill white
+     *                         2 copy borders
+     *                         3 use existing pixels
+     *                         4 dont't change extreme pixels
      */
     public static int[] get3x3Pixels(byte[] imageData, int i, int channels, int width, int height, int bordersMethod, int neighborhood) {
         if (neighborhood == 0) { // square neighborhood
@@ -149,6 +151,12 @@ public class ImageUtils {
 
     /**
      * @deprecated
+     * @param bordersMethod    0 fill black
+     *                         1 fill white
+     *                         2 copy borders
+     *                         3 use existing pixels
+     *                         4 dont't change extreme pixels
+
      */
     public static int[] get5x5Pixels(byte[] imageData, int i, int channels, int width, int height, int bordersMethod) {
         int[] pixels = new int[25];
@@ -214,6 +222,17 @@ public class ImageUtils {
         scaleImage(a, b, sharpening);
     }
 
+    /**
+     *
+     * @param bi
+     * @param mask
+     * @param bordersMethod    0 fill black
+     *                         1 fill white
+     *                         2 copy borders
+     *                         3 use existing pixels
+     *                         4 dont't change extreme pixels
+     * @param scaleMethod 0 - bez skalowania, 3 - obcinanie, 1 - skalowanie proporcjonalne
+     */
     public static void linearFilterWithScaling(BufferedImage bi, int[] mask, int bordersMethod, int scaleMethod) {
         byte[] a = getImageData(bi);
 
@@ -224,6 +243,18 @@ public class ImageUtils {
         scaleImage(a, b, scaleMethod);
     }
 
+    /**
+     *
+     * @param bi
+     * @param masks
+     * @param bordersMethod    0 fill black
+     *                         1 fill white
+     *                         2 copy borders
+     *                         3 use existing pixels
+     *                         4 dont't change extreme pixels
+     * @param scalingMethod 0 - bez skalowania, 3 - obcinanie, 1 - skalowanie proporcjonalne
+     * @param calcMethod
+     */
     public static void gradientFilter(BufferedImage bi, int[][] masks, int bordersMethod, int scalingMethod, int calcMethod) {
         byte[] a = getImageData(bi);
 
@@ -244,21 +275,28 @@ public class ImageUtils {
         return r;
     }
 
-    private static int[] filterImage(BufferedImage bi, int[] mask, int bordersMethod) {
+    /**
+     * @param bi
+     * @param mask
+     * @param bordersMethod    0 fill black
+     *                         1 fill white
+     *                         2 copy borders
+     *                         3 use existing pixels
+     *                         4 dont't change extreme pixels
+
+     * @return
+     */
+
+    public static int[] filterImage(BufferedImage bi, int[] mask, int bordersMethod) {
         int width = bi.getWidth();
-        int height = bi.getHeight();
         int channels = bi.getColorModel().getNumComponents();
         byte[] a = getImageData(bi);
-        final int bordersWidth = (int) (Math.sqrt(mask.length));
+        final int borderWidth = (int) (Math.sqrt(mask.length)/2);
 
         //create temporary image with extended borders
-        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, bordersWidth, bordersMethod);
+        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, borderWidth, bordersMethod);
 
         //calculate mask multiplier
-        double[] min = new double[channels];
-        double[] max = new double[channels];
-        Arrays.fill(min, 255);
-        Arrays.fill(max, 0);
         int multiplier = arraySum(mask);
         if (multiplier == 0) multiplier = 1;
 
@@ -281,10 +319,8 @@ public class ImageUtils {
                 }
 
                 for (int i = 0; i < channels; ++i) {
-                    int tmp = (int) (sum[i] / tmpMultiplier);
-                    if (tmp < min[i]) min[i] = tmp;
-                    if (tmp > max[i]) max[i] = tmp;
-                    b[xyToI(x, y, width, channels) + i] = tmp;
+                    double tmp = sum[i] / tmpMultiplier;
+                    b[xyToI(x, y, width, channels) + i] = (int) Math.round(tmp);
                 }
 
             }
@@ -316,8 +352,9 @@ public class ImageUtils {
      * @return
      */
     public static byte[] scaleImage(byte[] imageData, int[] inputArray, int scaleMethod) {
-        int min = Ints.min(inputArray);
-        int max = Ints.max(inputArray);
+        double min = Ints.min(inputArray);
+        double max = Ints.max(inputArray);
+        System.out.printf("MIN:\t%f MAX:\t%f", min, max);
 
         if (scaleMethod == 3) { // cut scaling
             for (int i = 0; i < imageData.length; ++i) {
@@ -328,7 +365,7 @@ public class ImageUtils {
 
         } else if (scaleMethod == 1) { // proportional scaling
             for (int i = 0; i < imageData.length; ++i)
-                imageData[i] = (byte) (((inputArray[i] - min) / (max - min)) * 255); // skalowanie proporcjonalne
+                imageData[i] = (byte) ((((double)inputArray[i] - min) / (max - min)) * 255); // skalowanie proporcjonalne
 
         } else if (scaleMethod == 2) { // 3 value scaling
             for (int i = 0; i < imageData.length; ++i)
@@ -394,8 +431,6 @@ public class ImageUtils {
         y+=diameter/2;
         int[][] ret = new int[diameter*diameter][image.getColorModel().getNumComponents()];
         int i = 0;
-        boolean flag = false;
-        String[] debug = new String[9];
         if (bordersMethod == 2 || bordersMethod == 1 || bordersMethod == 0) {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi)
@@ -416,34 +451,14 @@ public class ImageUtils {
         } else if (bordersMethod == 4) {
             for (int yi = -diameter/2; yi <= diameter/2; ++yi)
                 for (int xi = -diameter/2; xi <= diameter/2; ++xi) {
-                    int xx = xi + x;
-                    int yy = yi + y;
                     if (x <= 1 || x >= image.getWidth()-2 || y <= 1 || y >= image.getHeight()-2) {
                         for (int[] array : ret) Arrays.fill(array, -1);
-                        flag = true;
                         ret[ret.length/2] = getPixel(image, x, y);
-                        for (int iii = 0; iii < 9; ++iii) debug[iii] = String.valueOf(ret[iii][0]);
-
-                        System.out.println("X:"+x+" Y:"+y);
-                        for (int xz = 0; xz < 9; ++xz) {
-                            System.out.print(debug[xz] + "; ");
-                            if(xz % 3 == 2) System.out.println();
-                        }
-                        System.out.println();
                         return ret;
                     } else {
-                        debug[i] = "X:"+xx+" Y:"+yy+"V:" + getPixel(image, xx, yy)[0];
                         ret[i++] = getPixel(image, xi + x, yi + y);
                     }
                 }
-        }
-        if (flag) {
-            System.out.println("X:"+x+" Y:"+y);
-            for (int xz = 0; xz < 9; ++xz) {
-                System.out.print(debug[xz] + "; ");
-                if(xz % 3 == 2) System.out.println();
-            }
-            System.out.println();
         }
         return ret;
     }
@@ -981,7 +996,22 @@ public class ImageUtils {
         return croppedImage;
     }
 
-    public static Integer[][] asArray(BufferedImage image) {
+    public static int[] asArray(BufferedImage image) {
+        byte[] a = getImageData(image);
+        int[] r = new int[a.length];
+        for (int i = 0; i < a.length; ++i) r[i] = a[i] & 0xFF;
+        return r;
+    }
+
+    public static BufferedImage toImage(int[] array, int width) {
+        if(array.length % width != 0) throw new IllegalArgumentException();
+        BufferedImage image = new BufferedImage(width, array.length/width, BufferedImage.TYPE_BYTE_GRAY);
+        byte[] a = getImageData(image);
+        for(int i = 0; i < array.length; ++i) a[i] = (byte) array[i];
+        return image;
+    }
+
+    public static Integer[][] asTwoDimensionalArray(BufferedImage image) {
         if (image.getColorModel().getNumComponents() > 1) image = rgbToGrayscale(image);
         int width = image.getWidth();
         int height = image.getHeight();
@@ -993,72 +1023,94 @@ public class ImageUtils {
 
     }
 
-    private static class ExtendedBordersImage extends BufferedImage {
-        public ExtendedBordersImage(BufferedImage image, int bordersWidth, int borderFillMethod) {
-            super(image.getWidth() + bordersWidth - 1, image.getHeight() + bordersWidth - 1, image.getType());
-            rewriteImage(image, this, bordersWidth / 2, bordersWidth / 2);
-            fillBorders(this, bordersWidth, borderFillMethod);
-        }
+    public static class ExtendedBordersImage extends BufferedImage {
 
         /**
-         * Fills borders of image.
+         *
          * @param image
+         * @param borderWidth
          * @param borderFillMethod 0 fill black
          *                         1 fill white
          *                         2 copy borders
          *                         3 use existing pixels
          *                         4 dont't change extreme pixels
          */
-        private void fillBorders(ExtendedBordersImage image, int bordersWidth, int borderFillMethod) {
+        public ExtendedBordersImage(BufferedImage image, int borderWidth, int borderFillMethod) {
+            super(image.getWidth() + borderWidth * 2, image.getHeight() + borderWidth * 2, image.getType());
+            rewriteImage(image, this, borderWidth, borderWidth);
+            fillBorders(this, borderWidth, borderFillMethod);
+        }
+
+        /**
+         * Fills borders of image.
+         * @param image
+         * @param borderWidth
+         * @param borderFillMethod 0 fill black
+         *                         1 fill white
+         *                         2 copy borders
+         *                         3 use existing pixels
+         *                         4 dont't change extreme pixels
+         */
+        private void fillBorders(ExtendedBordersImage image, int borderWidth, int borderFillMethod) {
             switch (borderFillMethod) {
                 case 0:
-                    fillBordersWithValue(image, bordersWidth, 0);
+                    fillBordersWithValue(image, borderWidth, 0);
                     break;
                 case 1:
-                    fillBordersWithValue(image, bordersWidth, 255);
+                    fillBordersWithValue(image, borderWidth, 255);
                     break;
                 case 2:
                     int width = image.getWidth();
                     int height = image.getHeight();
                     // upper border
-                    for (int y = 0; y < bordersWidth; ++y)
-                        for (int x = 0; x < width; ++x) setPixel(image, x, y, getPixel(image, x, bordersWidth));
+                    for (int y = 0; y < borderWidth; ++y)
+                        for (int x = 0; x < width; ++x) setPixel(image, x, y, getPixel(image, x, borderWidth));
                     // lower border
-                    for (int y = height-bordersWidth; y < height; ++y)
-                        for (int x = 0; x < width; ++x) setPixel(image, x, y, getPixel(image, x, height-bordersWidth-1));
+                    for (int y = height-borderWidth; y < height; ++y)
+                        for (int x = 0; x < width; ++x) setPixel(image, x, y, getPixel(image, x, height-borderWidth-1));
                     // left border
-                    for (int x = 0; x < bordersWidth; ++x)
-                        for (int y = 0; y < height; ++y) setPixel(image, x, y, getPixel(image, bordersWidth, y));
+                    for (int x = 0; x < borderWidth; ++x)
+                        for (int y = 0; y < height; ++y) setPixel(image, x, y, getPixel(image, borderWidth, y));
                     // right border
-                    for (int x = width-bordersWidth; x < width; ++x)
-                        for (int y = 0; y < height; ++y) setPixel(image, x, y, getPixel(image, width-bordersWidth-1, y));
+                    for (int x = width-borderWidth; x < width; ++x)
+                        for (int y = 0; y < height; ++y) setPixel(image, x, y, getPixel(image, width-borderWidth-1, y));
                     // NW corner
-                    for (int x = 0; x < bordersWidth; ++x)
-                        for (int y = 0; y < bordersWidth; ++y) setPixel(image, x, y, getPixel(image, bordersWidth, bordersWidth));
+                    for (int x = 0; x < borderWidth; ++x)
+                        for (int y = 0; y < borderWidth; ++y) setPixel(image, x, y, getPixel(image, borderWidth, borderWidth));
                     // NE corner
-                    for (int x = width-bordersWidth; x < width; ++x)
-                        for (int y = 0; y < bordersWidth; ++y) setPixel(image, x, y, getPixel(image, width - 1 - bordersWidth, bordersWidth));
+                    for (int x = width-borderWidth; x < width; ++x)
+                        for (int y = 0; y < borderWidth; ++y) setPixel(image, x, y, getPixel(image, width - 1 - borderWidth, borderWidth));
                     // SE corner
-                    for (int x = width-bordersWidth; x < width; ++x)
-                        for (int y = height-bordersWidth; y < height; ++y) setPixel(image, x, y, getPixel(image, width - 1 - bordersWidth, height - 1 - bordersWidth));
+                    for (int x = width-borderWidth; x < width; ++x)
+                        for (int y = height-borderWidth; y < height; ++y) setPixel(image, x, y, getPixel(image, width - 1 - borderWidth, height - 1 - borderWidth));
                     // SW corner
-                    for (int x = 0; x < bordersWidth; ++x)
-                        for (int y = height-bordersWidth; y < height; ++y) setPixel(image, x, y, getPixel(image, bordersWidth, height - 1 - bordersWidth));
+                    for (int x = 0; x < borderWidth; ++x)
+                        for (int y = height-borderWidth; y < height; ++y) setPixel(image, x, y, getPixel(image, borderWidth, height - 1 - borderWidth));
             }
         }
 
-        private void fillBordersWithValue(ExtendedBordersImage image, int bordersWidth, int value) {
-            for (int y = 0; y < bordersWidth; ++y)
-                for (int x = 0; x < image.getWidth(); ++x) setPixel(image, x, y, value);
+        /**
+         *
+         * @param image
+         * @param borderWidth single border width
+         * @param value
+         */
+        public void fillBordersWithValue(ExtendedBordersImage image, int borderWidth, int value) {
+            for (int y = 0; y < borderWidth; ++y)
+                for (int x = 0; x < image.getWidth(); ++x)
+                    setPixel(image, x, y, value);
 
-            for (int y = image.getHeight()-bordersWidth; y < image.getHeight(); ++y)
-                for (int x = 0; x < image.getWidth(); ++x) setPixel(image, x, y, value);
+            for (int y = image.getHeight()-borderWidth; y < image.getHeight(); ++y)
+                for (int x = 0; x < image.getWidth(); ++x)
+                    setPixel(image, x, y, value);
 
-            for (int x = 0; x < bordersWidth; ++x)
-                for (int y = 0; y < image.getHeight(); ++y) setPixel(image, x, y, value);
+            for (int x = 0; x < borderWidth; ++x)
+                for (int y = 0; y < image.getHeight(); ++y)
+                    setPixel(image, x, y, value);
 
-            for (int x = image.getWidth()-bordersWidth; x < image.getWidth(); ++x)
-                for (int y = 0; y < image.getHeight(); ++y) setPixel(image, x, y, value);
+            for (int x = image.getWidth()-borderWidth; x < image.getWidth(); ++x)
+                for (int y = 0; y < image.getHeight(); ++y)
+                    setPixel(image, x, y, value);
         }
 
 
