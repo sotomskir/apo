@@ -1,2 +1,8 @@
 v0.1.2
- -
+ - remove binary operations
+ - add inverse option in interval threshold
+ - fix remember last dir
+ - add histogram hiding
+ - fix profile line tool
+ - extend gradient filter options
+ - bug fixes
