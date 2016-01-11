@@ -1,12 +1,11 @@
 package pl.sotomski.apoz.tools;
 
 import javafx.event.ActionEvent;
-import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.controllers.ToolController;
 
 public class EmptyTool extends Tool {
 
-    private static VBox instance;
+    private static Tool instance;
 
     protected EmptyTool(ToolController controller) {
         super(controller);
@@ -17,7 +16,7 @@ public class EmptyTool extends Tool {
 
     }
 
-    public static VBox getInstance(ToolController controller) {
+    public static Tool getInstance(ToolController controller) {
         if(instance == null) instance = new EmptyTool(controller);
         return instance;
     }
