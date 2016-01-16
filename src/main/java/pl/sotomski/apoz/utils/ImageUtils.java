@@ -1,6 +1,8 @@
 package pl.sotomski.apoz.utils;
 
 import com.google.common.primitives.Ints;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 import pl.sotomski.apoz.nodes.CropRectangle;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.nodes.ProfileLine;
@@ -30,18 +32,17 @@ public class ImageUtils {
         int channels = bufferedImage.getColorModel().getNumComponents();
         if (channels==1) return bufferedImage;
 
-        BufferedImage grayscaleImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
+        BufferedImage grayscaleImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 
         final byte[] a = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
         final byte[] gray = ((DataBufferByte) grayscaleImage.getRaster().getDataBuffer()).getData();
         for (int p = 0; p < width * height * channels; p += channels) {
-
-            int r = a[p+2] & 0xFF;
-            int g = a[p+1] & 0xFF;
-            int b = a[p] & 0xFF;
-            gray[p/channels] = (byte) ((r * rPerc) + (g * gPerc) + (b * bPerc));
+            double r = a[p+2] & 0xFF;
+            double g = a[p+1] & 0xFF;
+            double b = a[p] & 0xFF;
+            gray[p/channels] = (byte) Math.round((r * rPerc) + (g * gPerc) + (b * bPerc));
 
         }
         return grayscaleImage;
@@ -481,7 +482,7 @@ public class ImageUtils {
         }
     }
 
-    private static byte[] erode(byte[] a, int channels, int width, int height, int neighborhood) {
+    public static byte[] erode(byte[] a, int channels, int width, int height, int neighborhood) {
         int[] pixels;
         int min;
         byte[] b = new byte[a.length];
@@ -574,6 +575,14 @@ public class ImageUtils {
         return b;
     }
 
+    public static byte[] bitwise_xor(byte[] image1, byte[] image2){
+        byte[] b = new byte[image1.length];
+        for (int i = 0; i < image1.length; ++i) {
+            b[i] = (byte) (image1[i] ^ image2[i]);
+        }
+        return b;
+    }
+
     public static int max(byte[] a) {
         int max = 0, v;
         for (byte anA : a) {
@@ -595,6 +604,12 @@ public class ImageUtils {
     public static int countNonZero(byte[] a) {
         int c = 0;
         for (byte anA : a) if((anA & 0xFF) > 0) ++c;
+        return c;
+    }
+
+    public static int countNonWhite(byte[] a) {
+        int c = 0;
+        for (byte anA : a) if((anA & 0xFF) < 255) ++c;
         return c;
     }
     /*
@@ -636,33 +651,42 @@ public class ImageUtils {
             imagePane.refresh();
         }
         */
-    public static void skeleton(ImagePane imagePane, int neighborhood) {
+//    public static void skeleton(ImagePane imagePane, ProgressBar bar, int neighborhood) {
         //http://felix.abecassis.me/2011/09/opencv-morphological-skeleton/
-        BufferedImage image = imagePane.getImage();
-        byte[] img = getImageData(image);
-        byte[] temp;
-        byte[] eroded;
-        byte[] skel = new byte[img.length];
-        int channels = image.getColorModel().getNumComponents();
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        int maxIterations = 1000;
-        int nonZero;
-        do
-        {
-            eroded = erode(img, channels, width, height, neighborhood);
-            temp = dilate(eroded, channels, width, height, neighborhood);
-            temp = substract(img, temp);
-            skel = bitwise_or(skel, temp);
-            System.arraycopy(eroded, 0, img, 0, img.length);
-            nonZero = countNonZero(img);
-            System.out.println(nonZero);
-            --maxIterations;
-        } while (nonZero != 0 && maxIterations > 0);
-        byte[] a = getImageData(image);
-        System.arraycopy(skel, 0, a, 0, img.length);
-    }
+//        Task task = new Task<Void>() {
+//            @Override public Void call() {
+//                BufferedImage image = imagePane.getImage();
+//                byte[] img = getImageData(image);
+//                byte[] temp;
+//                byte[] eroded;
+//                byte[] skel = new byte[img.length];
+//                int channels = image.getColorModel().getNumComponents();
+//                int width = image.getWidth();
+//                int height = image.getHeight();
+//
+//                final int max = countNonZero(img);
+//                int maxIterations = 1000;
+//                int nonZero;
+//                do {
+//                    eroded = erode(img, channels, width, height, neighborhood);
+//                    temp = dilate(eroded, channels, width, height, neighborhood);
+//                    temp = substract(img, temp);
+//                    skel = bitwise_or(skel, temp);
+//                    System.arraycopy(eroded, 0, img, 0, img.length);
+//                    nonZero = countNonZero(img);
+//                    System.out.println(nonZero);
+//                    --maxIterations;
+//                    updateProgress(max - nonZero, max);
+//                } while (nonZero != 0 && maxIterations > 0);
+//                byte[] a = getImageData(image);
+//                System.arraycopy(skel, 0, a, 0, img.length);
+//                return null;
+//            }
+//        };
+//        bar.progressProperty().bind(task.progressProperty());
+//        new Thread(task).start();
+//    }
+//
     public static byte[] appendVertical(byte[] base, byte[] image) {
         byte[] tmp = new byte[base.length + image.length];
         System.arraycopy(base, 0, tmp, 0, base.length);
@@ -672,7 +696,7 @@ public class ImageUtils {
 
     public static byte[] substract(byte[] a, byte[] b) {
         byte[] c = new byte[a.length];
-        for (int i = 0; i < a.length; ++i) c[i] = (byte) ((a[i] & 0xFF) - (b[i] & 0xFF));
+        for (int i = 0; i < a.length; ++i) c[i] = (byte) Math.abs((a[i] & 0xFF) - (b[i] & 0xFF));
         return c;
     }
 
@@ -1011,6 +1035,14 @@ public class ImageUtils {
         return image;
     }
 
+    public static BufferedImage toImage(byte[] array, int width, int imageType) {
+//        if(array.length % (width* != 0) throw new IllegalArgumentException();
+        BufferedImage image = new BufferedImage(width, array.length/width, imageType);
+        byte[] a = getImageData(image);
+        System.arraycopy(array, 0, a, 0, a.length);
+        return image;
+    }
+
     public static Integer[][] asTwoDimensionalArray(BufferedImage image) {
         if (image.getColorModel().getNumComponents() > 1) image = rgbToGrayscale(image);
         int width = image.getWidth();
@@ -1021,6 +1053,16 @@ public class ImageUtils {
                 array[y][x] = getPixel(image, x, y)[0];
         return array;
 
+    }
+
+    public static Image asImage(byte[] img, int width, int imageType) {
+        BufferedImage image = toImage(img, width, imageType);
+        return SwingFXUtils.toFXImage(image, null);
+    }
+
+    public static byte[] negative(byte[] temp) {
+        for (int i = 0; i < temp.length; ++i) temp[i] = (byte) (255 - temp[i]);
+        return temp;
     }
 
     public static class ExtendedBordersImage extends BufferedImage {

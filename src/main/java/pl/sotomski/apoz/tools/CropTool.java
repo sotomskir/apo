@@ -64,8 +64,8 @@ public class CropTool extends Tool {
             tabName = oldName.substring(0, indexOfCrop-1) + " " + cropStr + " " + cropNumber;
         }
         ImagePane newImagePane = new ImagePane(histogramPane, croppedImage, tabName);
-        ((MainController)toolController).attachTab(new ImageTab(newImagePane));
         disableTool();
+        ((MainController)toolController).attachTab(new ImageTab(newImagePane));
     }
 
 }

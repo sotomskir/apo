@@ -2,6 +2,7 @@ v0.2.0
  - add online step by step skeleton
  - fix proportional scaling
  - extend binary operations
+ - fix RGB to Grayscale conversion bug
 
 v0.1.2
  - remove binary operations
