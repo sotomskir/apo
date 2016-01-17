@@ -208,7 +208,11 @@ public class RGBHistogramChart extends StackedAreaChart<Number, Number> {
         this.setAnimated(false);
         this.setLegendVisible(false);
         this.setCreateSymbols(false);
-//        NumberAxis xAxis = (NumberAxis) this.getXAxis();
+        NumberAxis xAxis = (NumberAxis) this.getXAxis();
+        xAxis.setAutoRanging(false);
+        xAxis.setUpperBound(255);
+        xAxis.setTickUnit(50);
+
         NumberAxis yAxis = (NumberAxis) this.getYAxis();
         yAxis.setMinorTickVisible(false);
         yAxis.setTickMarkVisible(false);
