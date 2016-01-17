@@ -243,6 +243,7 @@ public class MainController implements Initializable, ToolController {
     public void attachTab(ImageTab imageTab) {
         tabPane.getTabs().add(imageTab);
         imageTab.getPane().getImageView().addEventHandler(MouseEvent.MOUSE_MOVED, this::handleMouseMoved);
+        imageTab.getPane().getImageView().addEventHandler(MouseEvent.MOUSE_EXITED, this::handleMouseExited);
         tabPane.getSelectionModel().select(imageTab);
     }
 
@@ -359,6 +360,20 @@ public class MainController implements Initializable, ToolController {
         } catch (ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
         }
+    }
+
+    public void handleMouseExited(MouseEvent event) {
+        labelX.setText("X: -");
+        labelY.setText("Y: -");
+            if(activePane.getValue().getChannels() == 3) {
+                labelR.setText("R: -");
+                labelG.setText("G: -");
+                labelB.setText("B: -");
+            } else {
+                labelR.setText("K: -");
+                labelG.setText("");
+                labelB.setText("");
+            }
     }
 
     public void handleConvertToGreyscale(ActionEvent actionEvent) {

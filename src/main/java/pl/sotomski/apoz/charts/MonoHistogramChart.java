@@ -51,12 +51,16 @@ public class MonoHistogramChart extends BarChart<String, Number> {
             n.setOnMouseEntered(e -> {
                 if (valueLabel != null)
                     valueLabel.setText(
-                            String.format(bundle.getString("LevelValue"), data.getXValue(), data.getYValue())
+                            String.format(bundle.getString("LevelValue"), data.getXValue(), data.getYValue().toString())
                     );
-                n.setStyle("-fx-bar-fill: blue;");
+                n.setStyle("-fx-bar-fill: #e90000;");
             });
             n.setOnMouseExited(e -> {
-                n.setStyle("-fx-bar-fill: #e90000;");
+                if (valueLabel != null)
+                    valueLabel.setText(
+                            String.format(bundle.getString("LevelValue"), " -", " -")
+                    );
+                n.setStyle("-fx-bar-fill: #000000;");
             });
             n.setOnMouseClicked(e -> {
                 System.out.println("openDetailsScreen(<selected Bar>)");
