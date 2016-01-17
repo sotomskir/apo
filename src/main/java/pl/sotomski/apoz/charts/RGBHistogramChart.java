@@ -91,7 +91,7 @@ public class RGBHistogramChart extends StackedAreaChart<Number, Number> {
             verticalMarker.setXValue(x);
             tooltip.setX(event.getX() + screenXShift);
             tooltip.setY(screenBounds.getMaxY() + 20);
-            level.setText("Level:"+x.intValue());
+            level.setText("Poziom:"+x.intValue());
             try {
                 int c = (int) seriesC.getData().get((x.intValue())).getYValue();
                 int m = (int) seriesM.getData().get((x.intValue())).getYValue();
