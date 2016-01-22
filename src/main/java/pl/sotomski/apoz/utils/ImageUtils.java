@@ -247,6 +247,27 @@ public class ImageUtils {
     /**
      *
      * @param bi
+     * @param mask
+     * @param bordersMethod    0 fill black
+     *                         1 fill white
+     *                         2 copy borders
+     *                         3 use existing pixels
+     *                         4 dont't change extreme pixels
+     * @param scaleMethod 0 - bez skalowania, 3 - obcinanie, 1 - skalowanie proporcjonalne
+     */
+    public static void edgeDetectionWithScaling(BufferedImage bi, int[] mask, int bordersMethod, int scaleMethod) {
+        byte[] a = getImageData(bi);
+
+        //filter image
+        int[] b = edgeDetectImage(bi, mask, bordersMethod);
+
+        //scale image levels
+        scaleImage(a, b, scaleMethod);
+    }
+
+    /**
+     *
+     * @param bi
      * @param masks
      * @param bordersMethod    0 fill black
      *                         1 fill white
@@ -323,6 +344,45 @@ public class ImageUtils {
                     double tmp = sum[i] / tmpMultiplier;
                     b[xyToI(x, y, width, channels) + i] = (int) Math.round(tmp);
                 }
+
+            }
+        return b;
+    }
+    /**
+     * @param bi
+     * @param mask
+     * @param bordersMethod    0 fill black
+     *                         1 fill white
+     *                         2 copy borders
+     *                         3 use existing pixels
+     *                         4 dont't change extreme pixels
+
+     * @return
+     */
+
+    public static int[] edgeDetectImage(BufferedImage bi, int[] mask, int bordersMethod) {
+        int width = bi.getWidth();
+        int channels = bi.getColorModel().getNumComponents();
+        byte[] a = getImageData(bi);
+        final int borderWidth = (int) (Math.sqrt(mask.length)/2);
+
+        //create temporary image with extended borders
+        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, borderWidth, bordersMethod);
+
+        //filter image
+        int[] b = new int[a.length];
+        for (int y = 0; y < bi.getHeight(); ++y)
+            for (int x = 0; x < bi.getWidth(); ++x) {
+                int[][] pixels;
+                int diameter = (int) Math.sqrt(mask.length);
+                pixels = getPixels(tmpImage, diameter, x, y, bordersMethod);
+                double[] sum = new double[channels];
+                for (int p = 0; p < mask.length; ++p) {
+                    for (int i = 0; i < channels; ++i)
+                        sum[i] += pixels[p][i] * mask[p];
+                }
+
+                for (int i = 0; i < channels; ++i) b[xyToI(x, y, width, channels) + i] = (int) Math.round(sum[i]);
 
             }
         return b;

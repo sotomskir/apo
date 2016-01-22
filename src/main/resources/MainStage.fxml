@@ -142,12 +142,8 @@
                                 <Tooltip text="%ProfileLine"/>
                             </tooltip>
                         </ToggleButton>
-                    </ToolBar>
-                </top>
-                <center><TabPane fx:id="tabPane"/></center>
-                <bottom>
-                    <ToolBar>
-                        <Label fx:id="zoomLabel" prefWidth="55" text="100%"/>
+
+                        <Separator orientation="VERTICAL"/>
 
                         <Button text="%mdi-magnify-minus" styleClass="mdi" disable="${controller.needsImage}" onAction="#handleZoomOut">
                             <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
@@ -163,8 +159,12 @@
                             </tooltip>
                         </Button>
 
+                        <Label fx:id="zoomLabel" prefWidth="55" text="100%"/>
+
+                        <Separator orientation="VERTICAL"/>
                     </ToolBar>
-                </bottom>
+                </top>
+                <center><TabPane fx:id="tabPane"/></center>
             </BorderPane>
 
             <BorderPane>

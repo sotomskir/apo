@@ -5,6 +5,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.TilePane;
 import pl.sotomski.apoz.commands.CommandManager;
+import pl.sotomski.apoz.commands.EdgeDetectionCommand;
 import pl.sotomski.apoz.commands.LinearFilterCommand;
 import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.BordersMethodToggles;
@@ -111,7 +112,8 @@ public class LinearFilterTool extends Tool {
         for (int i = 0; i < 9; ++i) mask[i] = (int) spinners.get(i).getValue();
         int bordersMethod = bordersMethodToggles.getMethod();
         int scalingMethod = scalingComboBox.getSelectionModel().getSelectedIndex();
-        manager.executeCommand(new LinearFilterCommand(imagePane, mask, bordersMethod, scalingMethod));
+        if(choiceBox.getSelectionModel().getSelectedIndex()>7) manager.executeCommand(new EdgeDetectionCommand(imagePane, mask, bordersMethod, scalingMethod));
+        else manager.executeCommand(new LinearFilterCommand(imagePane, mask, bordersMethod, scalingMethod));
         imagePane.setImage(imagePane.getImage());
     }
 
