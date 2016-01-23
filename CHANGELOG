@@ -1,3 +1,13 @@
+v0.2.2
+ - extend zoom level to see individual pixels and disable pixel smoothing when zoomed.
+ - fix profile line and crop box zooming with image.
+ - change histogram to area chart.
+ - fix toolbox scroll.
+
+v0.2.1
+ - fix edge detection
+ - move zoom buttons to toolbar
+
 v0.2.0
  - add online step by step skeleton
  - fix proportional scaling

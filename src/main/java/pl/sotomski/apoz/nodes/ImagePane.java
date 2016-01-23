@@ -37,7 +37,7 @@ public class ImagePane extends BorderPane {
     private DoubleProperty zoomLevel = new SimpleDoubleProperty();
     private HistogramPane histogramPane;
     private CommandManager commandManager;
-    private static final double[] zoomLevels = new double[]{.05, .125, .25, .50, .75, 1, 1.25, 1.5, 2, 3, 4};
+    private static final double[] zoomLevels = new double[]{.05, .125, .25, .50, .75, 1, 1.25, 1.5, 2, 3, 4, 6, 8, 10, 15, 25, 35};
 //    private final double zoomStep = 0.125;
 //    private final double zoomMin  = 0.125;
 //    private final double zoomMax  = 4.00;

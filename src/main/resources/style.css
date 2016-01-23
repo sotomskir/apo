@@ -42,7 +42,7 @@
 .series5.chart-series-area-line { -fx-stroke: #1be900; visibility: hidden; }
 .series6.chart-series-area-line { -fx-stroke: #0029e9; visibility: hidden; }
 
-.series0.chart-series-area-fill { -fx-fill: #343434; }
+.series0.chart-series-area-fill { -fx-fill: #606060; }
 .series1.chart-series-area-fill { -fx-fill: #00ffff; }
 .series2.chart-series-area-fill { -fx-fill: #ff00ff; }
 .series3.chart-series-area-fill { -fx-fill: #ffff00; }

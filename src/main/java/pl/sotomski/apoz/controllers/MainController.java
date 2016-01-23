@@ -206,7 +206,7 @@ public class MainController implements Initializable, ToolController {
         final String os = System.getProperty ("os.name");
         if (os != null && os.startsWith ("Mac"))
             menuBar.useSystemMenuBarProperty ().set (true);
-        histogramPane.getMonoHistogramChart().setValueLabel(histogramValueLabel);
+//        histogramPane.getMonoHistogramChart().setValueLabel(histogramValueLabel);
 
         labelR.setFont(Font.font("monospace"));
         labelG.setFont(Font.font("monospace"));
