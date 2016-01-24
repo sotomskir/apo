@@ -16,27 +16,28 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CropRectangle extends Group {
-
-    private DoubleProperty zoomLevel = new SimpleDoubleProperty();
+//TODO poprawić skalowanie przy zmianie rozmiaru prostokąta
+    private DoubleProperty zoomLevel;
     Rectangle r = new Rectangle();
     final double handleRadius = 3;
     Color handleColor = new Color(0,0,0,0);
     List<Shape> resizeHandles = new ArrayList<>();
-    int x1, y1, x2, y2;
+    int x1, y1, x2, y2; //image coordinates
 
     public CropRectangle(DoubleProperty zoomLevel) {
         this();
-        this.zoomLevel.bind(zoomLevel);
+        this.zoomLevel = zoomLevel;
+        zoomLevel.addListener(observable -> update());
     }
 
     private void update() {
         int xMin, xMax, yMin, yMax;
         if (x1 < x2) { xMin = x1; xMax = x2; } else { xMin = x2; xMax = x1; }
         if (y1 < y2) { yMin = y1; yMax = y2; } else { yMin = y2; yMax = y1; }
-        r.setX(xMin);
-        r.setY(yMin);
-        r.setWidth(xMax-xMin);
-        r.setHeight(yMax-yMin);
+        r.setX(xMin*zoomLevel.getValue());
+        r.setY(yMin*zoomLevel.getValue());
+        r.setWidth(xMax*zoomLevel.getValue()-xMin*zoomLevel.getValue());
+        r.setHeight(yMax*zoomLevel.getValue()-yMin*zoomLevel.getValue());
     }
 
     public void setEnd(double x, double y) {
@@ -52,19 +53,19 @@ public class CropRectangle extends Group {
     }
 
     public double getX() {
-        return r.getX();
+        return r.getX()/zoomLevel.getValue();
     }
 
     public double getY() {
-        return r.getY();
+        return r.getY()/zoomLevel.getValue();
     }
 
     public double getWidth() {
-        return r.getWidth();
+        return r.getWidth()/zoomLevel.getValue();
     }
 
     public double getHeight() {
-        return r.getHeight();
+        return r.getHeight()/zoomLevel.getValue();
     }
 
     CropRectangle(double x, double y, double width, double height) {

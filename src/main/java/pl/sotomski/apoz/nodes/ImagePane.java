@@ -4,7 +4,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -30,14 +29,13 @@ import java.util.HashSet;
 public class ImagePane extends BorderPane {
 
     ImageStack imageStack = new ImageStack();
-    private ImageView imageView;
-    private BufferedImage bufferedImage;
+    private ZoomableImageView imageView;
     private IntegerProperty imageVersion;
     private IntegerProperty zoomIndex;
     private DoubleProperty zoomLevel = new SimpleDoubleProperty();
     private HistogramPane histogramPane;
     private CommandManager commandManager;
-    private static final double[] zoomLevels = new double[]{.05, .125, .25, .50, .75, 1, 1.25, 1.5, 2, 3, 4, 6, 8, 10, 15, 25, 35};
+    private static final double[] zoomLevels = new double[]{.05, .125, .25, .50, .75, 1, 1.25, 1.5, 2, 3, 4, 6, 8, 10};
 //    private final double zoomStep = 0.125;
 //    private final double zoomMin  = 0.125;
 //    private final double zoomMax  = 4.00;
@@ -58,7 +56,7 @@ public class ImagePane extends BorderPane {
         this.imageVersion = new SimpleIntegerProperty(0);
         int indexOfOne = 5;
         this.zoomIndex = new SimpleIntegerProperty(indexOfOne);
-        this.imageView = new ImageView();
+        this.imageView = new ZoomableImageView();
         imageView.setStyle("-fx-background-color: BLACK");
         imageStack.getChildren().add(imageView);
         scrollPane = new ScrollPane();
@@ -91,7 +89,7 @@ public class ImagePane extends BorderPane {
     public ImagePane(HistogramPane histogramPane, BufferedImage image, String name) {
         this();
         this.histogramPane = histogramPane;
-        this.bufferedImage = image;
+        this.imageView.setBufferedImage(image);
         this.name = incrementNameIfNotDistinct(name);
         refresh();
     }
@@ -102,7 +100,7 @@ public class ImagePane extends BorderPane {
         name = imagePane.getName();
         BufferedImage image = ImageUtils.deepCopy(imagePane.getImage());
         this.histogramPane = histogramPane;
-        this.bufferedImage = image;
+        this.imageView.setBufferedImage(image);
         String copyStr = histogramPane.getBundle().getString("copy");
         int indexOfCopy = name.indexOf(copyStr);
         if (indexOfCopy < 0) name = name + " " + copyStr;
@@ -159,16 +157,16 @@ public class ImagePane extends BorderPane {
     }
 
     public void setImage(BufferedImage bufferedImage) {
-        this.bufferedImage = bufferedImage;
+        this.imageView.setBufferedImage(bufferedImage);
     }
 
     public BufferedImage getImage() {
-        return bufferedImage;
+        return imageView.getBufferedImage();
     }
 
     public void setHistogramPane(HistogramPane histogramPane) {
         this.histogramPane = histogramPane;
-        histogramPane.update(bufferedImage);
+        histogramPane.update(imageView.getBufferedImage());
     }
 
     public CommandManager getCommandManager() {
@@ -205,23 +203,27 @@ public class ImagePane extends BorderPane {
     }
 
     public double getZoomLevel() {
-        return zoomLevels[zoomIndex.getValue()] * 100;
+        return zoomLevels[zoomIndex.getValue()];
     }
 
     public void handleZoomIn(Label textField) {
         if(zoomIndex.getValue() < zoomLevels.length - 1)
             zoomIndex.setValue(zoomIndex.getValue()+1);
-        imageStack.setScaleX(zoomLevels[zoomIndex.getValue()]);
-        imageStack.setScaleY(zoomLevels[zoomIndex.getValue()]);
-        textField.setText(String.format("%.0f%%", getZoomLevel()));
+        final double zoomFactor = zoomLevels[zoomIndex.getValue()];
+        imageView.setZoomFactor(zoomFactor);
+//        imageStack.setScaleX(zoomLevels[zoomIndex.getValue()]);
+//        imageStack.setScaleY(zoomLevels[zoomIndex.getValue()]);
+        textField.setText(String.format("%.0f%%", getZoomLevel()*100));
     }
 
     public void handleZoomOut(Label textField) {
         if(zoomIndex.getValue() > 0)
             zoomIndex.setValue(zoomIndex.getValue()-1);
-        imageStack.setScaleX(zoomLevels[zoomIndex.getValue()]);
-        imageStack.setScaleY(zoomLevels[zoomIndex.getValue()]);
-        textField.setText(String.format("%.0f%%", getZoomLevel()));
+        final double zoomFactor = zoomLevels[zoomIndex.getValue()];
+        imageView.setZoomFactor(zoomFactor);
+//        imageStack.setScaleX(zoomLevels[zoomIndex.getValue()]);
+//        imageStack.setScaleY(zoomLevels[zoomIndex.getValue()]);
+        textField.setText(String.format("%.0f%%", getZoomLevel()*100));
     }
 
     public IntegerProperty getZoomIndex() {
@@ -259,8 +261,8 @@ public class ImagePane extends BorderPane {
     public void refresh() {
         long startTime;
         startTime = System.currentTimeMillis();
-        imageView.setImage(SwingFXUtils.toFXImage(bufferedImage, null));
-        this.histogramPane.update(bufferedImage);
+        imageView.refresh();
+        this.histogramPane.update(imageView.getBufferedImage());
         this.imageVersionProperty().setValue(getImageVersion()+1);
         System.out.println("ImagePane.refresh(): " + (System.currentTimeMillis()-startTime));
     }
@@ -280,22 +282,22 @@ public class ImagePane extends BorderPane {
             double maxX = getWidth();
             double maxY = getHeight();
             if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
-                l.setEndPoint(newX, newY);
+                l.setEnd(newX, newY);
             }
         }
     }
 
     public void enableProfileLineSelection() {
         getImageStack().clear();
-        profileLine = new ProfileLine();
+        profileLine = new ProfileLine(zoomLevel);
         histogramPane.updateProfileLineChart(getImage(), profileLine);
         System.out.println("Enable mouse events on:"+hashCode());
 
         imageView.setOnMousePressed(mouseEvent -> {
             if (!profileLine.isHoverEndpoint()) {
                 if (!getImageStack().contains(profileLine)) getImageStack().push(profileLine);
-                profileLine.setStartPoint(mouseEvent.getX(), mouseEvent.getY());
-                profileLine.setEndPoint(mouseEvent.getX(), mouseEvent.getY());
+                profileLine.setStart(mouseEvent.getX(), mouseEvent.getY());
+                profileLine.setEnd(mouseEvent.getX(), mouseEvent.getY());
                 System.out.println("Mouse pressed X:" + profileLine.getStartX() + " Y:" + profileLine.getStartY() + " source:" + mouseEvent.getSource().getClass().getName());
             }
         });

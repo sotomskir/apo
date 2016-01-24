@@ -363,7 +363,7 @@ public class ImageUtilsTest {
 //        ImageUtils.setPixel(image, 5, 5, 255);
 //        printImage(image);
 //
-//        imagePane.setImage(image);
+//        imagePane.setBufferedImage(image);
 //        turtleAlgorithm(imagePane);
 //
 //        printImage(imagePane.getImage());

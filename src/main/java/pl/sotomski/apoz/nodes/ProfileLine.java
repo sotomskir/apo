@@ -16,22 +16,46 @@ public class ProfileLine extends Group {
     Line line;
     Endpoint startPoint, endPoint;
     IntegerProperty changed = new SimpleIntegerProperty();
+    DoubleProperty zoomLevel;
+    int x1, y1, x2, y2;
 
-    public ProfileLine() {
+
+    public ProfileLine(DoubleProperty zoomLevel) {
         super();
+        this.zoomLevel = zoomLevel;
+        zoomLevel.addListener(observable -> update());
         line = new Line();
         line.setStroke(Color.RED);
         startPoint = new Endpoint(line.startXProperty(), line.startYProperty());
         endPoint = new Endpoint(line.endXProperty(), line.endYProperty());
         this.getChildren().addAll(line, endPoint, startPoint);
-        startPoint.enableDrag();
-        endPoint.enableDrag();
+//        startPoint.enableDrag();
+//        endPoint.enableDrag();
         changed.setValue(0);
+    }
+
+    private void update() {
+        startPoint.setCenterX(x1*zoomLevel.getValue());
+        startPoint.setCenterY(y1*zoomLevel.getValue());
+        endPoint.setCenterX(x2*zoomLevel.getValue());
+        endPoint.setCenterY(y2*zoomLevel.getValue());
     }
 
     public void setStartPoint(double startPointX, double startPointY) {
         startPoint.setCenterX(startPointX);
         startPoint.setCenterY(startPointY);
+    }
+
+    public void setStart(double startPointX, double startPointY) {
+        x1 = (int) (startPointX/zoomLevel.getValue());
+        y1 = (int) (startPointY/zoomLevel.getValue());
+        update();
+    }
+
+    public void setEnd(double endPointX, double endPointY) {
+        x2 = (int) (endPointX/zoomLevel.getValue());
+        y2 = (int) (endPointY/zoomLevel.getValue());
+        update();
     }
 
     public void setEndPoint(double endPointX, double endPointY) {
@@ -48,19 +72,19 @@ public class ProfileLine extends Group {
     }
 
     public double getStartX() {
-        return line.getStartX();
+        return line.getStartX()/zoomLevel.getValue();
     }
 
     public double getStartY() {
-        return line.getStartY();
+        return line.getStartY()/zoomLevel.getValue();
     }
 
     public double getEndX() {
-        return line.getEndX();
+        return line.getEndX()/zoomLevel.getValue();
     }
 
     public double getEndY() {
-        return line.getEndY();
+        return line.getEndY()/zoomLevel.getValue();
     }
 
     public int getChanged() {

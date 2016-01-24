@@ -158,7 +158,7 @@ public class MainController implements Initializable, ToolController {
                 }
                 if(activePane.getValue().isTabbed())
                     histogramPane.update(activePane.getValue().getImage());
-                zoomLabel.setText(String.format("%.0f%%", activePane.getValue().getZoomLevel()));
+                zoomLabel.setText(String.format("%.0f%%", activePane.getValue().getZoomLevel()*100));
                 System.out.println("Selected: " + activePane.getValue().getName());
             }
             needsImage.setValue(activePane.getValue() == null);
@@ -342,8 +342,8 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleMouseMoved(MouseEvent event) {
-        int x = (int)event.getX();
-        int y = (int)event.getY();
+        int x = (int)(event.getX()/activePane.getValue().getZoomLevel());
+        int y = (int)(event.getY()/activePane.getValue().getZoomLevel());
         labelX.setText("X: " + (x+1));
         labelY.setText("Y: " + (y+1));
         try {
