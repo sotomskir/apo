@@ -1,7 +1,7 @@
 v0.2.2
  - extend zoom level to see individual pixels and disable pixel smoothing when zoomed.
  - fix profile line and crop box zooming with image.
- - change histogram to area chart.
+ - change histogram type to area chart.
  - fix toolbox scroll.
 
 v0.2.1

@@ -128,6 +128,7 @@ public class ProfileLineChart extends LineChart<Number, Number> {
         this.setAnimated(false);
         this.setLegendVisible(false);
         this.setCreateSymbols(false);
+
         NumberAxis xAxis = (NumberAxis) this.getXAxis();
         NumberAxis yAxis = (NumberAxis) this.getYAxis();
 //        yAxis.setMinorTickVisible(false);

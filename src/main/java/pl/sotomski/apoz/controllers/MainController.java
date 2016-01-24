@@ -65,6 +65,7 @@ public class MainController implements Initializable, ToolController {
     @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
     @FXML TabPane tabPane;
     @FXML Button pinButton;
+    @FXML Button revertBtn;
     @FXML private ToggleButton pointerButton;
     @FXML private ToggleButton cropButton;
     @FXML private ToggleButton profileLineButton;
@@ -159,7 +160,9 @@ public class MainController implements Initializable, ToolController {
                 zoomLabel.setText(String.format("%.0f%%", activePane.getValue().getZoomLevel()*100));
                 System.out.println("Selected: " + activePane.getValue().getName());
             }
-            needsImage.setValue(activePane.getValue() == null);
+            ImagePane imagePane = activePane.getValue();
+            needsImage.setValue(imagePane == null);
+            revertBtn.setDisable(!(imagePane != null && imagePane.getFile() != null));
         });
 
         menuBar.setFocusTraversable(false);

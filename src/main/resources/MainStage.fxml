@@ -71,7 +71,7 @@
                             </tooltip>
                         </Button>
 
-                        <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleRevert" styleClass="mdi" text="%mdi-backup-restore">
+                        <Button fx:id="revertBtn" mnemonicParsing="false" onAction="#handleRevert" styleClass="mdi" text="%mdi-backup-restore">
                             <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
                                 <Tooltip text="%Revert" />
