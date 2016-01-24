@@ -1,126 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="800.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/null" fx:controller="pl.sotomski.apoz.controllers.MainController"
-            onKeyPressed="#handleKeyInput">
+
+<BorderPane fx:id="rootLayout" onKeyPressed="#handleKeyInput" prefHeight="800.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.sotomski.apoz.controllers.MainController">
     <top>
         <MenuBar fx:id="menuBar" onKeyPressed="#handleKeyInput">
             <Menu text="%File">
-                <MenuItem onAction="#handleOpen" text="%Open"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleRevert" text="%Revert"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleDuplicate" text="%Duplicate"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleSave" text="%Save"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleSaveAs" text="%SaveAs"/>
-                <SeparatorMenuItem/>
-                <MenuItem onAction="#handlePreferences" text="%Preferences"/>
-                <SeparatorMenuItem/>
-                <MenuItem onAction="#handleExit" text="%Quit"/>
+                <MenuItem onAction="#handleOpen" text="%Open" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleRevert" text="%Revert" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleDuplicate" text="%Duplicate" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleSave" text="%Save" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleSaveAs" text="%SaveAs" />
+                <SeparatorMenuItem />
+                <MenuItem onAction="#handlePreferences" text="%Preferences" />
+                <SeparatorMenuItem />
+                <MenuItem onAction="#handleExit" text="%Quit" />
             </Menu>
             <Menu text="%Edit">
-                <MenuItem disable="${controller.undoUnavailable}" onAction="#handleUndo" text="%Undo"/>
-                <MenuItem disable="${controller.redoUnavailable}" onAction="#handleRedo" text="%Redo"/>
+                <MenuItem disable="${controller.undoUnavailable}" onAction="#handleUndo" text="%Undo" />
+                <MenuItem disable="${controller.redoUnavailable}" onAction="#handleRedo" text="%Redo" />
             </Menu>
             <Menu text="%Tools">
-                <MenuItem disable="${controller.needsImage}" onAction="#handleProfileLineToolMenu" text="%ProfileLine"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleCropToolMenu" text="%Crop"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleNumberTable" text="%GenerateNumberTable"/>
-                <MenuItem onAction="#handleToggleHistogramView" text="Histogram"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleZoomIn" text="%ZoomIn"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleZoomOut" text="%ZoomOut"/>
+                <MenuItem disable="${controller.needsImage}" onAction="#handleProfileLineToolMenu" text="%ProfileLine" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleCropToolMenu" text="%Crop" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleNumberTable" text="%GenerateNumberTable" />
+                <MenuItem onAction="#handleToggleHistogramView" text="Histogram" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleZoomIn" text="%ZoomIn" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleZoomOut" text="%ZoomOut" />
             </Menu>
             <Menu text="%PointOperations">
-                <MenuItem disable="${controller.needsImage}" onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleNegativeConversion" text="%NegativeConversion"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleHistogramEqualisation" text="%HistogramEqualisation"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleThresholding" text="%Thresholding"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleIntervalThreshloding" text="%IntervalThresholding"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleLevelsReduction" text="%LevelsReduction"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleBrightnessContrast" text="%BrightnessContrast"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleCurves" text="%Curves"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleBinaryOperationsTool" text="%BinaryOperations"/>
+                <MenuItem disable="${controller.needsImage}" onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleNegativeConversion" text="%NegativeConversion" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleHistogramEqualisation" text="%HistogramEqualisation" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleThresholding" text="%Thresholding" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleIntervalThreshloding" text="%IntervalThresholding" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleLevelsReduction" text="%LevelsReduction" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleBrightnessContrast" text="%BrightnessContrast" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleCurves" text="%Curves" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleBinaryOperationsTool" text="%BinaryOperations" />
             </Menu>
             <Menu text="%NeighborhoodOperations">
-                <MenuItem disable="${controller.needsImage}" onAction="#handleMaskTool" text="%MaskTool"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleTwoStepFilterTool" text="%TwoStepFilterTool"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleMedianTool" text="%MedianTool"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleLogicalFilterTool" text="%LogicalFilterTool"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleMorphTool" text="%MorphTool"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleTurtleAlgorithm" text="%TurtleAlgorithm"/>
-                <MenuItem disable="${controller.needsImage}" onAction="#handleGradientFiltering" text="%GradientFiltering"/>
+                <MenuItem disable="${controller.needsImage}" onAction="#handleMaskTool" text="%MaskTool" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleTwoStepFilterTool" text="%TwoStepFilterTool" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleMedianTool" text="%MedianTool" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleLogicalFilterTool" text="%LogicalFilterTool" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleMorphTool" text="%MorphTool" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleTurtleAlgorithm" text="%TurtleAlgorithm" />
+                <MenuItem disable="${controller.needsImage}" onAction="#handleGradientFiltering" text="%GradientFiltering" />
             </Menu>
             <Menu text="%Help">
-                <MenuItem onAction="#handleAboutAction" text="%About"/>
+                <MenuItem onAction="#handleAboutAction" text="%About" />
             </Menu>
         </MenuBar>
     </top>
     <center>
-        <SplitPane orientation="HORIZONTAL" dividerPositions="0.8">
-            <BorderPane>
+        <SplitPane dividerPositions="0.8" minHeight="0" orientation="HORIZONTAL">
+
+            <BorderPane minHeight="0">
                 <top>
                     <ToolBar prefHeight="40.0" prefWidth="240.0">
-                        <Button text="%mdi-folder-outline" styleClass="mdi" mnemonicParsing="false" onAction="#handleOpen">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <Button mnemonicParsing="false" onAction="#handleOpen" styleClass="mdi" text="%mdi-folder-outline">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%Open"/>
+                                <Tooltip text="%Open" />
                             </tooltip>
                         </Button>
 
-                        <Button text="%mdi-backup-restore" styleClass="mdi" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleRevert">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleRevert" styleClass="mdi" text="%mdi-backup-restore">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%Revert"/>
+                                <Tooltip text="%Revert" />
                             </tooltip>
                         </Button>
 
-                        <Button text="%mdi-content-save" styleClass="mdi" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleSaveAs">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleSaveAs" styleClass="mdi" text="%mdi-content-save">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%Save"/>
+                                <Tooltip text="%Save" />
                             </tooltip>
                         </Button>
 
-                        <Button text="%mdi-undo" styleClass="mdi" disable="${controller.undoUnavailable}" mnemonicParsing="false" onAction="#handleUndo">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <Button disable="${controller.undoUnavailable}" mnemonicParsing="false" onAction="#handleUndo" styleClass="mdi" text="%mdi-undo">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%Undo"/>
+                                <Tooltip text="%Undo" />
                             </tooltip>
                         </Button>
 
-                        <Button text="%mdi-redo" styleClass="mdi" disable="${controller.redoUnavailable}" mnemonicParsing="false" onAction="#handleRedo">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <Button disable="${controller.redoUnavailable}" mnemonicParsing="false" onAction="#handleRedo" styleClass="mdi" text="%mdi-redo">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%Redo"/>
+                                <Tooltip text="%Redo" />
                             </tooltip>
                         </Button>
 
-                        <Button text="%mdi-folder-multiple-image" styleClass="mdi" disable="${controller.needsImage}"  mnemonicParsing="false" onAction="#handleDuplicate">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <Button disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleDuplicate" styleClass="mdi" text="%mdi-folder-multiple-image">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%Duplicate"/>
+                                <Tooltip text="%Duplicate" />
                             </tooltip>
                         </Button>
 
-                        <Button text="%mdi-camera" styleClass="mdi" mnemonicParsing="false" onAction="#handleScreenShot">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <Button mnemonicParsing="false" onAction="#handleScreenShot" styleClass="mdi" text="%mdi-camera">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%ScreenShot"/>
+                                <Tooltip text="%ScreenShot" />
                             </tooltip>
                         </Button>
 
-                        <Button fx:id="pinButton" text="%mdi-pin-off" styleClass="mdi" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleUnpinTab">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <Button fx:id="pinButton" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleUnpinTab" styleClass="mdi" text="%mdi-pin-off">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%Detach"/>
+                                <Tooltip text="%Detach" />
                             </tooltip>
                         </Button>
 
-                        <Separator orientation="VERTICAL"/>
+                        <Separator orientation="VERTICAL" />
 
                         <!--<ToggleButton text="%mdi-cursor-default-outline" styleClass="mdi" disable="${controller.needsImage}" fx:id="pointerButton" mnemonicParsing="false" onAction="#disableTools">-->
                             <!--<padding><Insets bottom="2" right="2" left="2" top="2"/></padding>-->
@@ -129,82 +129,82 @@
                             <!--</tooltip>-->
                         <!--</ToggleButton>-->
 
-                        <ToggleButton text="%mdi-crop" styleClass="mdi" disable="${controller.needsImage}" fx:id="cropButton" mnemonicParsing="false" onAction="#handleCropTool">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <ToggleButton fx:id="cropButton" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleCropTool" styleClass="mdi" text="%mdi-crop">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%Crop"/>
+                                <Tooltip text="%Crop" />
                             </tooltip>
                         </ToggleButton>
 
-                        <ToggleButton text="%mdi-chart-line" styleClass="mdi" disable="${controller.needsImage}" fx:id="profileLineButton" mnemonicParsing="false" onAction="#handleProfileLineTool">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <ToggleButton fx:id="profileLineButton" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleProfileLineTool" styleClass="mdi" text="%mdi-chart-line">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%ProfileLine"/>
+                                <Tooltip text="%ProfileLine" />
                             </tooltip>
                         </ToggleButton>
 
-                        <Separator orientation="VERTICAL"/>
+                        <Separator orientation="VERTICAL" />
 
-                        <Button text="%mdi-magnify-minus" styleClass="mdi" disable="${controller.needsImage}" onAction="#handleZoomOut">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <Button disable="${controller.needsImage}" onAction="#handleZoomOut" styleClass="mdi" text="%mdi-magnify-minus">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%ZoomOut"/>
+                                <Tooltip text="%ZoomOut" />
                             </tooltip>
                         </Button>
 
-                        <Button text="%mdi-magnify-plus" styleClass="mdi" disable="${controller.needsImage}" onAction="#handleZoomIn">
-                            <padding><Insets bottom="2" right="2" left="2" top="2"/></padding>
+                        <Button disable="${controller.needsImage}" onAction="#handleZoomIn" styleClass="mdi" text="%mdi-magnify-plus">
+                            <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
-                                <Tooltip text="%ZoomIn"/>
+                                <Tooltip text="%ZoomIn" />
                             </tooltip>
                         </Button>
 
-                        <Label fx:id="zoomLabel" prefWidth="55" text="100%"/>
+                        <Label fx:id="zoomLabel" prefWidth="55" text="100%" />
 
-                        <Separator orientation="VERTICAL"/>
+                        <Separator orientation="VERTICAL" />
                     </ToolBar>
                 </top>
-                <center><TabPane fx:id="tabPane"/></center>
+                <center><TabPane fx:id="tabPane" /></center>
             </BorderPane>
 
-            <BorderPane>
-                <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
+            <BorderPane minHeight="0">
+                <padding><Insets bottom="0" left="0" right="0" top="0" /></padding>
                 <top>
                     <VBox>
-                        <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
+                        <padding><Insets bottom="0" left="0" right="0" top="0" /></padding>
                         <VBox fx:id="histogramPaneContainer" maxHeight="0">
-                            <padding><Insets bottom="0" right="0" left="0" top="0"/></padding>
+                            <padding><Insets bottom="0" left="0" right="0" top="0" /></padding>
                         </VBox>
-                        <Button fx:id="toggleHistogramViewBtn" text="%mdi-3arrow-down" maxHeight="10" prefWidth="Infinity" styleClass="mdi" mnemonicParsing="false"  onAction="#handleToggleHistogramView"/>
-                        <Separator orientation="HORIZONTAL"/>
+                        <Button fx:id="toggleHistogramViewBtn" maxHeight="10" mnemonicParsing="false" onAction="#handleToggleHistogramView" prefWidth="Infinity" styleClass="mdi" text="%mdi-3arrow-down" />
+                        <Separator orientation="HORIZONTAL" />
                         <HBox fx:id="labels">
-                            <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
+                            <padding><Insets bottom="5" left="5" right="5" top="5" /></padding>
                             <VBox>
-                                <Label fx:id="labelDepth" text="%Depth"/>
-                                <Label fx:id="labelR" text="R: -"/>
-                                <Label fx:id="labelG" text="G: -"/>
-                                <Label fx:id="labelB" text="B: -"/>
+                                <Label fx:id="labelDepth" text="%Depth" />
+                                <Label fx:id="labelR" text="R: -" />
+                                <Label fx:id="labelG" text="G: -" />
+                                <Label fx:id="labelB" text="B: -" />
                             </VBox>
-                            <Separator orientation="VERTICAL"/>
+                            <Separator orientation="VERTICAL" />
                             <VBox>
-                                <Label fx:id="labelWidth" text="%Width"/>
-                                <Label fx:id="labelHeight" text="%Heigth"/>
-                                <Label fx:id="labelX" text="x: -"/>
-                                <Label fx:id="labelY" text="y: -"/>
+                                <Label fx:id="labelWidth" text="%Width" />
+                                <Label fx:id="labelHeight" text="%Heigth" />
+                                <Label fx:id="labelX" text="x: -" />
+                                <Label fx:id="labelY" text="y: -" />
                             </VBox>
-                            <Separator orientation="VERTICAL"/>
+                            <Separator orientation="VERTICAL" />
                             <VBox>
-                                <Label fx:id="histogramLabel" text="Histogram:"/>
-                                <Label fx:id="histogramValueLabel" text="%LevelValueEmpty"/>
+                                <Label fx:id="histogramLabel" text="Histogram:" />
+                                <Label fx:id="histogramValueLabel" text="%LevelValueEmpty" />
                             </VBox>
                         </HBox>
                     </VBox>
                 </top>
                 <center>
-                    <ScrollPane fx:id="toolboxScrollPane" vbarPolicy="AS_NEEDED" hbarPolicy="AS_NEEDED">
-                        <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
-                        <VBox fx:id="toolbox" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
-                            <padding><Insets bottom="5" right="5" left="5" top="5"/></padding>
+                    <ScrollPane fx:id="toolboxScrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="AS_NEEDED" vbarPolicy="ALWAYS">
+                        <padding><Insets bottom="5" left="5" right="5" top="5" /></padding>
+                        <VBox fx:id="toolbox" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
+                            <padding><Insets bottom="5" left="5" right="5" top="5" /></padding>
                         </VBox>
                     </ScrollPane>
                 </center>
