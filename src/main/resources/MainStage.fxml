@@ -193,10 +193,6 @@
                                 <Label fx:id="labelY" text="y: -" />
                             </VBox>
                             <Separator orientation="VERTICAL" />
-                            <VBox>
-                                <Label fx:id="histogramLabel" text="Histogram:" />
-                                <Label fx:id="histogramValueLabel" text="%LevelValueEmpty" />
-                            </VBox>
                         </HBox>
                     </VBox>
                 </top>

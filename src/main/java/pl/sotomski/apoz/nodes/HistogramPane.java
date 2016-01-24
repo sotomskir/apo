@@ -4,11 +4,10 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.charts.CumulativeHistogramChart;
-import pl.sotomski.apoz.charts.ProfileLineChart;
 import pl.sotomski.apoz.charts.MonoHistogramChart;
+import pl.sotomski.apoz.charts.ProfileLineChart;
 import pl.sotomski.apoz.charts.RGBHistogramChart;
 import pl.sotomski.apoz.utils.Histogram;
-import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.util.ResourceBundle;
@@ -61,8 +60,8 @@ public class HistogramPane extends TabPane {
         cumulativeHistogramChart.getData().clear();
     }
 
-    public void updateProfileLineChart(BufferedImage image, ProfileLine line) {
-        profileLineChart.update(ImageUtils.getLineProfilePixels(image, line));
+    public void updateProfileLineChart(ProfileLine line) {
+        profileLineChart.update(line);
     }
 
     public ProfileLineChart getProfileLineChart() {

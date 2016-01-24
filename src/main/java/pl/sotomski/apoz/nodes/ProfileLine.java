@@ -8,19 +8,23 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import pl.sotomski.apoz.utils.ImageUtils;
+
+import java.awt.image.BufferedImage;
 
 /**
  * Line with draggable endpoints.
  */
 public class ProfileLine extends Group {
     Line line;
+    ImagePane imagePane;
     Endpoint startPoint, endPoint;
     IntegerProperty changed = new SimpleIntegerProperty();
     DoubleProperty zoomLevel;
-    int x1, y1, x2, y2;
+    double x1, y1, x2, y2;
 
 
-    public ProfileLine(DoubleProperty zoomLevel) {
+    public ProfileLine(DoubleProperty zoomLevel, ImagePane imagePane) {
         super();
         this.zoomLevel = zoomLevel;
         zoomLevel.addListener(observable -> update());
@@ -32,6 +36,11 @@ public class ProfileLine extends Group {
 //        startPoint.enableDrag();
 //        endPoint.enableDrag();
         changed.setValue(0);
+        this.imagePane = imagePane;
+    }
+
+    public ImagePane getImagePane() {
+        return imagePane;
     }
 
     private void update() {
@@ -47,14 +56,14 @@ public class ProfileLine extends Group {
     }
 
     public void setStart(double startPointX, double startPointY) {
-        x1 = (int) (startPointX/zoomLevel.getValue());
-        y1 = (int) (startPointY/zoomLevel.getValue());
+        x1 = (int)(startPointX/zoomLevel.getValue())+0.5;
+        y1 = (int)(startPointY/zoomLevel.getValue())+0.5;
         update();
     }
 
     public void setEnd(double endPointX, double endPointY) {
-        x2 = (int) (endPointX/zoomLevel.getValue());
-        y2 = (int) (endPointY/zoomLevel.getValue());
+        x2 = (int)(endPointX/zoomLevel.getValue())+0.5;
+        y2 = (int)(endPointY/zoomLevel.getValue())+0.5;
         update();
     }
 
@@ -105,31 +114,41 @@ public class ProfileLine extends Group {
         else { minY = (int) getEndY(); maxY = (int) getStartY(); }
         int sizeY = maxY - minY + 1;
         int[][] points;
+
         if(sizeX > sizeY) {
             points = new int[sizeX][2];
             double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
             for (int x = minX; x <= maxX; ++x) {
                 points[x - minX][0] = x;
-                points[x - minX][1] = (int) Math.round(slope * ((double) x - getEndX()) + getEndY());
+                points[x - minX][1] = (int) (slope * ((double) x - getEndX()) + getEndY());
             }
         } else {
             points = new int[sizeY][2];
             double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
             for (int y = minY; y <= maxY; ++y) {
-                points[y - minY][0] = (int) Math.round(( ((double) y - getEndY()) / slope) + getEndX());
+                points[y - minY][0] = (int) (( ((double) y - getEndY()) / slope) + getEndX());
                 points[y - minY][1] = y;
             }
 
-            //Reverse array
-            if(getEndY() > getStartY() && getStartX() > getEndX()) {
-                for(int i = 0; i < points.length / 2; i++) {
-                    int[] temp = points[i];
-                    points[i] = points[points.length - i - 1];
-                    points[points.length - i - 1] = temp;
-                }
-            }
+////          Reverse array
+//            if(getEndY() > getStartY() && getStartX() > getEndX()) {
+//                for(int i = 0; i < points.length / 2; i++) {
+//                    int[] temp = points[i];
+//                    points[i] = points[points.length - i - 1];
+//                    points[points.length - i - 1] = temp;
+//                }
+//            }
         }
         return points;
+    }
+
+    public int[][] getPixels() {
+        BufferedImage image = getImagePane().getImage();
+        int channels = image.getColorModel().getNumComponents();
+        int[][] points = getLinePoints();
+        int[][] pixels = new int[points.length][channels];
+        for (int i = 0; i < points.length; ++i) pixels[i] = ImageUtils.getPixel(image, points[i][0], points[i][1]);
+        return pixels;
     }
 
     public boolean isHoverEndpoint() {

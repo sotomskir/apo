@@ -68,8 +68,6 @@ public class MainController implements Initializable, ToolController {
     @FXML private ToggleButton pointerButton;
     @FXML private ToggleButton cropButton;
     @FXML private ToggleButton profileLineButton;
-    @FXML private Label histogramValueLabel;
-    @FXML public Label histogramLabel;
     private final BooleanProperty needsImage = new SimpleBooleanProperty(true);
     private final BooleanProperty undoUnavailable = new SimpleBooleanProperty(true);
     private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
@@ -217,8 +215,6 @@ public class MainController implements Initializable, ToolController {
         labelWidth.setFont(Font.font("monospace"));
         labelX.setFont(Font.font("monospace"));
         labelY.setFont(Font.font("monospace"));
-        histogramLabel.setFont(Font.font("monospace"));
-        histogramValueLabel.setFont(Font.font("monospace"));
         toggleHistogramViewBtn.setStyle("-fx-font-size:8;");
         histogramPane.setMaxHeight(0);
     }

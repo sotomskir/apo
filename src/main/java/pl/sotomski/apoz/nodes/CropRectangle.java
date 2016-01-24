@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CropRectangle extends Group {
-//TODO poprawić skalowanie przy zmianie rozmiaru prostokąta
     private DoubleProperty zoomLevel;
     Rectangle r = new Rectangle();
     final double handleRadius = 3;
@@ -39,6 +38,14 @@ public class CropRectangle extends Group {
         r.setWidth(xMax*zoomLevel.getValue()-xMin*zoomLevel.getValue());
         r.setHeight(yMax*zoomLevel.getValue()-yMin*zoomLevel.getValue());
     }
+
+    private void updateFromR() {
+        x1 = (int) (r.getX() / zoomLevel.getValue());
+        y1 = (int) (r.getY() / zoomLevel.getValue());
+        x2 = (int) ((r.getX()+r.getWidth()) / zoomLevel.getValue());
+        y2 = (int) ((r.getY()+r.getHeight()) / zoomLevel.getValue());
+    }
+
 
     public void setEnd(double x, double y) {
         x2 = (int) x;
@@ -204,8 +211,8 @@ public class CropRectangle extends Group {
 
         resizeHandleNE.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
-                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX());
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY());
                 double newMaxX = r.getX() + r.getWidth() + deltaX ;
                 if (newMaxX >= r.getX() && newMaxX <= getParent().getBoundsInLocal().getWidth() - handleRadius) {
                     r.setWidth(r.getWidth() + deltaX);
@@ -215,14 +222,15 @@ public class CropRectangle extends Group {
                     r.setY(newY);
                     r.setHeight(r.getHeight() - deltaY);
                 }
+                updateFromR();
                 mouseLocation.value = new Point2D(event.getSceneX(), event.getSceneY());
             }
         });
 
         resizeHandleNW.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
-                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX());
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY());
                 double newX = r.getX() + deltaX ;
                 if (newX >= handleRadius && newX <= r.getX() + r.getWidth() - handleRadius) {
                     r.setX(newX);
@@ -234,13 +242,14 @@ public class CropRectangle extends Group {
                     r.setHeight(r.getHeight() - deltaY);
                 }
                 mouseLocation.value = new Point2D(event.getSceneX(), event.getSceneY());
+                updateFromR();
             }
         });
 
         resizeHandleSE.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
-                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX());
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY());
                 double newMaxX = r.getX() + r.getWidth() + deltaX ;
                 if (newMaxX >= r.getX() && newMaxX <= getParent().getBoundsInLocal().getWidth() - handleRadius) {
                     r.setWidth(r.getWidth() + deltaX);
@@ -250,13 +259,14 @@ public class CropRectangle extends Group {
                     r.setHeight(r.getHeight() + deltaY);
                 }
                 mouseLocation.value = new Point2D(event.getSceneX(), event.getSceneY());
+                updateFromR();
             }
         });
 
         resizeHandleSW.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
-                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX());
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY());
                 double newX = r.getX() + deltaX ;
                 if (newX >= handleRadius && newX <= r.getX() + r.getWidth() - handleRadius) {
                     r.setX(newX);
@@ -267,13 +277,14 @@ public class CropRectangle extends Group {
                     r.setHeight(r.getHeight() + deltaY);
                 }
                 mouseLocation.value = new Point2D(event.getSceneX(), event.getSceneY());
+                updateFromR();
             }
         });
 
         moveHandle.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
-                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX());
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY());
                 double newX = r.getX() + deltaX ;
                 double newMaxX = newX + r.getWidth();
                 if (newX >= handleRadius && newMaxX <= getParent().getBoundsInLocal().getWidth() - handleRadius) {
@@ -285,53 +296,58 @@ public class CropRectangle extends Group {
                     r.setY(newY);
                 }
                 mouseLocation.value = new Point2D(event.getSceneX(), event.getSceneY());
+                updateFromR();
             }
 
         });
 
         resizeHandleE.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX());
                 double newMaxX = r.getX() + r.getWidth() + deltaX;
                 if (newMaxX >= r.getX() && newMaxX <= getParent().getBoundsInLocal().getWidth() - handleRadius) {
                     r.setWidth(r.getWidth() + deltaX);
                 }
                 mouseLocation.value = new Point2D(event.getSceneX(), event.getSceneY());
+                updateFromR();
             }
         });
 
         resizeHandleW.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaX = (event.getSceneX() - mouseLocation.value.getX()) / zoomLevel.get();
+                double deltaX = (event.getSceneX() - mouseLocation.value.getX());
                 double newX = r.getX() + deltaX;
                 if (newX >= handleRadius && newX <= r.getX() + r.getWidth() - handleRadius) {
                     r.setX(newX);
                     r.setWidth(r.getWidth() - deltaX);
                 }
                 mouseLocation.value = new Point2D(event.getSceneX(), event.getSceneY());
+                updateFromR();
             }
         });
 
         resizeHandleN.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY());
                 double newY = r.getY() + deltaY;
                 if (newY >= handleRadius && newY <= r.getY() + r.getHeight() - handleRadius) {
                     r.setY(newY);
                     r.setHeight(r.getHeight() - deltaY);
                 }
                 mouseLocation.value = new Point2D(event.getSceneX(), event.getSceneY());
+                updateFromR();
             }
         });
 
         resizeHandleS.setOnMouseDragged(event -> {
             if (mouseLocation.value != null) {
-                double deltaY = (event.getSceneY() - mouseLocation.value.getY()) / zoomLevel.get();
+                double deltaY = (event.getSceneY() - mouseLocation.value.getY());
                 double newMaxY = r.getY() + r.getHeight() + deltaY;
                 if (newMaxY >= r.getY() && newMaxY <= getParent().getBoundsInLocal().getHeight() - handleRadius) {
                     r.setHeight(r.getHeight() + deltaY);
                 }
                 mouseLocation.value = new Point2D(event.getSceneX(), event.getSceneY());
+                updateFromR();
             }
         });
 

@@ -81,13 +81,13 @@ public class MonoHistogramChart extends AreaChart<Number, Number> {
             // remember scene position of chart area
             double xShift = chartAreaBounds.getMinX() +5;
             double screenXShift = screenBounds.getMinX() - 100;
-            Number x = getXAxis().getValueForDisplay(event.getX() - xShift);
+            int x = getXAxis().getValueForDisplay(Math.round(event.getX() - xShift)).intValue();
             verticalMarker.setXValue(x);
             tooltip.setX(event.getX() + screenXShift);
             tooltip.setY(screenBounds.getMaxY() + 20);
-            level.setText("Poziom:"+x.intValue());
+            level.setText("Poziom:"+x);
             try {
-                int k = (int) data[(x.intValue())][0].getYValue();
+                int k = (int) data[(x)][0].getYValue();
                 value.setText("K:"+k);
             } catch (IndexOutOfBoundsException e) {
                 value.setText("K: -");
@@ -110,7 +110,7 @@ public class MonoHistogramChart extends AreaChart<Number, Number> {
     protected void layoutPlotChildren() {
         super.layoutPlotChildren();
         Line line = (Line) verticalMarker.getNode();
-        line.setStartX(getXAxis().getDisplayPosition(verticalMarker.getXValue()));  // 0.5 for crispness
+        line.setStartX(getXAxis().getDisplayPosition(verticalMarker.getXValue().doubleValue() + 0.5));  // 0.5 for crispness
         line.setEndX(line.getStartX());
         line.setStartY(0d);
         line.setEndY(getBoundsInLocal().getHeight());

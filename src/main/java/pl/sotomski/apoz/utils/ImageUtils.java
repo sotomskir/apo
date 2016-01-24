@@ -5,7 +5,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import pl.sotomski.apoz.nodes.CropRectangle;
 import pl.sotomski.apoz.nodes.ImagePane;
-import pl.sotomski.apoz.nodes.ProfileLine;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -19,14 +18,6 @@ public class ImageUtils {
     private static final double rPerc = 0.2;
     private static final double gPerc = 0.6;
     private static final double bPerc = 0.2;
-
-    public static int[][] getLineProfilePixels(BufferedImage image, ProfileLine line) {
-        int channels = image.getColorModel().getNumComponents();
-        int[][] points = line.getLinePoints();
-        int[][] pixels = new int[points.length][channels];
-        for (int i = 0; i < points.length; ++i) pixels[i] = getPixel(image, points[i][0], points[i][1]);
-        return pixels;
-    }
 
     public static BufferedImage rgbToGrayscale(BufferedImage bufferedImage){
         int channels = bufferedImage.getColorModel().getNumComponents();

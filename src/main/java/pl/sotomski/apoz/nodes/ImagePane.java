@@ -35,7 +35,7 @@ public class ImagePane extends BorderPane {
     private DoubleProperty zoomLevel = new SimpleDoubleProperty();
     private HistogramPane histogramPane;
     private CommandManager commandManager;
-    private static final double[] zoomLevels = new double[]{.05, .125, .25, .50, .75, 1, 1.25, 1.5, 2, 3, 4, 6, 8, 10};
+    private static final double[] zoomLevels = new double[]{.05, .125, .25, .50, .75, 1, 1.25, 1.5, 2, 3, 4, 6, 8, 10, 15, 20};
 //    private final double zoomStep = 0.125;
 //    private final double zoomMin  = 0.125;
 //    private final double zoomMax  = 4.00;
@@ -289,8 +289,8 @@ public class ImagePane extends BorderPane {
 
     public void enableProfileLineSelection() {
         getImageStack().clear();
-        profileLine = new ProfileLine(zoomLevel);
-        histogramPane.updateProfileLineChart(getImage(), profileLine);
+        profileLine = new ProfileLine(zoomLevel, this);
+        histogramPane.updateProfileLineChart(profileLine);
         System.out.println("Enable mouse events on:"+hashCode());
 
         imageView.setOnMousePressed(mouseEvent -> {
@@ -303,13 +303,13 @@ public class ImagePane extends BorderPane {
         });
 
         profileLine.changedProperty().addListener(observable -> {
-            histogramPane.updateProfileLineChart(getImage(), profileLine);
+            histogramPane.updateProfileLineChart(profileLine);
             refresh();
         });
         imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, profileLine));
 
         imageView.setOnMouseReleased(mouseEvent -> {
-            histogramPane.updateProfileLineChart(getImage(), profileLine);
+            histogramPane.updateProfileLineChart(profileLine);
             refresh();
         });
     }
@@ -365,7 +365,7 @@ public class ImagePane extends BorderPane {
         public void push(Node node) {
             getChildren().add(node);
         }
-
+        public void remove(Node node) { getChildren().remove(node); }
         public void clear() {
             getChildren().clear();
             getChildren().add(imageView);
