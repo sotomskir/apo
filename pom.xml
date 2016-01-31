@@ -6,7 +6,7 @@
     <groupId>pl.sotomski</groupId>
     <artifactId>apoz</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.2</version>
+    <version>0.2.3-SNAPSHOT</version>
     <name>apoz</name>
     <url>http://maven.apache.org</url>
 

@@ -57,12 +57,12 @@ public class ProfileLineChart extends LineChart<Number, Number> {
             addVerticalMarker();
             tooltip.show(getScene().getWindow());
             //show pixel marker
-            profileLine.getImagePane().getImageStack().push(pixelMarker);
+            if (profileLine != null) profileLine.getImagePane().getImageStack().push(pixelMarker);
         });
         setOnMouseExited(event1 -> {
             removeVerticalMarker();
             tooltip.hide();
-            profileLine.getImagePane().getImageStack().remove(pixelMarker);
+            if (profileLine != null) profileLine.getImagePane().getImageStack().remove(pixelMarker);
         });
         setOnMouseMoved(event -> {
             final Node chartBackground = lookup(".chart-plot-background");
