@@ -594,6 +594,11 @@ public class MainController implements Initializable, ToolController {
         addToToolbox(GradientEdgeDetectionTool.getInstance(this));
     }
 
+    public void handleShowHistogramView(ActionEvent actionEvent) {
+        histogramPane.setMaxHeight(300);
+        histogramPane.getSelectionModel().selectFirst();
+    }
+
     public void handleToggleHistogramView(ActionEvent actionEvent) {
         if(histogramPane.getHeight() > 0) {
             histogramPane.setMaxHeight(0);

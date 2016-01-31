@@ -5,6 +5,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -310,6 +311,7 @@ public class ImagePane extends BorderPane {
 
         imageView.setOnMouseReleased(mouseEvent -> {
             histogramPane.updateProfileLineChart(profileLine);
+            getScene().setCursor(Cursor.DEFAULT);
             refresh();
         });
     }

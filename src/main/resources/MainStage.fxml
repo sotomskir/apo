@@ -26,15 +26,15 @@
                 <MenuItem disable="${controller.redoUnavailable}" onAction="#handleRedo" text="%Redo" />
             </Menu>
             <Menu text="%Tools">
+                <MenuItem disable="${controller.needsImage}" onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale" />
                 <MenuItem disable="${controller.needsImage}" onAction="#handleProfileLineToolMenu" text="%ProfileLine" />
                 <MenuItem disable="${controller.needsImage}" onAction="#handleCropToolMenu" text="%Crop" />
                 <MenuItem disable="${controller.needsImage}" onAction="#handleNumberTable" text="%GenerateNumberTable" />
-                <MenuItem onAction="#handleToggleHistogramView" text="Histogram" />
+                <MenuItem onAction="#handleShowHistogramView" text="Histogram" />
                 <MenuItem disable="${controller.needsImage}" onAction="#handleZoomIn" text="%ZoomIn" />
                 <MenuItem disable="${controller.needsImage}" onAction="#handleZoomOut" text="%ZoomOut" />
             </Menu>
             <Menu text="%PointOperations">
-                <MenuItem disable="${controller.needsImage}" onAction="#handleConvertToGreyscale" text="%ConvertToGrayscale" />
                 <MenuItem disable="${controller.needsImage}" onAction="#handleNegativeConversion" text="%NegativeConversion" />
                 <MenuItem disable="${controller.needsImage}" onAction="#handleHistogramEqualisation" text="%HistogramEqualisation" />
                 <MenuItem disable="${controller.needsImage}" onAction="#handleThresholding" text="%Thresholding" />

@@ -2,12 +2,13 @@ package pl.sotomski.apoz.charts;
 
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import pl.sotomski.apoz.nodes.ProfileLine;
@@ -18,7 +19,7 @@ import java.util.List;
 /**
  * Created by sotomski on 19/10/15.
  */
-public class ProfileLineChart extends LineChart<Number, Number> {
+public class ProfileLineChart extends ScatterChart<Number, Number> {
     private List<XYChart.Data<Number, Number>> data = new ArrayList<>();
     Series<Number, Number> series = new Series<>();
     Data<Number, Number> verticalMarker = new Data<>(10, 0);
@@ -73,6 +74,14 @@ public class ProfileLineChart extends LineChart<Number, Number> {
             double xShift = chartAreaBounds.getMinX() +5;
             double screenXShift = screenBounds.getMinX() - 100;
             int x = (int) Math.round(getXAxis().getValueForDisplay(Math.round(event.getX() - xShift)).doubleValue());
+            //mark image node
+            if (profileLine != null) {
+                for (Circle node : profileLine.getNodes()) {
+                    Color color = profileLine.getNodes().indexOf(node) == x ? Color.GREENYELLOW : Color.YELLOW;
+                    node.setFill(color);
+                    node.setStroke(color);
+                }
+            }
             verticalMarker.setXValue(x);
             tooltip.setX(event.getX() + screenXShift);
             tooltip.setY(screenBounds.getMaxY() + 20);
@@ -84,7 +93,7 @@ public class ProfileLineChart extends LineChart<Number, Number> {
                 pixelMarker.setWidth(zoomFactor);
                 pixelMarker.setHeight(zoomFactor);
                 pixelMarker.setX(point[0] * zoomFactor);
-                pixelMarker.setY(point[1] * zoomFactor);
+                pixelMarker.setY((point[1]) * zoomFactor);
                 xLabel.setText("X:"+point[0]);
                 yLabel.setText("Y:"+point[1]);
                 value.setText("Wartość:"+k);
@@ -127,7 +136,7 @@ public class ProfileLineChart extends LineChart<Number, Number> {
 //        this.setBarGap(0d);
         this.setAnimated(false);
         this.setLegendVisible(false);
-        this.setCreateSymbols(false);
+//        this.setCreateSymbols(false);
 
         NumberAxis xAxis = (NumberAxis) this.getXAxis();
         NumberAxis yAxis = (NumberAxis) this.getYAxis();

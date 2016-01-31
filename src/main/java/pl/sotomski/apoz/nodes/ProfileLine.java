@@ -11,6 +11,8 @@ import javafx.scene.shape.Line;
 import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Line with draggable endpoints.
@@ -19,6 +21,7 @@ public class ProfileLine extends Group {
     Line line;
     ImagePane imagePane;
     Endpoint startPoint, endPoint;
+    List<Node> nodes = new ArrayList<>();
     IntegerProperty changed = new SimpleIntegerProperty();
     DoubleProperty zoomLevel;
     double x1, y1, x2, y2;
@@ -32,11 +35,22 @@ public class ProfileLine extends Group {
         line.setStroke(Color.RED);
         startPoint = new Endpoint(line.startXProperty(), line.startYProperty());
         endPoint = new Endpoint(line.endXProperty(), line.endYProperty());
-        this.getChildren().addAll(line, endPoint, startPoint);
+        getChildren().addAll(line, endPoint, startPoint);
 //        startPoint.enableDrag();
 //        endPoint.enableDrag();
         changed.setValue(0);
         this.imagePane = imagePane;
+    }
+
+    private void createNodes() {
+        getChildren().removeAll(nodes);
+        nodes.clear();
+        if (zoomLevel.getValue() > 6) {
+            int[][] points = getLinePoints();
+            for (int[] point : points)
+                nodes.add(new Node(point[0] * zoomLevel.getValue(), point[1] * zoomLevel.getValue()));
+            getChildren().addAll(nodes);
+        }
     }
 
     public ImagePane getImagePane() {
@@ -48,6 +62,7 @@ public class ProfileLine extends Group {
         startPoint.setCenterY(y1*zoomLevel.getValue());
         endPoint.setCenterX(x2*zoomLevel.getValue());
         endPoint.setCenterY(y2*zoomLevel.getValue());
+        createNodes();
     }
 
     public void setStartPoint(double startPointX, double startPointY) {
@@ -100,18 +115,22 @@ public class ProfileLine extends Group {
         return changed.get();
     }
 
+    public List<Node> getNodes() {
+        return nodes;
+    }
+
     public IntegerProperty changedProperty() {
         return changed;
     }
 
     public int[][] getLinePoints() {
         int minX, maxX;
-        if (getEndX() > getStartX()) { minX = (int) getStartX(); maxX = (int) getEndX(); }
-        else { minX = (int) getEndX(); maxX = (int) getStartX(); }
+        if (getEndX() > getStartX()) { minX = (int) Math.round(getStartX()); maxX = (int) Math.round(getEndX())-1; }
+        else { minX = (int) Math.round(getEndX()); maxX = (int) Math.round(getStartX())-1; }
         int sizeX = maxX - minX + 1;
         int minY, maxY;
-        if (getEndY() > getStartY()) { minY = (int) getStartY(); maxY = (int) getEndY(); }
-        else { minY = (int) getEndY(); maxY = (int) getStartY(); }
+        if (getEndY() > getStartY()) { minY = (int) Math.round(getStartY()); maxY = (int) Math.round(getEndY())-1; }
+        else { minY = (int) Math.round(getEndY()); maxY = (int) Math.round(getStartY())-1; }
         int sizeY = maxY - minY + 1;
         int[][] points;
 
@@ -120,17 +139,17 @@ public class ProfileLine extends Group {
             double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
             for (int x = minX; x <= maxX; ++x) {
                 points[x - minX][0] = x;
-                points[x - minX][1] = (int) (slope * ((double) x - getEndX()) + getEndY());
+                points[x - minX][1] = (int) Math.round(slope * ((double) x - getEndX()) + getEndY());
             }
         } else {
             points = new int[sizeY][2];
             double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
             for (int y = minY; y <= maxY; ++y) {
-                points[y - minY][0] = (int) (( ((double) y - getEndY()) / slope) + getEndX());
+                points[y - minY][0] = (int) Math.round(( ((double) y - getEndY()) / slope) + getEndX());
                 points[y - minY][1] = y;
             }
 
-////          Reverse array
+//          Reverse array
 //            if(getEndY() > getStartY() && getStartX() > getEndX()) {
 //                for(int i = 0; i < points.length / 2; i++) {
 //                    int[] temp = points[i];
@@ -169,6 +188,14 @@ public class ProfileLine extends Group {
 
     public DoubleProperty endYProperty() {
         return line.startYProperty();
+    }
+
+    private class Node extends Circle {
+        public Node(double centerX, double centerY) {
+            super(centerX, centerY, 3);
+            this.setStroke(Color.YELLOW);
+            this.setFill(Color.YELLOW);
+        }
     }
 
     private class Endpoint extends Circle {
