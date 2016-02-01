@@ -58,3 +58,17 @@
     -fx-font-family: 'Material Design Icons';
     -fx-font-size: 2em;
 }
+
+#series-hidden {
+    -fx-stroke: rgba(0,0,0,0);
+}
+
+#series-visible {
+    -fx-stroke: red;
+}
+
+.chart-symbol { /* solid circle */
+    -fx-background-color: yellow;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}

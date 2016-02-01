@@ -34,7 +34,7 @@ public class ImagePane extends BorderPane {
     private IntegerProperty imageVersion;
     private IntegerProperty zoomIndex;
     private DoubleProperty zoomLevel = new SimpleDoubleProperty();
-    private HistogramPane histogramPane;
+    private ChartsPane histogramPane;
     private CommandManager commandManager;
     private static final double[] zoomLevels = new double[]{.05, .125, .25, .50, .75, 1, 1.25, 1.5, 2, 3, 4, 6, 8, 10, 15, 20};
 //    private final double zoomStep = 0.125;
@@ -77,7 +77,7 @@ public class ImagePane extends BorderPane {
         imageView.setOnMouseClicked(event -> refresh());
     }
 
-    public ImagePane(HistogramPane histogramPane, File file) {
+    public ImagePane(ChartsPane histogramPane, File file) {
         this();
         BufferedImage bi = FileMenuUtils.loadImage(file);
         this.histogramPane = histogramPane;
@@ -87,7 +87,7 @@ public class ImagePane extends BorderPane {
         refresh();
     }
 
-    public ImagePane(HistogramPane histogramPane, BufferedImage image, String name) {
+    public ImagePane(ChartsPane histogramPane, BufferedImage image, String name) {
         this();
         this.histogramPane = histogramPane;
         this.imageView.setBufferedImage(image);
@@ -95,7 +95,7 @@ public class ImagePane extends BorderPane {
         refresh();
     }
 
-    public ImagePane(HistogramPane histogramPane, ImagePane imagePane) {
+    public ImagePane(ChartsPane histogramPane, ImagePane imagePane) {
         this();
         if(imagePane.getFile() != null) setFile(new File(imagePane.getFile().getPath()));
         name = imagePane.getName();
@@ -165,7 +165,7 @@ public class ImagePane extends BorderPane {
         return imageView.getBufferedImage();
     }
 
-    public void setHistogramPane(HistogramPane histogramPane) {
+    public void setHistogramPane(ChartsPane histogramPane) {
         this.histogramPane = histogramPane;
         histogramPane.update(imageView.getBufferedImage());
     }
@@ -251,7 +251,7 @@ public class ImagePane extends BorderPane {
         return getImage().getColorModel().getColorSpace().getNumComponents();
     }
 
-    public HistogramPane getHistogramPane() {
+    public ChartsPane getHistogramPane() {
         return histogramPane;
     }
 
@@ -280,8 +280,8 @@ public class ImagePane extends BorderPane {
         if (!l.isPressed()) {
             double newX = mouseEvent.getX();
             double newY = mouseEvent.getY();
-            double maxX = getWidth();
-            double maxY = getHeight();
+            double maxX = getImage().getWidth() * zoomLevel.getValue();
+            double maxY = getImage().getHeight() * zoomLevel.getValue();
             if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
                 l.setEnd(newX, newY);
             }

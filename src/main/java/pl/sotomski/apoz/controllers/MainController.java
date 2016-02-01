@@ -53,7 +53,7 @@ public class MainController implements Initializable, ToolController {
      *                                                                         *
      **************************************************************************/
     private ResourceBundle bundle;
-    private HistogramPane histogramPane;
+    private ChartsPane histogramPane;
     private ObjectProperty<ImagePane> activePane;
     private Preferences prefs;
     @FXML public ScrollPane toolboxScrollPane;
@@ -145,7 +145,7 @@ public class MainController implements Initializable, ToolController {
         prefs = Preferences.userNodeForPackage(Main.class);
         bundle = resources;
         activePane = new SimpleObjectProperty<>();
-        histogramPane = new HistogramPane(bundle);
+        histogramPane = new ChartsPane(bundle);
         histogramPaneContainer.getChildren().add(histogramPane);
         activePane.addListener(e -> {
             if (activePane.getValue() != null) {
@@ -423,7 +423,7 @@ public class MainController implements Initializable, ToolController {
             tabPane.getTabs().remove(selectedTab);
             Window parent = rootLayout.getScene().getWindow();
             ImagePane imagePane = selectedTab.getPane();
-            ImageWindow imageWindow = new ImageWindow(parent, imagePane, new HistogramPane(bundle));
+            ImageWindow imageWindow = new ImageWindow(parent, imagePane, new ChartsPane(bundle));
             imagePane.setWindow(imageWindow);
             imageWindow.setOnCloseRequest(e -> {
                 imagePane.onClose();

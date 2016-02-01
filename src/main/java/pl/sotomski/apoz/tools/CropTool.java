@@ -7,7 +7,7 @@ import javafx.scene.control.Separator;
 import pl.sotomski.apoz.controllers.MainController;
 import pl.sotomski.apoz.controllers.ToolController;
 import pl.sotomski.apoz.nodes.CropRectangle;
-import pl.sotomski.apoz.nodes.HistogramPane;
+import pl.sotomski.apoz.nodes.ChartsPane;
 import pl.sotomski.apoz.nodes.ImagePane;
 import pl.sotomski.apoz.nodes.ImageTab;
 import pl.sotomski.apoz.utils.ImageUtils;
@@ -46,7 +46,7 @@ public class CropTool extends Tool {
         BufferedImage image = toolController.getBufferedImage();
         CropRectangle cropRectangle = toolController.getActivePane().getCropRectangle();
         BufferedImage croppedImage = ImageUtils.crop(image, cropRectangle);
-        HistogramPane histogramPane = toolController.getActivePane().getHistogramPane();
+        ChartsPane histogramPane = toolController.getActivePane().getHistogramPane();
         String oldName = imagePane.getName();
         String cropStr = histogramPane.getBundle().getString("cropped");
         String tabName;

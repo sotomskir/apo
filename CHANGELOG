@@ -1,19 +1,7 @@
 v0.2.3
  - fix profile line null pointer exception
-
- - Pcx
- - fix image conversion while opening image
- - Odczyt wartości na przedziałach
- - Skalowanie UOP i przedziałów.
- - Linia profilu kropki. Dyskretyzacja freemanowska
- - Potwierdzenie przy zapisie
- - Wycinanie przez zaznaczenie
- - Dodać wezly
- - UOP automatyczne rozciąganie
- - Wyłączyć błędy
- - Wczytywania obrazu konwersja
- - Clipping
  - minor bugfixes
+ - add profile line nodes markers
 
 v0.2.2
  - extend zoom level to see individual pixels and disable pixel smoothing when zoomed.

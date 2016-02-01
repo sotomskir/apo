@@ -36,8 +36,8 @@ public class ProfileLine extends Group {
         startPoint = new Endpoint(line.startXProperty(), line.startYProperty());
         endPoint = new Endpoint(line.endXProperty(), line.endYProperty());
         getChildren().addAll(line, endPoint, startPoint);
-//        startPoint.enableDrag();
-//        endPoint.enableDrag();
+        startPoint.enableDrag();
+        endPoint.enableDrag();
         changed.setValue(0);
         this.imagePane = imagePane;
     }
@@ -198,6 +198,13 @@ public class ProfileLine extends Group {
         }
     }
 
+    private void updateCords() {
+        x1 = startPoint.getCenterX() / zoomLevel.getValue();
+        y1 = startPoint.getCenterY() / zoomLevel.getValue();
+        x2 = endPoint.getCenterX() / zoomLevel.getValue();
+        y2 = endPoint.getCenterY() / zoomLevel.getValue();
+    }
+
     private class Endpoint extends Circle {
         public Endpoint(DoubleProperty x, DoubleProperty y) {
             super(x.getValue(), y.getValue(), 4);
@@ -230,10 +237,12 @@ public class ProfileLine extends Group {
                 double newY = mouseEvent.getY() + dragDelta.y;
                 double minX = 0;
                 double minY = 0;
-                double maxX = getScene().getX() + getScene().getWidth();
-                double maxY = getScene().getY() + getScene().getWidth();
-                if (newX > minX && newX < maxX) setCenterX(newX);
-                if (newY > minY && newY < maxY) setCenterY(newY);
+                double maxX = imagePane.getImage().getWidth() * zoomLevel.getValue();
+                double maxY = imagePane.getImage().getHeight() * zoomLevel.getValue();
+                if (newX > minX && newX < maxX) setCenterX((Math.floor(newX/zoomLevel.getValue())+0.5)*zoomLevel.getValue());
+                if (newY > minY && newY < maxY) setCenterY((Math.floor(newY/zoomLevel.getValue())+0.5)*zoomLevel.getValue());
+                updateCords();
+                createNodes();
             });
 
             setOnMouseEntered(mouseEvent -> {
