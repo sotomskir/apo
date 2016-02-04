@@ -7,7 +7,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="rootLayout" onKeyPressed="#handleKeyInput" prefHeight="800.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.sotomski.apoz.controllers.MainController">
+<BorderPane fx:id="rootLayout" onKeyPressed="#handleKeyInput" prefHeight="800" minHeight="0" minWidth="0" prefWidth="600"
+            xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="pl.sotomski.apoz.controllers.MainController">
     <top>
         <MenuBar fx:id="menuBar" onKeyPressed="#handleKeyInput">
             <Menu text="%File">
@@ -59,9 +61,9 @@
         </MenuBar>
     </top>
     <center>
-        <SplitPane dividerPositions="0.8" minHeight="0" orientation="HORIZONTAL">
+        <SplitPane dividerPositions="0.8" orientation="HORIZONTAL">
 
-            <BorderPane minHeight="0">
+            <BorderPane minHeight="0" >
                 <top>
                     <ToolBar prefHeight="40.0" prefWidth="240.0">
                         <Button mnemonicParsing="false" onAction="#handleOpen" styleClass="mdi" text="%mdi-folder-outline">
@@ -167,7 +169,7 @@
                 <center><TabPane fx:id="tabPane" /></center>
             </BorderPane>
 
-            <BorderPane minHeight="0">
+            <BorderPane minHeight="0" minWidth="450" maxWidth="900" SplitPane.resizableWithParent="false">
                 <padding><Insets bottom="0" left="0" right="0" top="0" /></padding>
                 <top>
                     <VBox>
@@ -177,23 +179,23 @@
                         </VBox>
                         <Button fx:id="toggleHistogramViewBtn" maxHeight="10" mnemonicParsing="false" onAction="#handleToggleHistogramView" prefWidth="Infinity" styleClass="mdi" text="%mdi-3arrow-down" />
                         <Separator orientation="HORIZONTAL" />
-                        <HBox fx:id="labels">
-                            <padding><Insets bottom="5" left="5" right="5" top="5" /></padding>
-                            <VBox>
-                                <Label fx:id="labelDepth" text="%Depth" />
-                                <Label fx:id="labelR" text="R: -" />
-                                <Label fx:id="labelG" text="G: -" />
-                                <Label fx:id="labelB" text="B: -" />
-                            </VBox>
-                            <Separator orientation="VERTICAL" />
-                            <VBox>
-                                <Label fx:id="labelWidth" text="%Width" />
-                                <Label fx:id="labelHeight" text="%Heigth" />
-                                <Label fx:id="labelX" text="x: -" />
-                                <Label fx:id="labelY" text="y: -" />
-                            </VBox>
-                            <Separator orientation="VERTICAL" />
-                        </HBox>
+                        <!--<HBox fx:id="labels">-->
+                            <!--<padding><Insets bottom="5" left="5" right="5" top="5" /></padding>-->
+                            <!--<VBox>-->
+                                <!--<Label fx:id="labelDepth" text="%Depth" />-->
+                                <!--<Label fx:id="labelR" text="R: -" />-->
+                                <!--<Label fx:id="labelG" text="G: -" />-->
+                                <!--<Label fx:id="labelB" text="B: -" />-->
+                            <!--</VBox>-->
+                            <!--<Separator orientation="VERTICAL" />-->
+                            <!--<VBox>-->
+                                <!--<Label fx:id="labelWidth" text="%Width" />-->
+                                <!--<Label fx:id="labelHeight" text="%Heigth" />-->
+                                <!--<Label fx:id="labelX" text="x: -" />-->
+                                <!--<Label fx:id="labelY" text="y: -" />-->
+                            <!--</VBox>-->
+                            <!--<Separator orientation="VERTICAL" />-->
+                        <!--</HBox>-->
                     </VBox>
                 </top>
                 <center>

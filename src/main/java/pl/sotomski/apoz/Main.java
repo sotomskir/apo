@@ -27,7 +27,7 @@ public class Main extends Application {
             });
             Preferences prefs = Preferences.userNodeForPackage(Main.class);
             String lang = prefs.get(PrefsController.LANGUAGE, Locale.getDefault().getLanguage());
-            System.out.println("lang: "+lang);
+            System.out.println("lang: " + lang);
             FXMLLoader loader = new FXMLLoader();
             Locale locale = new Locale(lang);
             ResourceBundle bundle = ResourceBundle.getBundle("bundles.ApozBundle", locale, new UTF8Control());
@@ -43,9 +43,10 @@ public class Main extends Application {
             Font font = Font.loadFont(is, 24);
             System.out.println(font.getName());
             primaryStage.setMaximized(true);
+            primaryStage.setMinWidth(1000);
+            primaryStage.setMinHeight(650);
             primaryStage.setScene(scene);
             primaryStage.show();
-
         } catch (Exception e) {
             e.printStackTrace();
             new ExceptionDialog(e, "Exception occured");

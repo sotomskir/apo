@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class CurvesControl extends LineChart {
     private static final int PLOT_SIZE = 255;
+    private static final int CHART_SIZE = 300;
     private static final int N_SEGS    = 255;
     private Path path;
     private Path mousingPath;
@@ -31,6 +32,9 @@ public class CurvesControl extends LineChart {
 
     public CurvesControl() {
         super(new NumberAxis(0, 255, 64), new NumberAxis(0, 255, 64));
+        setMinSize(CHART_SIZE, CHART_SIZE);
+        setPrefSize(CHART_SIZE, CHART_SIZE);
+        setMaxSize(CHART_SIZE, CHART_SIZE);
         changed = new SimpleIntegerProperty();
         path = new Path();
         LUT = new int[256];

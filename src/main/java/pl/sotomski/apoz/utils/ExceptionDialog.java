@@ -8,6 +8,7 @@ import javafx.scene.layout.Priority;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by sotomski on 27/09/15.
@@ -49,6 +50,10 @@ public class ExceptionDialog {
         alert.getDialogPane().setExpandableContent(expContent);
 
         alert.show();
+        alert.setOnCloseRequest(event -> {
+            if(ex.getCause() instanceof InvocationTargetException) System.exit(-1);
+
+        });
     }
 
 }

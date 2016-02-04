@@ -55,7 +55,7 @@ public class ChartsPane extends TabPane {
         btn2.setOnAction(event -> profileLineChart.setLineType());
         VBox vbButtons = new VBox();
         vbButtons.setSpacing(10);
-        vbButtons.setPadding(new Insets(0, 20, 10, 20));
+        vbButtons.setPadding(new Insets(20, 5, 20, 5));
         vbButtons.getChildren().addAll(btn1, btn2);
         HBox lineProfilePane = new HBox(profileLineChart, vbButtons);
         tab1.setContent(histogramPane);

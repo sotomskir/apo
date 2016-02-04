@@ -5,7 +5,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
-import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -274,46 +273,6 @@ public class ImagePane extends BorderPane {
 
     public void setTabbed(boolean tabbed) {
         this.tabbed = tabbed;
-    }
-
-    public void mouseDraggedLine(MouseEvent mouseEvent, ProfileLine l) {
-        if (!l.isPressed()) {
-            double newX = mouseEvent.getX();
-            double newY = mouseEvent.getY();
-            double maxX = getImage().getWidth() * zoomLevel.getValue();
-            double maxY = getImage().getHeight() * zoomLevel.getValue();
-            if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
-                l.setEnd(newX, newY);
-            }
-        }
-    }
-
-    public void enableProfileLineSelection() {
-        getImageStack().clear();
-        profileLine = new ProfileLine(zoomLevel, this);
-        histogramPane.updateProfileLineChart(profileLine);
-        System.out.println("Enable mouse events on:"+hashCode());
-
-        imageView.setOnMousePressed(mouseEvent -> {
-            if (!profileLine.isHoverEndpoint()) {
-                if (!getImageStack().contains(profileLine)) getImageStack().push(profileLine);
-                profileLine.setStart(mouseEvent.getX(), mouseEvent.getY());
-                profileLine.setEnd(mouseEvent.getX(), mouseEvent.getY());
-                System.out.println("Mouse pressed X:" + profileLine.getStartX() + " Y:" + profileLine.getStartY() + " source:" + mouseEvent.getSource().getClass().getName());
-            }
-        });
-
-        profileLine.changedProperty().addListener(observable -> {
-            histogramPane.updateProfileLineChart(profileLine);
-            refresh();
-        });
-        imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, profileLine));
-
-        imageView.setOnMouseReleased(mouseEvent -> {
-            histogramPane.updateProfileLineChart(profileLine);
-            getScene().setCursor(Cursor.DEFAULT);
-            refresh();
-        });
     }
 
     public void disableTools() {

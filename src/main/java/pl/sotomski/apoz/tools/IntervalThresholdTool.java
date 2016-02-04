@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -68,15 +69,12 @@ public class IntervalThresholdTool extends Tool {
 
         chartControl.changedProperty().addListener(observable -> updateImageView());
 
+        VBox checkboxes = new VBox(checkBoxInvert, checkBoxNegative, checkBoxKeepLevels, checkBoxStretch);
         // add controls to view and init
         getChildren().addAll(
                 separator,
                 label,
-                chartControl,
-                checkBoxInvert,
-                checkBoxNegative,
-                checkBoxKeepLevels,
-                checkBoxStretch,
+                new HBox(chartControl, checkboxes),
                 hBox
         );
         chartControl.createDefaultIntervals(spinner.getValue());

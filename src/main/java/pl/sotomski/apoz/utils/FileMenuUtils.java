@@ -127,13 +127,23 @@ public class FileMenuUtils {
                 params.add(stream);
                 RenderedOp image1 = JAI.create("tiff", params);
                 image = image1.getAsBufferedImage();
+
+            } else if (fileExtension.equals("pcx") || fileExtension.equals("PCX")) {
+                System.out.println("Opening pcx image");
+                FileSeekableStream stream = new FileSeekableStream(file);
+                TIFFDecodeParam decodeParam = new TIFFDecodeParam();
+                decodeParam.setDecodePaletteAsShorts(true);
+                ParameterBlock params = new ParameterBlock();
+                params.add(stream);
+                RenderedOp image1 = JAI.create("pcx", params);
+                image = image1.getAsBufferedImage();
             } else {
                 image = ImageIO.read(fileIs);
             }
-            if (image.getType() != BufferedImage.TYPE_3BYTE_BGR) {
-                image = ImageUtils.convertTo3Byte(image);
-                System.out.println("Converting image to 3BYTE_BGR");
-            }
+//            if (image.getType() != BufferedImage.TYPE_3BYTE_BGR) {
+//                image = ImageUtils.convertTo3Byte(image);
+//                System.out.println("Converting image to 3BYTE_BGR");
+//            }
             return image;
         } catch (IOException e) {
             e.printStackTrace();

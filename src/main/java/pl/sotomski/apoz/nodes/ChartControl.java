@@ -22,6 +22,7 @@ import java.util.List;
  */
 public class ChartControl extends LineChart {
 
+    private static final int CHART_SIZE = 300;
     protected List<Data<Number, Number>> data;
     protected List<IntervalData> intervalDatas;
     protected List<LevelLine> levelLines;
@@ -37,7 +38,7 @@ public class ChartControl extends LineChart {
         super(new NumberAxis(0, 255, 25), new NumberAxis(0, 255, 25));
         data = new ArrayList<>();
         series = new Series<>();
-        setMaxWidth(Double.MAX_VALUE);
+        setMaxSize(CHART_SIZE, CHART_SIZE);
         changed = new SimpleIntegerProperty();
         intervalDatas = new ArrayList<>();
         levelLines = new ArrayList<>();
