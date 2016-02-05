@@ -226,6 +226,7 @@ public class MainController implements Initializable, ToolController {
 //        labelY.setFont(Font.font("monospace"));
         toggleHistogramViewBtn.setStyle("-fx-font-size:8;");
         histogramPane.setMaxHeight(0);
+        labels.getStyleClass().add("dark");
     }
 
     private void updateLabels(ImagePane pane) {
@@ -333,13 +334,17 @@ public class MainController implements Initializable, ToolController {
     public void handleSaveAs(ActionEvent actionEvent) {
         BufferedImage image = activePane.getValue().getImage();
         File file = FileMenuUtils.saveAsDialog(rootLayout, image);
-        activePane.getValue().setFile(file);
-        activePane.getValue().setName(file.getName());
+        if (file != null) {
+            activePane.getValue().setFile(file);
+            activePane.getValue().setName(file.getName());
+        }
     }
 
     public void handleSave(ActionEvent actionEvent) {
         File file = activePane.getValue().getFile();
-        FileMenuUtils.saveDialog(activePane.getValue().getImage(), file);
+        if (file != null) {
+            FileMenuUtils.saveDialog(activePane.getValue().getImage(), file);
+        } else handleSaveAs(null);
     }
 
     public void handleHistogramEqualisation() {

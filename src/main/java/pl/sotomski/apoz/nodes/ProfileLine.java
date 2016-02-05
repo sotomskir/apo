@@ -246,7 +246,7 @@ public class ProfileLine extends Group {
             });
 
             setOnMouseEntered(mouseEvent -> {
-                getScene().setCursor(Cursor.MOVE);
+                getScene().getRoot().setCursor(Cursor.MOVE);
                 System.out.println("Entered " + this.getClass().getName());
             });
 

@@ -36,6 +36,7 @@ public class ProfileLineChart extends LineChart<Number, Number> {
         applyStyle();
         setupHover();
         setLineType();
+        tooltip.getStyleClass().add("dark");
     }
 
     public void update(ProfileLine profileLine) {

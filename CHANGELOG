@@ -2,6 +2,17 @@ v0.2.3
  - fix profile line null pointer exception
  - minor bugfixes
  - add profile line nodes markers
+ - fix conversion on image load
+ - fix toolbox layout issues
+
+ - Pcx
+ - Odczyt wartości na przedziałach
+ - Skalowanie UOP i przedziałów.
+ - Potwierdzenie przy zapisie
+ - Wycinanie przez zaznaczenie
+ - UOP automatyczne rozciąganie
+ - Wyłączyć błędy
+ - Clipping
 
 v0.2.2
  - extend zoom level to see individual pixels and disable pixel smoothing when zoomed.
