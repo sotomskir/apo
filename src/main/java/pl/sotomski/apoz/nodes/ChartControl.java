@@ -33,6 +33,8 @@ public class ChartControl extends LineChart {
     protected Series<Number, Number> series;
     protected boolean stretched;
     protected boolean negated;
+    protected MenuItem labelX = new MenuItem();
+    protected ContextMenu tooltip = new ContextMenu(labelX);
 
     public ChartControl() {
         super(new NumberAxis(0, 255, 25), new NumberAxis(0, 255, 25));
@@ -43,6 +45,7 @@ public class ChartControl extends LineChart {
         intervalDatas = new ArrayList<>();
         levelLines = new ArrayList<>();
         keepLevels = false;
+        tooltip.getStyleClass().add("dark");
     }
 
     public ChartControl(double maxWidth, double maxHeight) {
@@ -146,7 +149,26 @@ public class ChartControl extends LineChart {
         updateLUT();
     }
 
-    public void toggleStretch(boolean stretch) {
+    protected void updateLUT() {
+        for (LevelLine l : levelLines) {
+            double slope = (yValue(l.getEndY()) - yValue(l.getStartY())) / (xValue(l.getEndX()) - xValue(l.getStartX()));
+            for (int x = (int) xValue(l.getStartX()); x <= Math.round(xValue(l.getEndX())); ++x) {
+                LUT[x] = (int) (slope * (x - xValue(l.getStartX())) + yValue(l.getStartY()));
+                LUT[x] = LUT[x] > 255 ? 255 : LUT[x] < 0 ? 0 : LUT[x];
+            }
+        }
+        changed.setValue(changed.get() + 1);
+    }
+
+    public IntegerProperty changedProperty() {
+        return changed;
+    }
+
+    public void setStretch(boolean stretch) {
+        if(stretch) {
+            setKeepLevels(false);
+            setNegative(false);
+        }
         for (int i = 0; i < intervalDatas.size(); ++i) {
             if (stretch) {
                 if (inverted ? i % 2 == 0 : i % 2 != 0) {
@@ -164,34 +186,34 @@ public class ChartControl extends LineChart {
         layoutPlotChildren();
     }
 
-    protected void updateLUT() {
-        for (LevelLine l : levelLines) {
-            double slope = (yValue(l.getEndY()) - yValue(l.getStartY())) / (xValue(l.getEndX()) - xValue(l.getStartX()));
-            for (int x = (int) xValue(l.getStartX()); x <= Math.round(xValue(l.getEndX())); ++x) {
-                LUT[x] = (int) (slope * (x - xValue(l.getStartX())) + yValue(l.getStartY()));
-                LUT[x] = LUT[x] > 255 ? 255 : LUT[x] < 0 ? 0 : LUT[x];
-            }
-        }
-        changed.setValue(changed.get() + 1);
-    }
-
-    public IntegerProperty changedProperty() {
-        return changed;
-    }
-
     public void setKeepLevels(boolean keepLevels) {
-        this.keepLevels = keepLevels;
-        handleBindXY();
+        if(keepLevels) {
+            setNegative(false);
+            setStretch(false);
+            bindXY();
+        } else unbindXY();
     }
 
     public void setNegative(boolean negative) {
-        this.negated = negative;
-        handleBindXY();
+        if(negative) {
+            setKeepLevels(false);
+            setStretch(false);
+            bindXYNegated();
+        } else unbindXY();
     }
 
-    private void handleBindXY() {
-        if(keepLevels) for (IntervalData l : intervalDatas) l.bindYtoX();
-        else for(IntervalData l :intervalDatas) l.unBindYfromX();
+    private void unbindXY() {
+        for(IntervalData l :intervalDatas) l.unBindYfromX();
+        layoutPlotChildren();
+    }
+
+    private void bindXY() {
+        for (IntervalData l : intervalDatas) l.bindYtoX();
+        layoutPlotChildren();
+    }
+
+    private void bindXYNegated() {
+        for (IntervalData l : intervalDatas) l.bindYtoXNegated();
         layoutPlotChildren();
     }
 
@@ -285,12 +307,18 @@ public class ChartControl extends LineChart {
         }
 
         public void bindYtoX() {
-            endXProperty().addListener(negated ? bindXYNegatedListener : bindXYListener);
-            setEndY(negated ? 255 - getX().getValue() : getX().getValue());
+            endXProperty().addListener(bindXYListener);
+            setEndY(getX().getValue());
+        }
+
+        public void bindYtoXNegated() {
+            endXProperty().addListener(bindXYNegatedListener);
+            setEndY(255 - getX().getValue());
         }
 
         public void unBindYfromX() {
-            endXProperty().removeListener(!negated ? bindXYNegatedListener : bindXYListener);
+            endXProperty().removeListener(bindXYNegatedListener);
+            endXProperty().removeListener(bindXYListener);
             if (inverted) endYProperty().setValue(getEndY() < 255 ? 0 : 255);
             else endYProperty().setValue(getEndY() > 0 ? 255 : 0);
             // special case for first and last line
@@ -312,15 +340,9 @@ public class ChartControl extends LineChart {
 
     class IntervalLine extends Line {
         private IntervalData data;
-        private ContextMenu menu;
-        private MenuItem menuItem;
-
         IntervalLine(IntervalData data, double x) {
             super();
             this.data = data;
-            this.menu = new ContextMenu();
-            this.menuItem = new MenuItem();
-            menu.getItems().add(menuItem);
             setStartX(xDisplay(x));
             setStartY(yDisplay(0));
             setEndX(xDisplay(x));
@@ -355,9 +377,13 @@ public class ChartControl extends LineChart {
                 dragDelta.x = getStartX() - mouseEvent.getX();
                 dragDelta.y = getStartY() - mouseEvent.getY();
                 getScene().setCursor(Cursor.MOVE);
+                tooltip.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
             });
 
-            setOnMouseReleased(mouseEvent -> getScene().setCursor(Cursor.E_RESIZE));
+            setOnMouseReleased(mouseEvent -> {
+                getScene().setCursor(Cursor.E_RESIZE);
+                tooltip.hide();
+            });
 
             setOnMouseDragged(mouseEvent -> {
                 double newX = mouseEvent.getX() + dragDelta.x;
@@ -369,23 +395,24 @@ public class ChartControl extends LineChart {
                     this.data.setX(xValue(newX));
                     updateLUT();
                     layoutPlotChildren();
-                    menu.setX(mouseEvent.getSceneX() + 25);
-                    menu.setY(mouseEvent.getSceneY() + 25);
+                    labelX.setText("X:" + data.getX().intValue());
+                    tooltip.setX(mouseEvent.getSceneX() + 25);
+                    tooltip.setY(mouseEvent.getSceneY() + 25);
                 }
             });
 
             setOnMouseEntered(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.E_RESIZE);
-                    menuItem.setText("X:" + data.getX().intValue());
-//                    menu.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
+                    labelX.setText("X:" + data.getX().intValue());
+                    tooltip.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
                 }
             });
 
             setOnMouseExited(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.DEFAULT);
-                    menu.hide();
+                    tooltip.hide();
                 }
             });
         }
@@ -427,12 +454,14 @@ public class ChartControl extends LineChart {
                 dragDelta.x = getStartX() - mouseEvent.getX();
                 dragDelta.y = getStartY() - mouseEvent.getY();
                 getScene().setCursor(Cursor.MOVE);
+                    System.out.println("Pressed");
             });
 
             setOnMouseReleased(mouseEvent -> {
                 getScene().setCursor(Cursor.V_RESIZE);
                 updateLUT();
                 layoutPlotChildren();
+                    System.out.println("Released");
             });
 
             setOnMouseDragged(mouseEvent -> {
@@ -441,20 +470,24 @@ public class ChartControl extends LineChart {
                     setStartY(newY);
                     setEndY(newY);
                 }
+                labelX.setText("Y:" + Math.round(yValue(this.startYProperty().intValue())));
+//                    System.out.println("Dragged");
             });
 
             setOnMouseEntered(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.V_RESIZE);
-//                    menuItem.setText("Y:" + yValue(this.startYProperty().intValue()));
-//                    menu.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
+                    labelX.setText("Y:" + Math.round(yValue(this.startYProperty().intValue())));
+                    tooltip.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
+                    System.out.println("Entered");
                 }
             });
 
             setOnMouseExited(mouseEvent -> {
                 if (!mouseEvent.isPrimaryButtonDown()) {
                     getScene().setCursor(Cursor.DEFAULT);
-//                    menu.hide();
+                    tooltip.hide();
+                    System.out.println("Exited");
                 }
             });
 
