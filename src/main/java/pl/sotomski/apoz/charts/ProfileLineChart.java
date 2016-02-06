@@ -40,17 +40,22 @@ public class ProfileLineChart extends LineChart<Number, Number> {
     }
 
     public void update(ProfileLine profileLine) {
-        int[][] pixels = profileLine.getPixels();
-        this.profileLine = profileLine;
-        // TODO optimize this
-        data.clear();
-        //TODO add RGB support
-        for (int i = 0; i < pixels.length; ++i) data.add(new XYChart.Data<>(i, pixels[i][0]));
-        series.getData().clear();
-        series.getData().addAll(data);
-        System.out.println("UPDATE");
-        if (type == 0) setLineType();
-        else setScatterType();
+        if(profileLine == null) {
+            series.getData().clear();
+            layoutPlotChildren();
+        } else {
+            int[][] pixels = profileLine.getPixels();
+            this.profileLine = profileLine;
+            // TODO optimize this
+            data.clear();
+            //TODO add RGB support
+            for (int i = 0; i < pixels.length; ++i) data.add(new XYChart.Data<>(i, pixels[i][0]));
+            series.getData().clear();
+            series.getData().addAll(data);
+            System.out.println("UPDATE");
+            if (type == 0) setLineType();
+            else setScatterType();
+        }
     }
     private void setupHover() {
         Line line = new Line();

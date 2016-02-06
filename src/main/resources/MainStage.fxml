@@ -16,7 +16,7 @@
                 <MenuItem onAction="#handleOpen" text="%Open" />
                 <MenuItem disable="${controller.needsImage}" onAction="#handleRevert" text="%Revert" />
                 <MenuItem disable="${controller.needsImage}" onAction="#handleDuplicate" text="%Duplicate" />
-                <MenuItem disable="${controller.needsImage}" onAction="#handleSave" text="%Save" />
+                <!--<MenuItem disable="${controller.needsImage}" onAction="#handleSave" text="%Save" />-->
                 <MenuItem disable="${controller.needsImage}" onAction="#handleSaveAs" text="%SaveAs" />
                 <SeparatorMenuItem />
                 <MenuItem onAction="#handlePreferences" text="%Preferences" />

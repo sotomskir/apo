@@ -56,12 +56,12 @@ public class MainController implements Initializable, ToolController {
     private ObjectProperty<ImagePane> activePane;
     private Preferences prefs;
     @FXML public ScrollPane toolboxScrollPane;
-//    @FXML public HBox labels;
+    //    @FXML public HBox labels;
     @FXML private MenuBar menuBar;
     @FXML private VBox toolbox;
     @FXML private VBox histogramPaneContainer;
     @FXML private BorderPane rootLayout;
-//    @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
+    //    @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
     MenuItem labelR = new MenuItem();
     MenuItem labelG = new MenuItem();
     MenuItem labelB = new MenuItem();
@@ -574,6 +574,7 @@ public class MainController implements Initializable, ToolController {
         toolbox.getChildren().add(EmptyTool.getInstance(this));
         cropButton.setSelected(false);
         profileLineButton.setSelected(false);
+        histogramPane.updateProfileLineChart(null);
         activePane.getValue().refresh();
     }
 
@@ -595,10 +596,10 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void disableProfileLine() {
-            profileLineButton.setSelected(false);
-            rootLayout.getScene().setCursor(Cursor.DEFAULT);
-            getActivePane().getImageView().removeEventFilter(MouseEvent.MOUSE_DRAGGED, dragHandler);
-            getActivePane().getImageView().setOnMousePressed(event -> {});
+        profileLineButton.setSelected(false);
+        rootLayout.getScene().setCursor(Cursor.DEFAULT);
+        getActivePane().getImageView().removeEventFilter(MouseEvent.MOUSE_DRAGGED, dragHandler);
+        getActivePane().getImageView().setOnMousePressed(event -> {});
     }
 
     EventHandler<MouseEvent> dragHandler = event -> {

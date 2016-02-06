@@ -1,11 +1,11 @@
 v0.2.3
  - fix profile line null pointer exception
- - minor bugfixes
  - add profile line nodes markers
  - fix conversion on image load
  - fix toolbox layout issues
  - add chart control tooltip
  - fix interval thresholds bugs
+ - minor bugfixes
 
 v0.2.2
  - extend zoom level to see individual pixels and disable pixel smoothing when zoomed.
