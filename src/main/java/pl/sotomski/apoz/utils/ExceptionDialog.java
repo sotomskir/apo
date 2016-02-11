@@ -18,9 +18,10 @@ public class ExceptionDialog {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
         alert.setHeaderText(header);
+        Throwable rootCause = getRootException(ex);
         String content =
-                "message: " + ex.getMessage() + "\n" +
-                "cause: " + ex.getCause();
+                "Message: " + ex + "\n" +
+                "Cause: " + rootCause;
         alert.setContentText(content);
 
 
@@ -51,9 +52,16 @@ public class ExceptionDialog {
 
         alert.show();
         alert.setOnCloseRequest(event -> {
-            if(ex.getCause() instanceof InvocationTargetException) System.exit(-1);
+            if(ex.getCause() instanceof InvocationTargetException ||
+               ex.getCause() instanceof OutOfMemoryError) System.exit(-1);
 
         });
+    }
+
+    private Throwable getRootException(Throwable ex) {
+        Throwable root = ex;
+        while (root.getCause() != null) root = root.getCause();
+        return root;
     }
 
 }

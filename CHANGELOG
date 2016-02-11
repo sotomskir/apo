@@ -7,6 +7,7 @@ v0.2.3
  - fix interval thresholds bugs
  - minor bugfixes
  - drag & drop crop
+ - add PCX support
 
 v0.2.2
  - extend zoom level to see individual pixels and disable pixel smoothing when zoomed.
