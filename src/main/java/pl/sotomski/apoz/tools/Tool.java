@@ -34,7 +34,7 @@ public abstract class Tool extends VBox {
         this.toolController = toolController;
     }
 
-    protected abstract void handleApply(ActionEvent actionEvent);
+    public abstract void handleApply(ActionEvent actionEvent);
 
     public void handleCancel() {
         disableTool();

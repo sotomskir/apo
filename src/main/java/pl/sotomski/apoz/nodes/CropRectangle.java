@@ -21,7 +21,7 @@ public class CropRectangle extends Group {
     final double handleRadius = 3;
     Color handleColor = new Color(0,0,0,0);
     List<Shape> resizeHandles = new ArrayList<>();
-    int x1, y1, x2, y2; //image coordinates
+    public int x1, y1, x2, y2; //image coordinates
 
     public CropRectangle(DoubleProperty zoomLevel) {
         this();
@@ -48,14 +48,14 @@ public class CropRectangle extends Group {
 
 
     public void setEnd(double x, double y) {
-        x2 = (int) x;
-        y2 = (int) y;
+        x2 = (int) (x / zoomLevel.getValue());
+        y2 = (int) (y / zoomLevel.getValue());
         update();
     }
 
     public void setStart(double x, double y) {
-        x1 = (int) x;
-        y1 = (int) y;
+        x1 = (int) (x / zoomLevel.getValue());
+        y1 = (int) (y / zoomLevel.getValue());
         update();
     }
 

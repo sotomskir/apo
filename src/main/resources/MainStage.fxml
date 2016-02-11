@@ -131,14 +131,14 @@
                             <!--</tooltip>-->
                         <!--</ToggleButton>-->
 
-                        <ToggleButton fx:id="cropButton" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleCropTool" styleClass="mdi" text="%mdi-crop">
+                        <ToggleButton fx:id="cropButton" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#toggleCropTool" styleClass="mdi" text="%mdi-crop">
                             <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
                                 <Tooltip text="%Crop" />
                             </tooltip>
                         </ToggleButton>
 
-                        <ToggleButton fx:id="profileLineButton" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#handleProfileLineTool" styleClass="mdi" text="%mdi-chart-line">
+                        <ToggleButton fx:id="profileLineButton" disable="${controller.needsImage}" mnemonicParsing="false" onAction="#toggleProfileLineTool" styleClass="mdi" text="%mdi-chart-line">
                             <padding><Insets bottom="2" left="2" right="2" top="2" /></padding>
                             <tooltip>
                                 <Tooltip text="%ProfileLine" />

@@ -80,6 +80,7 @@ public class MainController implements Initializable, ToolController {
     private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
     @FXML private Button toggleHistogramViewBtn;
     private ProfileLine profileLine;
+    CropRectangle cropRectangle;
 
 
     /***************************************************************************
@@ -132,6 +133,11 @@ public class MainController implements Initializable, ToolController {
     }
     public ImagePane getActivePane() {
         return activePane.getValue();
+    }
+
+    @Override
+    public CropRectangle getCropRectangle() {
+        return cropRectangle;
     }
 
     public TabPane getTabPane() {
@@ -300,9 +306,15 @@ public class MainController implements Initializable, ToolController {
                 handleRedo(null);
             } else if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.Z) {
                 handleUndo(null);
+            } else if (keyEvent.getCode() == KeyCode.ENTER) {
+                Tool tool = (Tool) toolbox.getChildren().get(0);
+                if(tool != null) tool.handleApply(null);
             } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
                 Tool tool = (Tool) toolbox.getChildren().get(0);
                 if(tool != null) tool.handleCancel();
+                disableTools();
+                disableProfileLine();
+                disableCropRectangle();
             }
         }
     }
@@ -376,7 +388,7 @@ public class MainController implements Initializable, ToolController {
     }
 
     public void handleMouseEntered(MouseEvent event) {
-        if(!profileLineButton.isSelected())
+        if(!profileLineButton.isSelected() && !cropButton.isSelected())
             labels.show(rootLayout.getScene().getWindow());
     }
 
@@ -553,37 +565,99 @@ public class MainController implements Initializable, ToolController {
         addToToolbox(TwoStepFilterTool.getInstance(this));
     }
 
-    public void handleCropTool(ActionEvent actionEvent) {
+
+
+
+
+    public void toggleCropTool(ActionEvent actionEvent) {
         if(cropButton.isSelected()) {
+            disableTools();
             addToToolbox(CropTool.getInstance(this));
             cropButton.setSelected(true);
-            rootLayout.getScene().setCursor(Cursor.DEFAULT);
-            getActivePane().enableCropSelection();
-        } else disableTools();
+            rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
+            enableCropSelection();
+            handleMouseExited(null);
+        } else disableCropRectangle();
     }
 
     public void handleCropToolMenu(ActionEvent actionEvent) {
         cropButton.setSelected(true);
-        handleCropTool(actionEvent);
+        toggleCropTool(actionEvent);
+    }
+
+    EventHandler<MouseEvent> cropDragHandler = event -> {
+//        if (!cropButton.isPressed()) {
+            MouseEvent mouseEvent = (MouseEvent) event;
+            double newX = mouseEvent.getX();
+            double newY = mouseEvent.getY();
+            double maxX = getActivePane().getImage().getWidth() * getActivePane().getZoomLevel();
+            double maxY = getActivePane().getImage().getHeight() * getActivePane().getZoomLevel();
+            System.out.println("Mouse dragged");
+            if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
+                cropRectangle.setEnd((int) (newX), (int) (newY));
+            }
+//        }
+    };
+
+    public void enableCropSelection() {
+        ImagePane p = getActivePane();
+        p.getImageStack().clear();
+//        p.getImageView().setOnMousePressed(event -> {});
+//        p.getImageView().setOnMouseReleased(event -> {});
+//        imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
+        cropRectangle = new CropRectangle(p.zoomLevelProperty());
+//        p.getImageStack().push(cropRectangle);
+//        int width = p.getImage().getWidth();
+//        int height = p.getImage().getHeight();
+//        cropRectangle.setStart(width*0.25, height*0.25);
+//        cropRectangle.setEnd(width*0.75, height*0.75);
+
+        p.getImageView().setOnMousePressed(mouseEvent -> {
+            p.getImageStack().clear();
+            p.getImageStack().push(cropRectangle);
+            cropRectangle.setStart(mouseEvent.getX(), mouseEvent.getY());
+            cropRectangle.setEnd(mouseEvent.getX(), mouseEvent.getY());
+            System.out.println("Mouse pressed X:" + cropRectangle.x1 + " Y:" + cropRectangle.y1 + " source:" + mouseEvent.getSource().hashCode());
+        });
+
+        p.getImageView().addEventFilter(MouseEvent.MOUSE_DRAGGED, cropDragHandler);
+
+        p.getImageView().setOnMouseReleased(mouseEvent -> {
+            disableCropRectangle();
+//            p.getImageStack().clear();
+            p.refresh();
+        });
+    }
+
+    public void disableCropRectangle() {
+//        cropRectangle.setSelected(false);
+        rootLayout.getScene().setCursor(Cursor.DEFAULT);
+        getActivePane().getImageView().removeEventFilter(MouseEvent.MOUSE_DRAGGED, cropDragHandler);
+        getActivePane().getImageView().setOnMousePressed(event -> {});
     }
 
     public void disableTools() {
         rootLayout.getScene().setCursor(Cursor.DEFAULT);
-        getActivePane().disableTools();
+//        disableTools();
         toolbox.getChildren().clear();
         toolbox.getChildren().add(EmptyTool.getInstance(this));
         cropButton.setSelected(false);
         profileLineButton.setSelected(false);
         histogramPane.updateProfileLineChart(null);
+        activePane.getValue().getImageStack().clear();
         activePane.getValue().refresh();
     }
 
+
+
+
+
     public void handleProfileLineToolMenu(ActionEvent actionEvent) {
         profileLineButton.setSelected(true);
-        handleProfileLineTool(actionEvent);
+        toggleProfileLineTool(actionEvent);
     }
 
-    public void handleProfileLineTool(ActionEvent actionEvent) {
+    public void toggleProfileLineTool(ActionEvent actionEvent) {
         if(profileLineButton.isSelected()) {
             disableTools();
             profileLineButton.setSelected(true);
@@ -598,11 +672,11 @@ public class MainController implements Initializable, ToolController {
     public void disableProfileLine() {
         profileLineButton.setSelected(false);
         rootLayout.getScene().setCursor(Cursor.DEFAULT);
-        getActivePane().getImageView().removeEventFilter(MouseEvent.MOUSE_DRAGGED, dragHandler);
+        getActivePane().getImageView().removeEventFilter(MouseEvent.MOUSE_DRAGGED, profileLineDragHandler);
         getActivePane().getImageView().setOnMousePressed(event -> {});
     }
 
-    EventHandler<MouseEvent> dragHandler = event -> {
+    EventHandler<MouseEvent> profileLineDragHandler = event -> {
         if (!profileLine.isPressed()) {
             MouseEvent mouseEvent = (MouseEvent) event;
             double newX = mouseEvent.getX();
@@ -637,7 +711,7 @@ public class MainController implements Initializable, ToolController {
             p.refresh();
         });
 
-        p.getImageView().addEventFilter(MouseEvent.MOUSE_DRAGGED, dragHandler);
+        p.getImageView().addEventFilter(MouseEvent.MOUSE_DRAGGED, profileLineDragHandler);
 
         p.getImageView().setOnMouseReleased(mouseEvent -> {
             histogramPane.updateProfileLineChart(profileLine);
@@ -646,6 +720,11 @@ public class MainController implements Initializable, ToolController {
             p.refresh();
         });
     }
+
+
+
+
+
 
     public void handleTurtleAlgorithm(ActionEvent actionEvent) {
         CommandManager manager = getActivePane().getCommandManager();

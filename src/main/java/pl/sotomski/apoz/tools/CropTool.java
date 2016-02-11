@@ -44,7 +44,7 @@ public class CropTool extends Tool {
     public void handleApply(ActionEvent actionEvent) {
         ImagePane imagePane = toolController.getActivePane();
         BufferedImage image = toolController.getBufferedImage();
-        CropRectangle cropRectangle = toolController.getActivePane().getCropRectangle();
+        CropRectangle cropRectangle = toolController.getCropRectangle();
         BufferedImage croppedImage = ImageUtils.crop(image, cropRectangle);
         ChartsPane histogramPane = toolController.getActivePane().getHistogramPane();
         String oldName = imagePane.getName();
