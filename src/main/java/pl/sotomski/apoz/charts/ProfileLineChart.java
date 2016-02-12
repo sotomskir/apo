@@ -44,12 +44,12 @@ public class ProfileLineChart extends LineChart<Number, Number> {
             series.getData().clear();
             layoutPlotChildren();
         } else {
-            int[][] pixels = profileLine.getPixels();
+            List<ProfileLine.LinePoint> points = profileLine.getLinePoints();
             this.profileLine = profileLine;
             // TODO optimize this
             data.clear();
             //TODO add RGB support
-            for (int i = 0; i < pixels.length; ++i) data.add(new XYChart.Data<>(i, pixels[i][0]));
+            for (int i = 0; i < points.size(); ++i) data.add(new XYChart.Data<>(i, points.get(i).b));
             series.getData().clear();
             series.getData().addAll(data);
             System.out.println("UPDATE");
@@ -61,14 +61,14 @@ public class ProfileLineChart extends LineChart<Number, Number> {
         Line line = new Line();
         line.setStrokeWidth(2);
         verticalMarker.setNode(line);
-        Circle circle = new Circle(5, Color.GREEN);
+        Circle circle = new Circle(5, Color.GREENYELLOW);
         circleMarker.setNode(circle);
         MenuItem level = new MenuItem();
         MenuItem xLabel = new MenuItem();
         MenuItem yLabel = new MenuItem();
         MenuItem value = new MenuItem();
         pixelMarker = new Rectangle(2, 2, new Color(0,0,0,0.01));
-        pixelMarker.setStroke(Color.GREEN);
+        pixelMarker.setStroke(Color.GREENYELLOW);
         tooltip = new ContextMenu(level, xLabel, yLabel, value);
 
         setOnMouseEntered(event1 -> addMarkers());
@@ -85,7 +85,7 @@ public class ProfileLineChart extends LineChart<Number, Number> {
             //mark image node
             if (profileLine != null) {
                 for (Circle node : profileLine.getNodes()) {
-                    Color color = profileLine.getNodes().indexOf(node) == x ? Color.GREEN : Color.YELLOW;
+                    Color color = profileLine.getNodes().indexOf(node) == x ? Color.GREENYELLOW : Color.YELLOW;
                     node.setFill(color);
                     node.setStroke(color);
                 }
@@ -98,14 +98,14 @@ public class ProfileLineChart extends LineChart<Number, Number> {
             try {
                 circleMarker.setYValue(data.get(x).getYValue());
                 int k = (int) series.getData().get(x).getYValue();
-                int[] point = profileLine.getLinePoints()[x];
+                ProfileLine.LinePoint point = profileLine.getLinePoints().get(x);
                 double zoomFactor = profileLine.getImagePane().getZoomLevel();
                 pixelMarker.setWidth(zoomFactor);
                 pixelMarker.setHeight(zoomFactor);
-                pixelMarker.setX(point[0] * zoomFactor);
-                pixelMarker.setY((point[1]) * zoomFactor);
-                xLabel.setText("X:"+point[0]);
-                yLabel.setText("Y:"+point[1]);
+                pixelMarker.setX((point.x - 1) * zoomFactor);
+                pixelMarker.setY((point.y - 1) * zoomFactor);
+                xLabel.setText("X:"+(point.x));
+                yLabel.setText("Y:"+(point.y));
                 value.setText("Wartość:"+k);
                 if (!getPlotChildren().contains(circleMarker.getNode())) addMarkers();
             } catch (IndexOutOfBoundsException e) {

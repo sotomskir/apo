@@ -24,7 +24,7 @@ public class ProfileLine extends Group {
     List<Node> nodes = new ArrayList<>();
     IntegerProperty changed = new SimpleIntegerProperty();
     DoubleProperty zoomLevel;
-    double x1, y1, x2, y2;
+    double x1 = 1, y1 = 1, x2 = 1, y2 = 1;
 
 
     public ProfileLine(DoubleProperty zoomLevel, ImagePane imagePane) {
@@ -46,9 +46,9 @@ public class ProfileLine extends Group {
         getChildren().removeAll(nodes);
         nodes.clear();
         if (zoomLevel.getValue() > 6) {
-            int[][] points = getLinePoints();
-            for (int[] point : points)
-                nodes.add(new Node(point[0] * zoomLevel.getValue(), point[1] * zoomLevel.getValue()));
+            List<LinePoint> points = getLinePoints();
+            for (LinePoint point : points)
+                nodes.add(new Node(point.x * zoomLevel.getValue(), point.y * zoomLevel.getValue()));
             getChildren().addAll(nodes);
         }
     }
@@ -123,7 +123,7 @@ public class ProfileLine extends Group {
         return changed;
     }
 
-    public int[][] getLinePoints() {
+    public List<LinePoint> getLinePoints() {
         int minX, maxX;
         if (getEndX() > getStartX()) { minX = (int) Math.round(getStartX()); maxX = (int) Math.round(getEndX())-1; }
         else { minX = (int) Math.round(getEndX()); maxX = (int) Math.round(getStartX())-1; }
@@ -132,21 +132,23 @@ public class ProfileLine extends Group {
         if (getEndY() > getStartY()) { minY = (int) Math.round(getStartY()); maxY = (int) Math.round(getEndY())-1; }
         else { minY = (int) Math.round(getEndY()); maxY = (int) Math.round(getStartY())-1; }
         int sizeY = maxY - minY + 1;
-        int[][] points;
+        List<LinePoint> points = new ArrayList<>();
 
         if(sizeX > sizeY) {
-            points = new int[sizeX][2];
             double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
             for (int x = minX; x <= maxX; ++x) {
-                points[x - minX][0] = x;
-                points[x - minX][1] = (int) Math.round(slope * ((double) x - getEndX()) + getEndY());
+                LinePoint point = new LinePoint();
+                point.x = x;
+                point.y = (int) Math.round(slope * ((double) x - getEndX()) + getEndY());
+                points.add(point);
             }
         } else {
-            points = new int[sizeY][2];
             double slope = (getEndY() - getStartY()) / (getEndX() - getStartX());
             for (int y = minY; y <= maxY; ++y) {
-                points[y - minY][0] = (int) Math.round(( ((double) y - getEndY()) / slope) + getEndX());
-                points[y - minY][1] = y;
+                LinePoint point = new LinePoint();
+                point.x = (int) Math.round(( ((double) y - getEndY()) / slope) + getEndX());
+                point.y = y;
+                points.add(point);
             }
 
 //          Reverse array
@@ -158,16 +160,16 @@ public class ProfileLine extends Group {
 //                }
 //            }
         }
-        return points;
-    }
 
-    public int[][] getPixels() {
         BufferedImage image = getImagePane().getImage();
-        int channels = image.getColorModel().getNumComponents();
-        int[][] points = getLinePoints();
-        int[][] pixels = new int[points.length][channels];
-        for (int i = 0; i < points.length; ++i) pixels[i] = ImageUtils.getPixel(image, points[i][0], points[i][1]);
-        return pixels;
+        for (LinePoint point : points) {
+            int rgb = image.getRGB(point.x - 1, point.y - 1);
+            point.r = ImageUtils.getR(rgb);
+            point.g = ImageUtils.getG(rgb);
+            point.b = ImageUtils.getB(rgb);
+        }
+
+        return points;
     }
 
     public boolean isHoverEndpoint() {
@@ -188,6 +190,10 @@ public class ProfileLine extends Group {
 
     public DoubleProperty endYProperty() {
         return line.startYProperty();
+    }
+
+    public class LinePoint {
+        public int x, y, r, g, b;
     }
 
     private class Node extends Circle {

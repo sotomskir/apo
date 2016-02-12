@@ -1,4 +1,4 @@
-v0.2.3
+v0.3.0
  - fix profile line null pointer exception
  - add profile line nodes markers
  - fix conversion on image load

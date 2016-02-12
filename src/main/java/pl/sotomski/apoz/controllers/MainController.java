@@ -177,6 +177,7 @@ public class MainController implements Initializable, ToolController {
             revertBtn.setDisable(!(imagePane != null && imagePane.getFile() != null));
         });
 
+        revertBtn.setDisable(true);
         menuBar.setFocusTraversable(false);
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {

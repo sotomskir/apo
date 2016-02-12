@@ -20,6 +20,7 @@ public class ImageWindow extends Stage {
         borderPane.setCenter(imagePane);
         borderPane.setRight(histogramPane);
         Scene newScene = new Scene(borderPane);
+        newScene.getStylesheets().add(String.valueOf(getClass().getClassLoader().getResource("style.css")));
         this.setScene(newScene);
         this.setTitle(imagePane.getName());
         this.setAlwaysOnTop(false);
