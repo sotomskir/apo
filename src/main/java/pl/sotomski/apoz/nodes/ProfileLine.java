@@ -8,11 +8,14 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import pl.sotomski.apoz.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
+import static pl.sotomski.apoz.utils.ImageUtils.getB;
+import static pl.sotomski.apoz.utils.ImageUtils.getG;
+import static pl.sotomski.apoz.utils.ImageUtils.getR;
 
 /**
  * Line with draggable endpoints.
@@ -164,9 +167,11 @@ public class ProfileLine extends Group {
         BufferedImage image = getImagePane().getImage();
         for (LinePoint point : points) {
             int rgb = image.getRGB(point.x - 1, point.y - 1);
-            point.r = ImageUtils.getR(rgb);
-            point.g = ImageUtils.getG(rgb);
-            point.b = ImageUtils.getB(rgb);
+//            point.r = ImageUtils.getR(rgb);
+//            point.g = ImageUtils.getG(rgb);
+//            point.b = ImageUtils.getB(rgb);
+
+            point.b = image.getColorModel().getNumComponents() > 1 ? (getR(rgb) + getB(rgb) + getG(rgb)) / 3 : getB(rgb);
         }
 
         return points;
