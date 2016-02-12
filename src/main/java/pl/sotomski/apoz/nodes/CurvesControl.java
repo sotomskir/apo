@@ -171,7 +171,7 @@ public class CurvesControl extends LineChart {
                 // record a delta distance for the drag and drop operation.
                 dragDelta.x = getCenterX() - mouseEvent.getX();
                 dragDelta.y = getCenterY() - mouseEvent.getY();
-                getScene().setCursor(Cursor.MOVE);
+//                getScene().setCursor(Cursor.MOVE);
             });
             setOnMouseReleased(mouseEvent -> {
                 System.out.println("Released");

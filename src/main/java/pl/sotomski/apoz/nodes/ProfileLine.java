@@ -233,7 +233,7 @@ public class ProfileLine extends Group {
                 // record a delta distance for the drag and drop operation.
                 dragDelta.x = getCenterX() - mouseEvent.getX();
                 dragDelta.y = getCenterY() - mouseEvent.getY();
-                getScene().setCursor(Cursor.MOVE);
+//                getScene().setCursor(Cursor.MOVE);
             });
 
             setOnMouseReleased(mouseEvent -> {
@@ -257,7 +257,7 @@ public class ProfileLine extends Group {
             });
 
             setOnMouseEntered(mouseEvent -> {
-                getScene().getRoot().setCursor(Cursor.MOVE);
+                getScene().setCursor(Cursor.MOVE);
                 System.out.println("Entered " + this.getClass().getName());
             });
 

@@ -376,7 +376,7 @@ public class ChartControl extends LineChart {
                 // record a delta distance for the drag and drop operation.
                 dragDelta.x = getStartX() - mouseEvent.getX();
                 dragDelta.y = getStartY() - mouseEvent.getY();
-                getScene().setCursor(Cursor.MOVE);
+//                getScene().setCursor(Cursor.MOVE);
                 tooltip.show(getScene().getWindow(), mouseEvent.getSceneX() + 25, mouseEvent.getSceneY() + 25);
             });
 
@@ -453,7 +453,7 @@ public class ChartControl extends LineChart {
                 // record a delta distance for the drag and drop operation.
                 dragDelta.x = getStartX() - mouseEvent.getX();
                 dragDelta.y = getStartY() - mouseEvent.getY();
-                getScene().setCursor(Cursor.MOVE);
+//                getScene().setCursor(Cursor.MOVE);
                     System.out.println("Pressed");
             });
 
