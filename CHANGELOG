@@ -1,3 +1,14 @@
+v0.3.0
+ - fix profile line null pointer exception
+ - add profile line nodes markers
+ - fix conversion on image load
+ - fix toolbox layout issues
+ - add chart control tooltip
+ - fix interval thresholds bugs
+ - minor bugfixes
+ - drag & drop crop
+ - add PCX support
+
 v0.2.2
  - extend zoom level to see individual pixels and disable pixel smoothing when zoomed.
  - fix profile line and crop box zooming with image.

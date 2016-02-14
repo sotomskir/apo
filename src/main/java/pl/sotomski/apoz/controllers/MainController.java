@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,9 +21,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import pl.sotomski.apoz.Main;
@@ -53,16 +52,23 @@ public class MainController implements Initializable, ToolController {
      *                                                                         *
      **************************************************************************/
     private ResourceBundle bundle;
-    private HistogramPane histogramPane;
+    private ChartsPane histogramPane;
     private ObjectProperty<ImagePane> activePane;
     private Preferences prefs;
     @FXML public ScrollPane toolboxScrollPane;
-    @FXML public HBox labels;
+    //    @FXML public HBox labels;
     @FXML private MenuBar menuBar;
     @FXML private VBox toolbox;
     @FXML private VBox histogramPaneContainer;
     @FXML private BorderPane rootLayout;
-    @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
+    //    @FXML Label labelR, labelG, labelB, labelX, labelY, labelWidth, labelHeight, labelDepth, zoomLabel;
+    MenuItem labelR = new MenuItem();
+    MenuItem labelG = new MenuItem();
+    MenuItem labelB = new MenuItem();
+    MenuItem labelX = new MenuItem();
+    MenuItem labelY = new MenuItem();
+    ContextMenu labels = new ContextMenu(labelX, labelY, labelR, labelG, labelB);
+    @FXML Label zoomLabel;
     @FXML TabPane tabPane;
     @FXML Button pinButton;
     @FXML Button revertBtn;
@@ -73,7 +79,8 @@ public class MainController implements Initializable, ToolController {
     private final BooleanProperty undoUnavailable = new SimpleBooleanProperty(true);
     private final BooleanProperty redoUnavailable = new SimpleBooleanProperty(true);
     @FXML private Button toggleHistogramViewBtn;
-
+    private ProfileLine profileLine;
+    CropRectangle cropRectangle;
 
 
     /***************************************************************************
@@ -128,6 +135,11 @@ public class MainController implements Initializable, ToolController {
         return activePane.getValue();
     }
 
+    @Override
+    public CropRectangle getCropRectangle() {
+        return cropRectangle;
+    }
+
     public TabPane getTabPane() {
         return tabPane;
     }
@@ -145,7 +157,7 @@ public class MainController implements Initializable, ToolController {
         prefs = Preferences.userNodeForPackage(Main.class);
         bundle = resources;
         activePane = new SimpleObjectProperty<>();
-        histogramPane = new HistogramPane(bundle);
+        histogramPane = new ChartsPane(bundle);
         histogramPaneContainer.getChildren().add(histogramPane);
         activePane.addListener(e -> {
             if (activePane.getValue() != null) {
@@ -165,6 +177,7 @@ public class MainController implements Initializable, ToolController {
             revertBtn.setDisable(!(imagePane != null && imagePane.getFile() != null));
         });
 
+        revertBtn.setDisable(true);
         menuBar.setFocusTraversable(false);
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -195,7 +208,7 @@ public class MainController implements Initializable, ToolController {
             if (selectedTab != null) activePane.setValue(selectedTab.getPane());
         });
 
-        labels.setMinHeight(Control.USE_PREF_SIZE);
+//        labels.setMinHeight(Control.USE_PREF_SIZE);
         histogramPaneContainer.setMinHeight(Control.USE_PREF_SIZE);
         toolboxScrollPane.setFitToHeight(true);
 
@@ -209,23 +222,24 @@ public class MainController implements Initializable, ToolController {
             menuBar.useSystemMenuBarProperty ().set (true);
 //        histogramPane.getMonoHistogramChart().setValueLabel(histogramValueLabel);
 
-        labelR.setFont(Font.font("monospace"));
-        labelG.setFont(Font.font("monospace"));
-        labelB.setFont(Font.font("monospace"));
-        labelB.setFont(Font.font("monospace"));
-        labelDepth.setFont(Font.font("monospace"));
-        labelHeight.setFont(Font.font("monospace"));
-        labelWidth.setFont(Font.font("monospace"));
-        labelX.setFont(Font.font("monospace"));
-        labelY.setFont(Font.font("monospace"));
+//        labelR.setFont(Font.font("monospace"));
+//        labelG.setFont(Font.font("monospace"));
+//        labelB.setFont(Font.font("monospace"));
+//        labelB.setFont(Font.font("monospace"));
+//        labelDepth.setFont(Font.font("monospace"));
+//        labelHeight.setFont(Font.font("monospace"));
+//        labelWidth.setFont(Font.font("monospace"));
+//        labelX.setFont(Font.font("monospace"));
+//        labelY.setFont(Font.font("monospace"));
         toggleHistogramViewBtn.setStyle("-fx-font-size:8;");
         histogramPane.setMaxHeight(0);
+        labels.getStyleClass().add("dark");
     }
 
     private void updateLabels(ImagePane pane) {
-        labelDepth.setText(bundle.getString("Depth") + ": " + (pane.getImage().getColorModel().getNumComponents() > 1 ? "RGB" : "Gray"));
-        labelWidth.setText(bundle.getString("Width") + ": " + pane.getImage().getWidth());
-        labelHeight.setText(bundle.getString("Heigth") + ": " + pane.getImage().getHeight());
+//        labelDepth.setText(bundle.getString("Depth") + ": " + (pane.getImage().getColorModel().getNumComponents() > 1 ? "RGB" : "Gray"));
+//        labelWidth.setText(bundle.getString("Width") + ": " + pane.getImage().getWidth());
+//        labelHeight.setText(bundle.getString("Heigth") + ": " + pane.getImage().getHeight());
     }
 
     /**
@@ -243,6 +257,7 @@ public class MainController implements Initializable, ToolController {
         tabPane.getTabs().add(imageTab);
         imageTab.getPane().getImageView().addEventHandler(MouseEvent.MOUSE_MOVED, this::handleMouseMoved);
         imageTab.getPane().getImageView().addEventHandler(MouseEvent.MOUSE_EXITED, this::handleMouseExited);
+        imageTab.getPane().getImageView().addEventHandler(MouseEvent.MOUSE_ENTERED, this::handleMouseEntered);
         tabPane.getSelectionModel().select(imageTab);
     }
 
@@ -292,9 +307,15 @@ public class MainController implements Initializable, ToolController {
                 handleRedo(null);
             } else if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.Z) {
                 handleUndo(null);
+            } else if (keyEvent.getCode() == KeyCode.ENTER) {
+                Tool tool = (Tool) toolbox.getChildren().get(0);
+                if(tool != null) tool.handleApply(null);
             } else if (keyEvent.getCode() == KeyCode.ESCAPE) {
                 Tool tool = (Tool) toolbox.getChildren().get(0);
                 if(tool != null) tool.handleCancel();
+                disableTools();
+                disableProfileLine();
+                disableCropRectangle();
             }
         }
     }
@@ -326,13 +347,17 @@ public class MainController implements Initializable, ToolController {
     public void handleSaveAs(ActionEvent actionEvent) {
         BufferedImage image = activePane.getValue().getImage();
         File file = FileMenuUtils.saveAsDialog(rootLayout, image);
-        activePane.getValue().setFile(file);
-        activePane.getValue().setName(file.getName());
+        if (file != null) {
+            activePane.getValue().setFile(file);
+            activePane.getValue().setName(file.getName());
+        }
     }
 
     public void handleSave(ActionEvent actionEvent) {
         File file = activePane.getValue().getFile();
-        FileMenuUtils.saveDialog(activePane.getValue().getImage(), file);
+        if (file != null) {
+            FileMenuUtils.saveDialog(activePane.getValue().getImage(), file);
+        } else handleSaveAs(null);
     }
 
     public void handleHistogramEqualisation() {
@@ -359,20 +384,28 @@ public class MainController implements Initializable, ToolController {
         } catch (ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
         }
+        labels.setX(event.getSceneX()+25);
+        labels.setY(event.getSceneY()+25);
+    }
+
+    public void handleMouseEntered(MouseEvent event) {
+        if(!profileLineButton.isSelected() && !cropButton.isSelected())
+            labels.show(rootLayout.getScene().getWindow());
     }
 
     public void handleMouseExited(MouseEvent event) {
-        labelX.setText("X: -");
-        labelY.setText("Y: -");
-            if(activePane.getValue().getChannels() == 3) {
-                labelR.setText("R: -");
-                labelG.setText("G: -");
-                labelB.setText("B: -");
-            } else {
-                labelR.setText("K: -");
-                labelG.setText("");
-                labelB.setText("");
-            }
+        labels.hide();
+//        labelX.setText("X: -");
+//        labelY.setText("Y: -");
+//            if(activePane.getValue().getChannels() == 3) {
+//                labelR.setText("R: -");
+//                labelG.setText("G: -");
+//                labelB.setText("B: -");
+//            } else {
+//                labelR.setText("K: -");
+//                labelG.setText("");
+//                labelB.setText("");
+//            }
     }
 
     public void handleConvertToGreyscale(ActionEvent actionEvent) {
@@ -423,7 +456,7 @@ public class MainController implements Initializable, ToolController {
             tabPane.getTabs().remove(selectedTab);
             Window parent = rootLayout.getScene().getWindow();
             ImagePane imagePane = selectedTab.getPane();
-            ImageWindow imageWindow = new ImageWindow(parent, imagePane, new HistogramPane(bundle));
+            ImageWindow imageWindow = new ImageWindow(parent, imagePane, new ChartsPane(bundle));
             imagePane.setWindow(imageWindow);
             imageWindow.setOnCloseRequest(e -> {
                 imagePane.onClose();
@@ -533,45 +566,165 @@ public class MainController implements Initializable, ToolController {
         addToToolbox(TwoStepFilterTool.getInstance(this));
     }
 
-    public void handleCropTool(ActionEvent actionEvent) {
+
+
+
+
+    public void toggleCropTool(ActionEvent actionEvent) {
         if(cropButton.isSelected()) {
+            disableTools();
             addToToolbox(CropTool.getInstance(this));
             cropButton.setSelected(true);
-            rootLayout.getScene().setCursor(Cursor.DEFAULT);
-            getActivePane().enableCropSelection();
-        } else disableTools();
+            rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
+            enableCropSelection();
+            handleMouseExited(null);
+        } else disableCropRectangle();
     }
 
     public void handleCropToolMenu(ActionEvent actionEvent) {
         cropButton.setSelected(true);
-        handleCropTool(actionEvent);
+        toggleCropTool(actionEvent);
+    }
+
+    EventHandler<MouseEvent> cropDragHandler = event -> {
+//        if (!cropButton.isPressed()) {
+            MouseEvent mouseEvent = (MouseEvent) event;
+            double newX = mouseEvent.getX();
+            double newY = mouseEvent.getY();
+            double maxX = getActivePane().getImage().getWidth() * getActivePane().getZoomLevel();
+            double maxY = getActivePane().getImage().getHeight() * getActivePane().getZoomLevel();
+            System.out.println("Mouse dragged");
+            if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
+                cropRectangle.setEnd((int) (newX), (int) (newY));
+            }
+//        }
+    };
+
+    public void enableCropSelection() {
+        ImagePane p = getActivePane();
+        p.getImageStack().clear();
+//        p.getImageView().setOnMousePressed(event -> {});
+//        p.getImageView().setOnMouseReleased(event -> {});
+//        imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
+        cropRectangle = new CropRectangle(p.zoomLevelProperty());
+//        p.getImageStack().push(cropRectangle);
+//        int width = p.getImage().getWidth();
+//        int height = p.getImage().getHeight();
+//        cropRectangle.setStart(width*0.25, height*0.25);
+//        cropRectangle.setEnd(width*0.75, height*0.75);
+
+        p.getImageView().setOnMousePressed(mouseEvent -> {
+            p.getImageStack().clear();
+            p.getImageStack().push(cropRectangle);
+            cropRectangle.setStart(mouseEvent.getX(), mouseEvent.getY());
+            cropRectangle.setEnd(mouseEvent.getX(), mouseEvent.getY());
+            System.out.println("Mouse pressed X:" + cropRectangle.x1 + " Y:" + cropRectangle.y1 + " source:" + mouseEvent.getSource().hashCode());
+        });
+
+        p.getImageView().addEventFilter(MouseEvent.MOUSE_DRAGGED, cropDragHandler);
+
+        p.getImageView().setOnMouseReleased(mouseEvent -> {
+            disableCropRectangle();
+//            p.getImageStack().clear();
+            p.refresh();
+        });
+    }
+
+    public void disableCropRectangle() {
+//        cropRectangle.setSelected(false);
+        rootLayout.getScene().setCursor(Cursor.DEFAULT);
+        getActivePane().getImageView().removeEventFilter(MouseEvent.MOUSE_DRAGGED, cropDragHandler);
+        getActivePane().getImageView().setOnMousePressed(event -> {});
     }
 
     public void disableTools() {
         rootLayout.getScene().setCursor(Cursor.DEFAULT);
-        getActivePane().disableTools();
+//        disableTools();
         toolbox.getChildren().clear();
         toolbox.getChildren().add(EmptyTool.getInstance(this));
         cropButton.setSelected(false);
         profileLineButton.setSelected(false);
+        histogramPane.updateProfileLineChart(null);
+        activePane.getValue().getImageStack().clear();
         activePane.getValue().refresh();
     }
 
+
+
+
+
     public void handleProfileLineToolMenu(ActionEvent actionEvent) {
         profileLineButton.setSelected(true);
-        handleProfileLineTool(actionEvent);
+        toggleProfileLineTool(actionEvent);
     }
 
-    public void handleProfileLineTool(ActionEvent actionEvent) {
+    public void toggleProfileLineTool(ActionEvent actionEvent) {
         if(profileLineButton.isSelected()) {
             disableTools();
             profileLineButton.setSelected(true);
             histogramPane.selectProfileLineChart();
             rootLayout.getScene().setCursor(Cursor.CROSSHAIR);
-            getActivePane().enableProfileLineSelection();
+            enableProfileLineSelection();
+            handleMouseExited(null);
             if (histogramPane.getHeight() == 0) handleToggleHistogramView(null);
-        } else disableTools();
+        } else disableProfileLine();
     }
+
+    public void disableProfileLine() {
+        profileLineButton.setSelected(false);
+        rootLayout.getScene().setCursor(Cursor.DEFAULT);
+        getActivePane().getImageView().removeEventFilter(MouseEvent.MOUSE_DRAGGED, profileLineDragHandler);
+        getActivePane().getImageView().setOnMousePressed(event -> {});
+    }
+
+    EventHandler<MouseEvent> profileLineDragHandler = event -> {
+        if (!profileLine.isPressed()) {
+            MouseEvent mouseEvent = (MouseEvent) event;
+            double newX = mouseEvent.getX();
+            double newY = mouseEvent.getY();
+            double maxX = getActivePane().getImage().getWidth() * getActivePane().getZoomLevel();
+            double maxY = getActivePane().getImage().getHeight() * getActivePane().getZoomLevel();
+            System.out.println("Mouse dragged");
+            if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
+                profileLine.setEnd(newX, newY);
+            }
+        }
+    };
+
+    public void enableProfileLineSelection() {
+        ImagePane p = getActivePane();
+        p.getImageStack().clear();
+        profileLine = new ProfileLine(p.zoomLevelProperty(), getActivePane());
+        histogramPane.updateProfileLineChart(profileLine);
+        System.out.println("Enable mouse events on:"+hashCode());
+
+        p.getImageView().setOnMousePressed(mouseEvent -> {
+            if (!profileLine.isHoverEndpoint()) {
+                if (!p.getImageStack().contains(profileLine)) p.getImageStack().push(profileLine);
+                profileLine.setStart(mouseEvent.getX(), mouseEvent.getY());
+                profileLine.setEnd(mouseEvent.getX(), mouseEvent.getY());
+                System.out.println("Mouse pressed X:" + profileLine.getStartX() + " Y:" + profileLine.getStartY() + " source:" + mouseEvent.getSource().getClass().getName());
+            }
+        });
+
+        profileLine.changedProperty().addListener(observable -> {
+            histogramPane.updateProfileLineChart(profileLine);
+            p.refresh();
+        });
+
+        p.getImageView().addEventFilter(MouseEvent.MOUSE_DRAGGED, profileLineDragHandler);
+
+        p.getImageView().setOnMouseReleased(mouseEvent -> {
+            histogramPane.updateProfileLineChart(profileLine);
+            disableProfileLine();
+            System.out.println("Mouse released");
+            p.refresh();
+        });
+    }
+
+
+
+
 
 
     public void handleTurtleAlgorithm(ActionEvent actionEvent) {
@@ -592,6 +745,11 @@ public class MainController implements Initializable, ToolController {
 
     public void handleGradientFiltering(ActionEvent actionEvent) {
         addToToolbox(GradientEdgeDetectionTool.getInstance(this));
+    }
+
+    public void handleShowHistogramView(ActionEvent actionEvent) {
+        histogramPane.setMaxHeight(300);
+        histogramPane.getSelectionModel().selectFirst();
     }
 
     public void handleToggleHistogramView(ActionEvent actionEvent) {

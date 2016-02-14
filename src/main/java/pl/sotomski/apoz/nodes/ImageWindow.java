@@ -12,14 +12,15 @@ import javafx.stage.Window;
 public class ImageWindow extends Stage {
 
     private ImagePane imagePane;
-    private HistogramPane histogramPane;
-    public ImageWindow(Window owner, ImagePane imagePane, HistogramPane histogramPane) {
+    private ChartsPane histogramPane;
+    public ImageWindow(Window owner, ImagePane imagePane, ChartsPane histogramPane) {
         super();
         imagePane.setHistogramPane(histogramPane);
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(imagePane);
         borderPane.setRight(histogramPane);
         Scene newScene = new Scene(borderPane);
+        newScene.getStylesheets().add(String.valueOf(getClass().getClassLoader().getResource("style.css")));
         this.setScene(newScene);
         this.setTitle(imagePane.getName());
         this.setAlwaysOnTop(false);
@@ -32,7 +33,7 @@ public class ImageWindow extends Stage {
         return imagePane;
     }
 
-    public HistogramPane getHistogramPane() {
+    public ChartsPane getHistogramPane() {
         return histogramPane;
     }
 }

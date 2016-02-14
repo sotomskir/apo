@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.commands.CommandManager;
 import pl.sotomski.apoz.commands.LUTCommand;
 import pl.sotomski.apoz.controllers.ToolController;
@@ -50,33 +51,35 @@ public class IntervalThresholdTool extends Tool {
         });
         checkBoxKeepLevels.selectedProperty().addListener(observable1 -> {
             if (checkBoxKeepLevels.isSelected()) checkBoxStretch.selectedProperty().setValue(false);
-            if (!checkBoxKeepLevels.isSelected()) checkBoxNegative.selectedProperty().setValue(false);
+            if (checkBoxKeepLevels.isSelected()) checkBoxNegative.selectedProperty().setValue(false);
             chartControl.setKeepLevels(checkBoxKeepLevels.isSelected());
             updateImageView();
         });
         checkBoxStretch.selectedProperty().addListener(observable1 -> {
-            if (checkBoxStretch.isSelected()) checkBoxKeepLevels.selectedProperty().setValue(false);
-            if (checkBoxStretch.isSelected()) checkBoxNegative.selectedProperty().setValue(false);
-            chartControl.toggleStretch(checkBoxStretch.isSelected());
+            if (checkBoxStretch.isSelected()) {
+                checkBoxKeepLevels.selectedProperty().setValue(false);
+                checkBoxNegative.selectedProperty().setValue(false);
+            }
+            chartControl.setStretch(checkBoxStretch.isSelected());
             updateImageView();
         });
         checkBoxNegative.selectedProperty().addListener(observable1 -> {
-            if (checkBoxNegative.isSelected()) checkBoxKeepLevels.selectedProperty().setValue(true);
+            if (checkBoxNegative.isSelected()) {
+                checkBoxKeepLevels.selectedProperty().setValue(false);
+                checkBoxStretch.selectedProperty().setValue(false);
+            }
             chartControl.setNegative(checkBoxNegative.isSelected());
             updateImageView();
         });
 
         chartControl.changedProperty().addListener(observable -> updateImageView());
 
+        VBox checkboxes = new VBox(checkBoxInvert, checkBoxNegative, checkBoxKeepLevels, checkBoxStretch);
         // add controls to view and init
         getChildren().addAll(
                 separator,
                 label,
-                chartControl,
-                checkBoxInvert,
-                checkBoxNegative,
-                checkBoxKeepLevels,
-                checkBoxStretch,
+                new HBox(chartControl, checkboxes),
                 hBox
         );
         chartControl.createDefaultIntervals(spinner.getValue());

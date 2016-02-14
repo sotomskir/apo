@@ -1,7 +1,8 @@
 package pl.sotomski.apoz.nodes;
 
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import pl.sotomski.apoz.charts.CumulativeHistogramChart;
 import pl.sotomski.apoz.charts.MonoHistogramChart;
@@ -15,7 +16,7 @@ import java.util.ResourceBundle;
 /**
  * Created by sotomski on 23/09/15.
  */
-public class HistogramPane extends TabPane {
+public class ChartsPane extends TabPane {
     private Histogram histogram;
     private RGBHistogramChart rgbHistogramChart;
     private MonoHistogramChart monoHistogramChart;
@@ -24,7 +25,7 @@ public class HistogramPane extends TabPane {
     Tab profileLineTab;
     ResourceBundle bundle;
 
-    public HistogramPane(ResourceBundle bundle) {
+    public ChartsPane(ResourceBundle bundle) {
         super();
         this.bundle = bundle;
         Tab tab1 = new Tab(bundle.getString("monoHistogram"));
@@ -40,7 +41,23 @@ public class HistogramPane extends TabPane {
         VBox histogramPane = new VBox(monoHistogramChart);
         VBox rgbHistogramPane = new VBox(rgbHistogramChart);
         VBox cumulativeHistogramPane = new VBox(cumulativeHistogramChart);
-        VBox lineProfilePane = new VBox(profileLineChart);
+        ToggleGroup tg = new ToggleGroup();
+        ToggleButton btn1 = new ToggleButton(bundle.getString("scatterChart"));
+        btn1.setToggleGroup(tg);
+        ToggleButton btn2 = new ToggleButton(bundle.getString("lineChart"));
+        btn1.setMinWidth(Button.USE_PREF_SIZE);
+        btn2.setMinWidth(Button.USE_PREF_SIZE);
+        btn1.setMaxWidth(Double.MAX_VALUE);
+        btn2.setMaxWidth(Double.MAX_VALUE);
+        btn2.setToggleGroup(tg);
+        btn2.setSelected(true);
+        btn1.setOnAction(event -> profileLineChart.setScatterType());
+        btn2.setOnAction(event -> profileLineChart.setLineType());
+        VBox vbButtons = new VBox();
+        vbButtons.setSpacing(10);
+        vbButtons.setPadding(new Insets(20, 5, 20, 5));
+        vbButtons.getChildren().addAll(btn1, btn2);
+        HBox lineProfilePane = new HBox(profileLineChart, vbButtons);
         tab1.setContent(histogramPane);
         tab2.setContent(rgbHistogramPane);
         tab3.setContent(cumulativeHistogramPane);

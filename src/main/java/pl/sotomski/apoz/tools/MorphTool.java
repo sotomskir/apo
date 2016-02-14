@@ -44,7 +44,7 @@ public class MorphTool extends Tool {
     }
 
     @Override
-    protected void handleApply(ActionEvent actionEvent) {
+    public void handleApply(ActionEvent actionEvent) {
 
     }
 

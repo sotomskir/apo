@@ -26,6 +26,34 @@
 .hidden {
     visibility: hidden;
 }
+
+.chart {
+    -fx-padding: 5px;
+}
+
+.chart-content {
+    -fx-padding: 5px;
+}
+
+.dark .context-menu {
+    -fx-background-color: #343434;
+    -fx-text-fill: white;
+}
+
+.dark .menu-item {
+    -fx-padding: 0px;
+}
+
+.dark .menu-item .label {
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 0px;
+}
+
+.dark .menu-item:focused .label {
+    -fx-text-fill: white;
+}
+
 .default-color0.chart-bar { -fx-bar-fill: #000000; }
 .default-color1.chart-bar { -fx-bar-fill: #00ffff; }
 .default-color2.chart-bar { -fx-bar-fill: #ff00ff; }
@@ -57,4 +85,18 @@
 .mdi {
     -fx-font-family: 'Material Design Icons';
     -fx-font-size: 2em;
+}
+
+#series-hidden {
+    -fx-stroke: rgba(0,0,0,0);
+}
+
+#series-visible {
+    -fx-stroke: red;
+}
+
+.chart-symbol { /* solid circle */
+    -fx-background-color: yellow;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
 }

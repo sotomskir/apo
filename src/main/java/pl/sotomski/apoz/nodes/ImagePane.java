@@ -33,7 +33,7 @@ public class ImagePane extends BorderPane {
     private IntegerProperty imageVersion;
     private IntegerProperty zoomIndex;
     private DoubleProperty zoomLevel = new SimpleDoubleProperty();
-    private HistogramPane histogramPane;
+    private ChartsPane histogramPane;
     private CommandManager commandManager;
     private static final double[] zoomLevels = new double[]{.05, .125, .25, .50, .75, 1, 1.25, 1.5, 2, 3, 4, 6, 8, 10, 15, 20};
 //    private final double zoomStep = 0.125;
@@ -42,8 +42,6 @@ public class ImagePane extends BorderPane {
     private File file;
     private ScrollPane scrollPane;
     private boolean tabbed;
-    ProfileLine profileLine;
-    CropRectangle cropRectangle;
     private String name = "";
     Window window;
     private static HashSet<String> names = new HashSet<>();
@@ -76,7 +74,7 @@ public class ImagePane extends BorderPane {
         imageView.setOnMouseClicked(event -> refresh());
     }
 
-    public ImagePane(HistogramPane histogramPane, File file) {
+    public ImagePane(ChartsPane histogramPane, File file) {
         this();
         BufferedImage bi = FileMenuUtils.loadImage(file);
         this.histogramPane = histogramPane;
@@ -86,7 +84,7 @@ public class ImagePane extends BorderPane {
         refresh();
     }
 
-    public ImagePane(HistogramPane histogramPane, BufferedImage image, String name) {
+    public ImagePane(ChartsPane histogramPane, BufferedImage image, String name) {
         this();
         this.histogramPane = histogramPane;
         this.imageView.setBufferedImage(image);
@@ -94,7 +92,7 @@ public class ImagePane extends BorderPane {
         refresh();
     }
 
-    public ImagePane(HistogramPane histogramPane, ImagePane imagePane) {
+    public ImagePane(ChartsPane histogramPane, ImagePane imagePane) {
         this();
         if(imagePane.getFile() != null) setFile(new File(imagePane.getFile().getPath()));
         name = imagePane.getName();
@@ -144,10 +142,6 @@ public class ImagePane extends BorderPane {
         this.window = window;
     }
 
-    public CropRectangle getCropRectangle() {
-        return cropRectangle;
-    }
-
     public ImageStack getImageStack() {
         return imageStack;
     }
@@ -164,17 +158,13 @@ public class ImagePane extends BorderPane {
         return imageView.getBufferedImage();
     }
 
-    public void setHistogramPane(HistogramPane histogramPane) {
+    public void setHistogramPane(ChartsPane histogramPane) {
         this.histogramPane = histogramPane;
         histogramPane.update(imageView.getBufferedImage());
     }
 
     public CommandManager getCommandManager() {
         return commandManager;
-    }
-
-    public ProfileLine getProfileLine() {
-        return profileLine;
     }
 
     public void setFitHeight(double fitHeight) {
@@ -250,7 +240,7 @@ public class ImagePane extends BorderPane {
         return getImage().getColorModel().getColorSpace().getNumComponents();
     }
 
-    public HistogramPane getHistogramPane() {
+    public ChartsPane getHistogramPane() {
         return histogramPane;
     }
 
@@ -275,86 +265,11 @@ public class ImagePane extends BorderPane {
         this.tabbed = tabbed;
     }
 
-    public void mouseDraggedLine(MouseEvent mouseEvent, ProfileLine l) {
-        if (!l.isPressed()) {
-            double newX = mouseEvent.getX();
-            double newY = mouseEvent.getY();
-            double maxX = getWidth();
-            double maxY = getHeight();
-            if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
-                l.setEnd(newX, newY);
-            }
-        }
-    }
-
-    public void enableProfileLineSelection() {
-        getImageStack().clear();
-        profileLine = new ProfileLine(zoomLevel, this);
-        histogramPane.updateProfileLineChart(profileLine);
-        System.out.println("Enable mouse events on:"+hashCode());
-
-        imageView.setOnMousePressed(mouseEvent -> {
-            if (!profileLine.isHoverEndpoint()) {
-                if (!getImageStack().contains(profileLine)) getImageStack().push(profileLine);
-                profileLine.setStart(mouseEvent.getX(), mouseEvent.getY());
-                profileLine.setEnd(mouseEvent.getX(), mouseEvent.getY());
-                System.out.println("Mouse pressed X:" + profileLine.getStartX() + " Y:" + profileLine.getStartY() + " source:" + mouseEvent.getSource().getClass().getName());
-            }
-        });
-
-        profileLine.changedProperty().addListener(observable -> {
-            histogramPane.updateProfileLineChart(profileLine);
-            refresh();
-        });
-        imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedLine(event, profileLine));
-
-        imageView.setOnMouseReleased(mouseEvent -> {
-            histogramPane.updateProfileLineChart(profileLine);
-            refresh();
-        });
-    }
-
     public void disableTools() {
         imageView.setOnMousePressed(event -> {});
         imageView.setOnMouseReleased(event -> {});
         imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
         getImageStack().clear();
-    }
-
-    private void mouseDraggedRect(MouseEvent mouseEvent, CropRectangle r) {
-        double newX = mouseEvent.getX();
-        double newY = mouseEvent.getY();
-        double maxX = getScene().getWidth();
-        double maxY = getScene().getHeight();
-        if (newX > 0 && newX < maxX && newY > 0 && newY < maxY) {
-            r.setEnd((int) (newX), (int) (newY));
-        }
-    }
-
-    public void enableCropSelection() {
-        getImageStack().clear();
-        imageView.setOnMousePressed(event -> {});
-        imageView.setOnMouseReleased(event -> {});
-        imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {});
-        cropRectangle = new CropRectangle(zoomLevel);
-        getImageStack().push(cropRectangle);
-        int width = getImage().getWidth();
-        int height = getImage().getHeight();
-        cropRectangle.setStart(width*0.25, height*0.25);
-        cropRectangle.setEnd(width*0.75, height*0.75);
-
-//        setOnMousePressed(mouseEvent -> {
-//            getImageStack().clear();
-//            cropRectangle.setStart(mouseEvent.getX(), mouseEvent.getY());
-//            cropRectangle.setEnd(mouseEvent.getX(), mouseEvent.getY());
-//            System.out.println("Mouse pressed X:" + cropRectangle.x + " Y:" + cropRectangle.y + " source:" + mouseEvent.getSource().hashCode());
-//        });
-
-//        addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> mouseDraggedRect(event, cropRectangle));
-
-//        setOnMouseReleased(mouseEvent -> {
-//            getImageStack().clear();
-//        });
     }
 
     public class ImageStack extends AnchorPane {

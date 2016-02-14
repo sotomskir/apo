@@ -8,6 +8,7 @@ import javafx.scene.layout.Priority;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by sotomski on 27/09/15.
@@ -17,9 +18,10 @@ public class ExceptionDialog {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
         alert.setHeaderText(header);
+        Throwable rootCause = getRootException(ex);
         String content =
-                "message: " + ex.getMessage() + "\n" +
-                "cause: " + ex.getCause();
+                "Message: " + ex + "\n" +
+                "Cause: " + rootCause;
         alert.setContentText(content);
 
 
@@ -49,6 +51,17 @@ public class ExceptionDialog {
         alert.getDialogPane().setExpandableContent(expContent);
 
         alert.show();
+        alert.setOnCloseRequest(event -> {
+            if(ex.getCause() instanceof InvocationTargetException ||
+               ex.getCause() instanceof OutOfMemoryError) System.exit(-1);
+
+        });
+    }
+
+    private Throwable getRootException(Throwable ex) {
+        Throwable root = ex;
+        while (root.getCause() != null) root = root.getCause();
+        return root;
     }
 
 }

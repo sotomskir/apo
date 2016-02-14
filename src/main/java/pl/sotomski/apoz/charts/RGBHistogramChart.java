@@ -70,6 +70,7 @@ public class RGBHistogramChart extends StackedAreaChart<Number, Number> {
         MenuItem green = new MenuItem();
         MenuItem blue = new MenuItem();
         ContextMenu tooltip = new ContextMenu(level,red,green,blue);
+        tooltip.getStyleClass().add("dark");
         setOnMouseEntered(event1 -> {
             addVerticalMarker();
             tooltip.show(getScene().getWindow());

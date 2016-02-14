@@ -65,6 +65,7 @@ public class MonoHistogramChart extends AreaChart<Number, Number> {
         MenuItem level = new MenuItem();
         MenuItem value = new MenuItem();
         ContextMenu tooltip = new ContextMenu(level, value);
+        tooltip.getStyleClass().add("dark");
         setOnMouseEntered(event1 -> {
             addVerticalMarker();
             tooltip.show(getScene().getWindow());

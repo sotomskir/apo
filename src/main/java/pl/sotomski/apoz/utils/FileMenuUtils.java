@@ -1,7 +1,5 @@
 package pl.sotomski.apoz.utils;
 
-import com.sun.media.jai.codec.FileSeekableStream;
-import com.sun.media.jai.codec.TIFFDecodeParam;
 import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -11,10 +9,7 @@ import javafx.stage.Window;
 import pl.sotomski.apoz.Main;
 
 import javax.imageio.ImageIO;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.renderable.ParameterBlock;
 import java.io.*;
 import java.util.prefs.Preferences;
 
@@ -116,23 +111,35 @@ public class FileMenuUtils {
         try {
             FileInputStream fileIs = new FileInputStream(file);
             BufferedImage image;
-            String fileExtension = getFileExtension(file);
-            System.out.println(fileExtension);
-            if (fileExtension.equals("tiff") || fileExtension.equals("tif")) {
-                System.out.println("Opening tiff image");
-                FileSeekableStream stream = new FileSeekableStream(file);
-                TIFFDecodeParam decodeParam = new TIFFDecodeParam();
-                decodeParam.setDecodePaletteAsShorts(true);
-                ParameterBlock params = new ParameterBlock();
-                params.add(stream);
-                RenderedOp image1 = JAI.create("tiff", params);
-                image = image1.getAsBufferedImage();
-            } else {
+//            String fileExtension = getFileExtension(file);
+//            System.out.println(fileExtension);
+//            if (fileExtension.equals("tiff") || fileExtension.equals("tif")) {
+//                System.out.println("Opening tiff image");
+//                FileSeekableStream stream = new FileSeekableStream(file);
+//                TIFFDecodeParam decodeParam = new TIFFDecodeParam();
+//                decodeParam.setDecodePaletteAsShorts(true);
+//                ParameterBlock params = new ParameterBlock();
+//                params.add(stream);
+//                RenderedOp image1 = JAI.create("tiff", params);
+//                image = image1.getAsBufferedImage();
+//
+//            } else if (fileExtension.equals("pcx") || fileExtension.equals("PCX")) {
+//                System.out.println("Opening pcx image");
+//                FileSeekableStream stream = new FileSeekableStream(file);
+//                TIFFDecodeParam decodeParam = new TIFFDecodeParam();
+//                decodeParam.setDecodePaletteAsShorts(true);
+//                ParameterBlock params = new ParameterBlock();
+//                params.add(stream);
+//                RenderedOp image1 = JAI.create("pcx", params);
+//                image = image1.getAsBufferedImage();
+//            } else {
                 image = ImageIO.read(fileIs);
-            }
-            if (image.getType() != BufferedImage.TYPE_3BYTE_BGR) {
+//            }
+            if (image.getType() != BufferedImage.TYPE_3BYTE_BGR && image.getType() != BufferedImage.TYPE_BYTE_GRAY) {
+                System.out.println("Image type not: " + BufferedImage.TYPE_3BYTE_BGR);
+                System.out.println("Image type not: " + BufferedImage.TYPE_BYTE_GRAY);
+                System.out.println("Image type: " + image.getType() + ", Converting image to 3BYTE_BGR");
                 image = ImageUtils.convertTo3Byte(image);
-                System.out.println("Converting image to 3BYTE_BGR");
             }
             return image;
         } catch (IOException e) {
