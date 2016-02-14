@@ -74,7 +74,7 @@ public class IntervalThresholdTool extends Tool {
 
         chartControl.changedProperty().addListener(observable -> updateImageView());
 
-        VBox checkboxes = new VBox(checkBoxInvert, checkBoxNegative, checkBoxKeepLevels, checkBoxStretch);
+        VBox checkboxes = new VBox(checkBoxNegative, checkBoxKeepLevels, checkBoxStretch);
         // add controls to view and init
         getChildren().addAll(
                 separator,
@@ -95,8 +95,7 @@ public class IntervalThresholdTool extends Tool {
     }
 
     public static Tool getInstance(ToolController controller) {
-        if(instance == null) instance = new IntervalThresholdTool(controller);
-        return instance;
+        return new IntervalThresholdTool(controller);
     }
 
     @Override

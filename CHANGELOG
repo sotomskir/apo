@@ -1,3 +1,7 @@
+v0.3.1
+ - median filter color fringe fix
+ - interval threshold bug fixes
+
 v0.3.0
  - fix profile line null pointer exception
  - add profile line nodes markers
