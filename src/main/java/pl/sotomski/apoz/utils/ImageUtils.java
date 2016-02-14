@@ -878,18 +878,24 @@ public class ImageUtils {
         return ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
     }
 
-    public static void medianOperation(BufferedImage image, int diameter) {
-        byte[] a = getImageData(image);
-        byte[] b = new byte[a.length];
-        int width = image.getWidth();
-        int channels = image.getColorModel().getNumComponents();
-        int offset = (diameter - 1) / 2 * width * channels + ((diameter - 1) / 2);
-        for (int i = offset; i < a.length - offset; ++i) {
-            int[] pixels = get3x3Pixels(a, i, channels, width, diameter);
-            Arrays.sort(pixels);
-            b[i] = (byte) pixels[diameter/2];
-        }
-        System.arraycopy(b, 0, a, 0, a.length);
+    public static void medianOperation(BufferedImage bi, int diameter) {
+        int channels = bi.getColorModel().getNumComponents();
+        if (channels > 1) rgbToGrayscale(bi);
+        final int borderWidth = diameter/2;
+
+        //create temporary image with extended borders
+        ExtendedBordersImage tmpImage = new ExtendedBordersImage(bi, borderWidth, 2);
+
+        //filter image
+        for (int y = 0; y < bi.getHeight(); ++y)
+            for (int x = 0; x < bi.getWidth(); ++x) {
+                int[][] pixels;
+                pixels = getPixels(tmpImage, diameter, x, y, 2);
+                int[] pixelsArray = new int[pixels.length];
+                for (int i = 0; i < pixels.length; i++) pixelsArray[i] = pixels[i][0];
+                Arrays.sort(pixelsArray);
+                setPixel(bi, x, y, (byte) pixelsArray[diameter/2]);
+            }
     }
 
     public static void logicalFilter(BufferedImage image, int direction) {
